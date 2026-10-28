@@ -26,7 +26,8 @@ KeylightBar speaks Elgato's local HTTP API (port 9123, `/elgato/lights`), which 
 - **No light, no menu actions** — preset picking stays disabled until a Key Light is actually configured, so the app never pretends to control something it can't reach
 - **Stays in sync** with the light's real state: at launch, every 30 s, and freshly before every menu open — even if you change the light from Elgato's own app or its physical controls
 - **Remembers your last preset** across restarts
-- **Sleep-aware** (toggleable via the *Auto: off on sleep, preset on wake* menu item): turns the light off when your Mac sleeps, and picks a time-of-day preset (work by day, chill by night) on wake
+- **Sleep-aware** (toggleable via the *Auto: off on sleep, preset on wake* menu item): turns the light off when your Mac sleeps, and picks a preset on wake
+- **Time-of-day automation** (toggleable via *Time Of Day*): auto-switches between a **day preset** and an **evening preset** at configurable hours (default: Work from 08:00, Chill from 19:00). Applies continuously while running — at 19:00 your light flips to the evening preset on its own — and on wake. With it off, wake restores the last-used preset instead.
 - No Dock icon, no dependencies, no Xcode project — **one Swift file** compiled with plain `swiftc`
 
 ## Build & run
@@ -71,14 +72,12 @@ Everything else lives in the configuration block at the top of `main.swift`. Edi
 
 ```swift
 let pollInterval: TimeInterval = 30      // state sync every N seconds
-let daytimePreset  = "Work"              // applied on wake, 08:00–18:59
-let eveningPreset = "Chill"             // applied on wake, otherwise
 
 let iconOn  = "💡"                       // menubar icon while on
 let iconOff = "🌑"                       // menubar icon while off
 ```
 
-If a configured wake preset no longer exists (renamed/removed in the manager), wake falls back to the first preset in the list.
+Preset sets, sleep/wake handling, and the day/evening switch are all adjustable from the menubar menu itself — no source edit needed. The `daytimePreset`/`eveningPreset` constants in the source are only the fallback defaults. If a configured preset no longer exists (renamed/removed in the manager), the switch falls back to the first preset in the list.
 
 ## Troubleshooting
 

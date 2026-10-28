@@ -15,6 +15,8 @@
 //     and freshly every time the menu opens
 //   * remembers the last preset across restarts (UserDefaults)
 //   * turns the light off on sleep, picks a time-of-day preset on wake
+//   * auto-switches between a day and an evening preset at set times
+//     (on/off, presets, and hours adjustable via the "Time Of Day" menu)
 //
 // Build:  make bundle   (or: swiftc main.swift -o KeylightBar.app/Contents/MacOS/KeylightBar)
 // Run:    open KeylightBar.app
@@ -25,11 +27,15 @@ import AppKit
 
 // MARK: - Configuration
 
-let appVersion = "1.3"
+let appVersion = "1.4"
 
 let pollInterval: TimeInterval = 30
-let daytimePreset  = "Work"    // applied on wake, 08:00-18:59
-let eveningPreset = "Chill"   // applied on wake, otherwise
+// Fallback defaults; the live values are adjustable in the "Time Of Day"
+// menu (UserDefaults) and apply on wake *and* continuously while running.
+let daytimePreset    = "Work"    // default day preset
+let eveningPreset    = "Chill"   // default evening preset
+let defaultDayStartHour    = 8    // day starts (hour)
+let defaultEveningStartHour = 19   // evening starts (hour)
 
 let iconOn  = "\u{1F4A1}"      // 💡
 let iconOff = "\u{1F311}"      // 🌑
@@ -38,6 +44,11 @@ let hostKey          = "keylight.host"          // e.g. "192.168.178.33:9123" or
 let lastPresetKey    = "keylight.lastPreset"
 let presetsKey       = "keylight.presets"
 let autoSleepWakeKey = "keylight.autoSleepWake"  // off-on-sleep + preset-on-wake (default: on)
+let timeSwitchKey   = "keylight.timeSwitch"    // auto-switch presets by time of day (default: on)
+let dayPresetKey    = "keylight.dayPreset"      // preset applied during day hours
+let eveningPresetKey = "keylight.eveningPreset"  // preset applied during evening hours
+let dayStartKey     = "keylight.dayStart"        // hour the day part begins
+let eveningStartKey = "keylight.eveningStart"    // hour the evening part begins
 
 struct Preset: Codable {
     let name: String
@@ -91,12 +102,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var statusItem: NSStatusItem!
     private var pollTimer: Timer?
+    private var timeTimer: Timer?
     private var browser: NetServiceBrowser?
     private var resolvingServices: [NetService] = []
     private var discoveryTimer: Timer?
     private var scanSession: URLSession?
     private var scanGeneration = 0
     private var presetManager: PresetManager?
+    private var currentDayPart = 0   // 1 = day, 2 = evening, 0 = unknown
 
     var presets = loadPresets()
     private var currentOn     = false
@@ -114,6 +127,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             : UserDefaults.standard.bool(forKey: autoSleepWakeKey)
     }
 
+    /// Auto-switch between a day and an evening preset at set times.
+    private var timeSwitchEnabled: Bool {
+        UserDefaults.standard.object(forKey: timeSwitchKey) == nil
+            ? true
+            : UserDefaults.standard.bool(forKey: timeSwitchKey)
+    }
+
+    private var dayPresetName: String {
+        let name = UserDefaults.standard.string(forKey: dayPresetKey) ?? daytimePreset
+        return presets.contains(where: { $0.name == name })
+            ? name : (presets.first?.name ?? name)
+    }
+
+    private var eveningPresetName: String {
+        let name = UserDefaults.standard.string(forKey: eveningPresetKey) ?? eveningPreset
+        return presets.contains(where: { $0.name == name })
+            ? name : (presets.first?.name ?? name)
+    }
+
+    private var dayStartHour: Int {
+        UserDefaults.standard.object(forKey: dayStartKey) == nil
+            ? defaultDayStartHour
+            : UserDefaults.standard.integer(forKey: dayStartKey)
+    }
+
+    private var eveningStartHour: Int {
+        UserDefaults.standard.object(forKey: eveningStartKey) == nil
+            ? defaultEveningStartHour
+            : UserDefaults.standard.integer(forKey: eveningStartKey)
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)   // no Dock icon
 
@@ -129,6 +173,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         pollTimer = Timer.scheduledTimer(withTimeInterval: pollInterval, repeats: true) { [weak self] _ in
             self?.syncFromLight()
+        }
+
+        currentDayPart = dayPartNow()   // don't yank the light at launch; switch only on change
+        timeTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+            self?.evaluateTimeSwitch()
         }
 
         watchSleepAndWake()
@@ -186,6 +235,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         auto.target = self
         auto.state = autoSleepWakeEnabled ? .on : .off
         menu.addItem(auto)
+
+        let timeOfDay = NSMenuItem(title: "Time Of Day", action: nil, keyEquivalent: "")
+        timeOfDay.submenu = buildTimeMenu()
+        menu.addItem(timeOfDay)
 
         menu.addItem(.separator())
 
@@ -255,6 +308,122 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func toggleAutoSleepWake(_ sender: NSMenuItem) {
         UserDefaults.standard.set(!autoSleepWakeEnabled, forKey: autoSleepWakeKey)
         sender.state = autoSleepWakeEnabled ? .on : .off
+    }
+
+    // MARK: Time of day
+
+    private func buildTimeMenu() -> NSMenu {
+        let m = NSMenu()
+        m.autoenablesItems = false
+
+        let toggle = NSMenuItem(title: "Auto-switch by time of day",
+                                action: #selector(toggleTimeSwitch(_:)),
+                                keyEquivalent: "")
+        toggle.target = self
+        toggle.state = timeSwitchEnabled ? .on : .off
+        m.addItem(toggle)
+
+        m.addItem(.separator())
+
+        m.addItem(presetSubmenu(title: "Day Preset",
+                                 action: #selector(dayPresetChosen(_:)),
+                                 current: dayPresetName))
+        m.addItem(presetSubmenu(title: "Evening Preset",
+                                 action: #selector(eveningPresetChosen(_:)),
+                                 current: eveningPresetName))
+        m.addItem(hourSubmenu(title: "Day Starts",
+                              action: #selector(dayStartChosen(_:)),
+                              current: dayStartHour, hours: 5...11))
+        m.addItem(hourSubmenu(title: "Evening Starts",
+                              action: #selector(eveningStartChosen(_:)),
+                              current: eveningStartHour, hours: 15...23))
+        return m
+    }
+
+    private func presetSubmenu(title: String, action: Selector, current: String) -> NSMenuItem {
+        let item = NSMenuItem(title: "\(title): \(current)", action: nil, keyEquivalent: "")
+        let m = NSMenu()
+        m.autoenablesItems = false
+        for preset in presets {
+            let p = NSMenuItem(title: preset.name, action: action, keyEquivalent: "")
+            p.target = self
+            p.representedObject = preset.name
+            p.state = (preset.name == current) ? .on : .off
+            m.addItem(p)
+        }
+        item.submenu = m
+        return item
+    }
+
+    private func hourSubmenu(title: String, action: Selector, current: Int, hours: ClosedRange<Int>) -> NSMenuItem {
+        let item = NSMenuItem(title: "\(title): \(String(format: "%02d:00", current))", action: nil, keyEquivalent: "")
+        let m = NSMenu()
+        m.autoenablesItems = false
+        for h in hours {
+            let hi = NSMenuItem(title: String(format: "%02d:00", h), action: action, keyEquivalent: "")
+            hi.target = self
+            hi.representedObject = h
+            hi.state = (h == current) ? .on : .off
+            m.addItem(hi)
+        }
+        item.submenu = m
+        return item
+    }
+
+    @objc private func toggleTimeSwitch(_ sender: NSMenuItem) {
+        UserDefaults.standard.set(!timeSwitchEnabled, forKey: timeSwitchKey)
+        if timeSwitchEnabled {
+            evaluateTimeSwitch(force: true)
+        } else {
+            currentDayPart = 0
+        }
+    }
+
+    @objc private func dayPresetChosen(_ sender: NSMenuItem) {
+        if let name = sender.representedObject as? String {
+            UserDefaults.standard.set(name, forKey: dayPresetKey)
+            if timeSwitchEnabled, dayPartNow() == 1 { applyPreset(name) }
+        }
+    }
+
+    @objc private func eveningPresetChosen(_ sender: NSMenuItem) {
+        if let name = sender.representedObject as? String {
+            UserDefaults.standard.set(name, forKey: eveningPresetKey)
+            if timeSwitchEnabled, dayPartNow() == 2 { applyPreset(name) }
+        }
+    }
+
+    @objc private func dayStartChosen(_ sender: NSMenuItem) {
+        if let h = sender.representedObject as? Int {
+            UserDefaults.standard.set(h, forKey: dayStartKey)
+            evaluateTimeSwitch(force: true)
+        }
+    }
+
+    @objc private func eveningStartChosen(_ sender: NSMenuItem) {
+        if let h = sender.representedObject as? Int {
+            UserDefaults.standard.set(h, forKey: eveningStartKey)
+            evaluateTimeSwitch(force: true)
+        }
+    }
+
+    /// 1 = day hours, 2 = evening/night hours.
+    private func dayPartNow() -> Int {
+        let hour = Calendar.current.component(.hour, from: Date())
+        return (hour >= dayStartHour && hour < eveningStartHour) ? 1 : 2
+    }
+
+    /// Applies the time-appropriate preset when the day part changes.
+    /// `force` also applies when the part is unchanged (wake, setting changes).
+    private func evaluateTimeSwitch(force: Bool = false) {
+        guard timeSwitchEnabled, isConfigured else {
+            currentDayPart = 0
+            return
+        }
+        let part = dayPartNow()
+        defer { currentDayPart = part }
+        guard force || part != currentDayPart else { return }
+        applyPreset(part == 1 ? dayPresetName : eveningPresetName)
     }
 
     @objc private func aboutViaMenu(_ sender: NSMenuItem) {
@@ -478,14 +647,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func wakeUp() {
-        let hour = Calendar.current.component(.hour, from: Date())
-        let preferred = (hour >= 8 && hour < 19) ? daytimePreset : eveningPreset
-        // Fall back to the first preset if the configured wake preset was
-        // renamed or deleted in the manager.
-        let name = presets.contains(where: { $0.name == preferred })
-            ? preferred
-            : (presets.first?.name ?? "")
-        applyPreset(name)
+        if timeSwitchEnabled {
+            evaluateTimeSwitch(force: true)   // wake picks the time-appropriate preset
+        } else {
+            applyPreset(lastPreset ?? presets.first?.name ?? "")
+        }
     }
 
     // MARK: HTTP
