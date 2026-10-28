@@ -320,7 +320,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                       (response as? HTTPURLResponse)?.statusCode == 200,
                       let data = data,
                       let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                      (json["productName"] as? String)?.contains("Key Light") == true else {
+                      // Any Elgato light speaks this API: Key Light (Air/Mini),
+                      // Ring Light, Light Strip — they all advertise "lights".
+                      (json["features"] as? [String])?.contains("lights") == true else {
                     probeDone(); return
                 }
                 DispatchQueue.main.async {

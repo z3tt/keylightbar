@@ -14,6 +14,10 @@ That two-state click is the whole point. macOS itself won't let one menu bar ite
 [![screenshot](docs/screenshot.png)](docs/screenshot.png)
 *(screenshot placeholder — drop a capture of the menu bar + open preset menu at `docs/screenshot.png`)*
 
+## Compatibility
+
+KeylightBar speaks Elgato's local HTTP API (port 9123, `/elgato/lights`), which is shared by all their WiFi lights: **Key Light, Key Light Air, Key Light Mini, Ring Light, and Light Strip**. The scanner detects any device advertising the `lights` feature, not just Key Lights. On the RGB **Light Strip**, the temperature value has no visible effect.
+
 ## Features
 
 - **Hybrid menubar icon** — off → one-click on with last preset; on → native preset menu with a ✓ on the active preset
