@@ -179,6 +179,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         syncFromLight()
 
+        // A freshly compiled binary needs its own macOS Local Network grant;
+        // the launch sync races that prompt and fails silently if it hasn't
+        // been granted yet. Retry briefly so the icon settles as soon as a
+        // request can actually go out.
+        for delay: TimeInterval in [2, 5, 10] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                self?.syncFromLight()
+            }
+        }
+
         pollTimer = Timer.scheduledTimer(withTimeInterval: pollInterval, repeats: true) { [weak self] _ in
             self?.syncFromLight()
         }

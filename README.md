@@ -82,6 +82,7 @@ Preset sets, sleep/wake handling, and the day/evening switch are all adjustable 
 ## Troubleshooting
 
 - **Nothing happens on click** → check Local Network permission (see above), and that the Mac and Key Light are on the same network.
+- **Icon shows 🌑 although the light is on** → the launch sync couldn't reach the light. Most common cause: a freshly compiled binary hasn't been granted *Local Network* access yet — approve it and the icon corrects itself within seconds (the app retries shortly after launch). If it stays wrong for over a minute, check the address via *Configure…*.
 - **Discovery doesn't find the light** → *Find Key Light* runs both a Bonjour search and a scan of your local subnet (every address, port 9123). If that still fails, the light likely isn't reachable at all — use *Configure…* and enter `IP:9123` directly. Both methods need the Local Network permission granted once.
 - **Compile warnings about NetService deprecation** → expected and accepted; the API works fine and keeps the app single-file. Migrating to `NWBrowser` (Network.framework) is the modern alternative.
 
