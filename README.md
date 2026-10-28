@@ -2,7 +2,7 @@
 
 A tiny, dependency-free **macOS menu bar app for the [Elgato Key Light](https://www.elgato.com/key-light)**.
 
-One icon, hybrid behavior — the thing macOS menu bars don't give you for free:
+One icon, right in your navbar, to control your Elgato Light:
 
 | State | Click does |
 | --- | --- |
