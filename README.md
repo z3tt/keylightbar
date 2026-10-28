@@ -17,7 +17,7 @@ That two-state click is the whole point. macOS itself won't let one menu bar ite
 ## Features
 
 - **Hybrid menubar icon** — off → one-click on with last preset; on → native preset menu with a ✓ on the active preset
-- **7 presets** out of the box: `MEET`, `WORK`, `BRIGHT`, `COLD`, `WARM`, `NIGHT`, `CHILL` — **add, rename, and edit your own in-app** via *Manage Presets…* (no source editing, no command line)
+- **7 presets** out of the box: `Meet`, `Work`, `Bright`, `Cold`, `Warm`, `Night`, `Chill` — **add, rename, and edit your own in-app** via *Manage Presets…* (no source editing, no command line)
 - **Two-way discovery** — Bonjour (`_elgato._tcp`) *plus* a local subnet scan, for routers that don't propagate Bonjour advertisements (they exist — that's why the scan is there)
 - **No light, no menu actions** — preset picking stays disabled until a Key Light is actually configured, so the app never pretends to control something it can't reach
 - **Stays in sync** with the light's real state: at launch, every 30 s, and freshly before every menu open — even if you change the light from Elgato's own app or its physical controls
@@ -53,7 +53,7 @@ Also note: macOS grants **Local Network** access per binary. A freshly compiled 
 
 ### Presets
 
-Open the menubar menu while the light is on (or anytime via *Configure…* → *Manage Presets…*) to **add, rename, remove, and edit presets**: pick a preset in the table — or double-click its name to rename it in place — then adjust name, brightness (0–100), and temperature (143 = coldest, 344 = warmest) with the sliders. Names are always uppercased. Changes apply immediately and survive restarts — they're stored in UserDefaults. *Reset Defaults* restores the original seven.
+Open the menubar menu while the light is on (or anytime via *Configure…* → *Manage Presets…*) to **add, rename, remove, and edit presets**: pick a preset in the table — or double-click its name to rename it in place — then adjust name, brightness (0–100), and temperature (143 = coldest, 344 = warmest) with the sliders. Names are always title-cased (e.g. "Night Mode"). Changes apply immediately and survive restarts — they're stored in UserDefaults. *Reset Defaults* restores the original seven.
 
 Presets live under the `keylight.presets` UserDefaults key (JSON); the Key Light address under `keylight.host`:
 
@@ -67,8 +67,8 @@ Everything else lives in the configuration block at the top of `main.swift`. Edi
 
 ```swift
 let pollInterval: TimeInterval = 30      // state sync every N seconds
-let daytimePreset  = "WORK"              // applied on wake, 08:00–18:59
-let eveningPreset = "CHILL"             // applied on wake, otherwise
+let daytimePreset  = "Work"              // applied on wake, 08:00–18:59
+let eveningPreset = "Chill"             // applied on wake, otherwise
 
 let iconOn  = "💡"                       // menubar icon while on
 let iconOff = "🌑"                       // menubar icon while off

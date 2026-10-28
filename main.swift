@@ -28,8 +28,8 @@ import AppKit
 let appVersion = "1.3"
 
 let pollInterval: TimeInterval = 30
-let daytimePreset  = "WORK"    // applied on wake, 08:00-18:59
-let eveningPreset = "CHILL"   // applied on wake, otherwise
+let daytimePreset  = "Work"    // applied on wake, 08:00-18:59
+let eveningPreset = "Chill"   // applied on wake, otherwise
 
 let iconOn  = "\u{1F4A1}"      // 💡
 let iconOff = "\u{1F311}"      // 🌑
@@ -51,24 +51,24 @@ struct Preset: Codable {
 }
 
 let defaultPresets: [Preset] = [
-    Preset(name: "MEET",   brightness: 60,  temperature: 180),
-    Preset(name: "WORK",   brightness: 45,  temperature: 220),
-    Preset(name: "BRIGHT", brightness: 100, temperature: 220),
-    Preset(name: "COLD",   brightness: 50,  temperature: 143),
-    Preset(name: "WARM",   brightness: 50,  temperature: 344),
-    Preset(name: "NIGHT",  brightness: 10,  temperature: 220),
-    Preset(name: "CHILL",  brightness: 15,  temperature: 300),
+    Preset(name: "Meet",   brightness: 60,  temperature: 180),
+    Preset(name: "Work",   brightness: 45,  temperature: 220),
+    Preset(name: "Bright", brightness: 100, temperature: 220),
+    Preset(name: "Cold",   brightness: 50,  temperature: 143),
+    Preset(name: "Warm",   brightness: 50,  temperature: 344),
+    Preset(name: "Night",  brightness: 10,  temperature: 220),
+    Preset(name: "Chill",  brightness: 15,  temperature: 300),
 ]
 
 func loadPresets() -> [Preset] {
     if let data = UserDefaults.standard.data(forKey: presetsKey),
        let decoded = try? JSONDecoder().decode([Preset].self, from: data),
        !decoded.isEmpty {
-        // Uppercase legacy names (v1.3 and earlier stored mixed case),
-        // dropping duplicates that collide after uppercasing.
+        // Title-case legacy names (earlier versions stored mixed case),
+        // dropping duplicates that collide after title-casing.
         var seen = Set<String>()
         return decoded.compactMap { preset in
-            let name = preset.name.uppercased()
+            let name = preset.name.capitalized
             guard !seen.contains(name) else { return nil }
             seen.insert(name)
             return Preset(name: name, brightness: preset.brightness,
@@ -100,7 +100,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var presets = loadPresets()
     private var currentOn     = false
     private var currentPreset: String?
-    private var lastPreset   = UserDefaults.standard.string(forKey: lastPresetKey)?.uppercased()
+    private var lastPreset   = UserDefaults.standard.string(forKey: lastPresetKey)?.capitalized
 
     private var isConfigured: Bool {
         UserDefaults.standard.string(forKey: hostKey) != nil
@@ -696,10 +696,10 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
     }
 
     /// Shared validation for the name field and in-table renames:
-    /// names are uppercased, never empty, never duplicates.
+    /// names are title-cased, never empty, never duplicates.
     private func renamePreset(at row: Int, to rawName: String) {
         guard row >= 0, row < app.presets.count else { return }
-        let newName = rawName.trimmingCharacters(in: .whitespaces).uppercased()
+        let newName = rawName.trimmingCharacters(in: .whitespaces).capitalized
         let collides = app.presets.enumerated().contains {
             $0.offset != row && $0.element.name == newName
         }
@@ -734,10 +734,10 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
 
     @objc private func addPreset(_ sender: Any?) {
         var n = app.presets.count + 1
-        var newName = "PRESET \(n)"
+        var newName = "Preset \(n)"
         while app.presets.contains(where: { $0.name == newName }) {
             n += 1
-            newName = "PRESET \(n)"
+            newName = "Preset \(n)"
         }
         app.presets.append(Preset(name: newName, brightness: 50, temperature: 220))
         commit()
