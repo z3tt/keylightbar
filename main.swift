@@ -37,6 +37,7 @@ let iconOff = "\u{1F311}"      // 🌑
 let hostKey          = "keylight.host"          // e.g. "192.168.178.33:9123" or "Elgato Key Light.local.:9123"
 let lastPresetKey    = "keylight.lastPreset"
 let presetsKey       = "keylight.presets"
+let autoSleepWakeKey = "keylight.autoSleepWake"  // off-on-sleep + preset-on-wake (default: on)
 
 struct Preset: Codable {
     let name: String
@@ -106,6 +107,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         UserDefaults.standard.string(forKey: hostKey) != nil
     }
 
+    /// Turn off on sleep + apply a preset on wake. On by default.
+    private var autoSleepWakeEnabled: Bool {
+        UserDefaults.standard.object(forKey: autoSleepWakeKey) == nil
+            ? true
+            : UserDefaults.standard.bool(forKey: autoSleepWakeKey)
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)   // no Dock icon
 
@@ -172,6 +180,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(.separator())
 
+        let auto = NSMenuItem(title: "Auto: off on sleep, preset on wake",
+                              action: #selector(toggleAutoSleepWake(_:)),
+                              keyEquivalent: "")
+        auto.target = self
+        auto.state = autoSleepWakeEnabled ? .on : .off
+        menu.addItem(auto)
+
+        menu.addItem(.separator())
+
         let discover = NSMenuItem(title: "Find Key Light",
                                   action: #selector(discoverViaMenu(_:)),
                                   keyEquivalent: "")
@@ -233,6 +250,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             presetManager = PresetManager(app: self)
         }
         presetManager?.show()
+    }
+
+    @objc private func toggleAutoSleepWake(_ sender: NSMenuItem) {
+        UserDefaults.standard.set(!autoSleepWakeEnabled, forKey: autoSleepWakeKey)
+        sender.state = autoSleepWakeEnabled ? .on : .off
     }
 
     @objc private func aboutViaMenu(_ sender: NSMenuItem) {
@@ -445,11 +467,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let center = NSWorkspace.shared.notificationCenter
         center.addObserver(forName: NSWorkspace.willSleepNotification,
                            object: nil, queue: .main) { [weak self] _ in
-            self?.turnOff()
+            guard let self = self, self.autoSleepWakeEnabled else { return }
+            self.turnOff()
         }
         center.addObserver(forName: NSWorkspace.screensDidWakeNotification,
                            object: nil, queue: .main) { [weak self] _ in
-            self?.wakeUp()
+            guard let self = self, self.autoSleepWakeEnabled else { return }
+            self.wakeUp()
         }
     }
 

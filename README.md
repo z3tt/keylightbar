@@ -26,7 +26,7 @@ KeylightBar speaks Elgato's local HTTP API (port 9123, `/elgato/lights`), which 
 - **No light, no menu actions** — preset picking stays disabled until a Key Light is actually configured, so the app never pretends to control something it can't reach
 - **Stays in sync** with the light's real state: at launch, every 30 s, and freshly before every menu open — even if you change the light from Elgato's own app or its physical controls
 - **Remembers your last preset** across restarts
-- **Sleep-aware**: turns the light off when your Mac sleeps, and picks a time-of-day preset (work by day, chill by night) on wake
+- **Sleep-aware** (toggleable via the *Auto: off on sleep, preset on wake* menu item): turns the light off when your Mac sleeps, and picks a time-of-day preset (work by day, chill by night) on wake
 - No Dock icon, no dependencies, no Xcode project — **one Swift file** compiled with plain `swiftc`
 
 ## Build & run
