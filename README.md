@@ -1,52 +1,43 @@
 # KeylightBar 💡
 
-A tiny, dependency-free **macOS menu bar app for the [Elgato Key Light](https://www.elgato.com/key-light)**.
+Your [Elgato Key Light](https://www.elgato.com/key-light), in your macOS menu bar — one click to switch it on exactly how you like it, and from there it manages itself: it turns off when your Mac sleeps, comes back on when you wake it, and moves between your daytime and evening setups on schedule.
 
-One icon, right in your navbar, to control your Elgato Light:
-
-| State | Click does |
-| --- | --- |
-| 🌑 light **off** | turns it **on** with the last-used preset |
-| 💡 light **on** | opens a **preset picker** |
-
-That two-state click is the whole point. macOS itself won't let one menu bar item act as a *button* when you want it to and as a *menu* when you don't — KeylightBar does.
+No Dock icon, no companion windows, no dependencies. Just a 💡 in your menu bar.
 
 [![screenshot](docs/screenshot.png)](docs/screenshot.png)
 *(screenshot placeholder — drop a capture of the menu bar + open preset menu at `docs/screenshot.png`)*
 
-## Compatibility
+## What you get
 
-KeylightBar speaks Elgato's local HTTP API (port 9123, `/elgato/lights`), which is shared by all their WiFi lights: **Key Light, Key Light Air, Key Light Mini, Ring Light, and Light Strip**. The scanner detects any device advertising the `lights` feature, not just Key Lights. On the RGB **Light Strip**, the temperature value has no visible effect.
+- **One click to a perfect light.** Light off? Click the 🌑 and it comes on with your last-used preset. Light on? Click the 💡 for the full preset picker.
+- **Your presets, built in-app.** Seven sensible presets ship with it — *Meet, Work, Bright, Cold, Warm, Night, Chill* — and you can add, rename, and tune your own with sliders. No config files, no command line.
+- **A light that sleeps and wakes with your Mac.** Two independent rules you can toggle: *Off When Mac Sleeps* and *On When Mac Wakes*. This is the gap KeylightBar was born to fill — Elgato's own Control Center can switch your light off automatically, but nothing switches it back on when you return to your desk.
+- **A light that knows the time.** *Time Of Day* switches between a day preset and an evening preset automatically — Work until 19:00, Chill after (presets and hours are yours to choose). It applies on its own while you work, and on wake.
+- **Always in sync.** The icon and menu reflect the light's *real* state — even if you changed it from Elgato's app or the physical controls, KeylightBar keeps up.
+- **Zero setup on normal networks.** It finds your light by itself; on networks where auto-discovery fails, it scans the local network and finds it anyway. And it never pretends to control what it can't reach: preset picking stays disabled until your light is actually connected.
+- **Tiny and private.** One Swift file, no dependencies, and it talks only to your light over your local network.
 
-## Features
+## The trick behind the click
 
-- **Hybrid menubar icon** — off → one-click on with last preset; on → native preset menu with a ✓ on the active preset
-- **7 presets** out of the box: `Meet`, `Work`, `Bright`, `Cold`, `Warm`, `Night`, `Chill` — **add, rename, and edit your own in-app** via *Manage Presets…* (no source editing, no command line)
-- **Two-way discovery** — Bonjour (`_elgato._tcp`) *plus* a local subnet scan, for routers that don't propagate Bonjour advertisements (they exist — that's why the scan is there)
-- **No light, no menu actions** — preset picking stays disabled until a Key Light is actually configured, so the app never pretends to control something it can't reach
-- **Stays in sync** with the light's real state: at launch, every 30 s, and freshly before every menu open — even if you change the light from Elgato's own app or its physical controls
-- **Remembers your last preset** across restarts
-- **Sleep-aware, in two independent rules** (menu items *Off When Mac Sleeps* / *On When Mac Wakes*, both on by default): the light turns off when your Mac sleeps and comes back on when it wakes — with the time-appropriate preset if *Time Of Day* is on, otherwise the last-used one
-- **Time-of-day automation** (toggleable via *Time Of Day*): auto-switches between a **day preset** and an **evening preset** at configurable hours (default: Work from 08:00, Chill from 19:00). Applies continuously while running — at 19:00 your light flips to the evening preset on its own — and on wake.
-- No Dock icon, no dependencies, no Xcode project — **one Swift file** compiled with plain `swiftc`
+The menu bar icon behaves differently depending on your light's state:
 
-## Build & run
+| State | Click does |
+| --- | --- |
+| 🌑 light **off** | turns it **on** with the last-used preset |
+| 💡 light **on** | opens the **preset picker** |
 
-Requirements: macOS with the Swift toolchain (ships with Xcode Command Line Tools: `xcode-select --install`).
+macOS itself won't let one menu bar item act as a *button* when you want a button and a *menu* when you want a menu — that hybrid is what got this project started, and it's still the fastest way to a good light: no click path takes more than one step.
+
+## Install & run
+
+Requirements: a Mac with the Swift toolchain (ships with Xcode Command Line Tools: `xcode-select --install`).
 
 ```sh
-make bundle        # compiles main.swift and (re)builds KeylightBar.app
+make bundle        # compiles the app and (re)builds KeylightBar.app
 open KeylightBar.app
 ```
 
-Or manually:
-
-```sh
-swiftc main.swift -o KeylightBar.app/Contents/MacOS/KeylightBar
-open KeylightBar.app
-```
-
-To run it at login, add **KeylightBar.app** to *System Settings → General → Login Items*.
+To start it automatically at login, add **KeylightBar.app** to *System Settings → General → Login Items & Extensions*.
 
 ### If you downloaded the app instead of building it
 
@@ -54,21 +45,27 @@ The binary is unsigned, so **Gatekeeper** will block the first launch. Right-cli
 
 Also note: macOS grants **Local Network** access per binary. A freshly compiled KeylightBar needs its own permission — if commands silently do nothing, check *System Settings → Privacy & Security → Local Network* and enable KeylightBar there.
 
-## Configuration
+## Make it yours
 
-### Presets
+Everything is adjustable from the menu bar menu itself — no source editing, no terminal.
 
-Open the menubar menu while the light is on (or anytime via *Configure…* → *Manage Presets…*) to **add, rename, remove, and edit presets**: pick a preset in the table — or double-click its name to rename it in place — then adjust name, brightness (0–100), and temperature (143 = coldest, 344 = warmest) with the sliders. Names are always title-cased (e.g. "Night Mode"). Changes apply immediately and survive restarts — they're stored in UserDefaults. *Reset Defaults* restores the original seven.
+- **Presets** — *Manage Presets…* opens a small editor: pick a preset in the table (or double-click its name to rename it), then set name, brightness (0–100), and temperature (143 = coldest, 344 = warmest) with the sliders. Names are always title-cased (e.g. "Night Mode"). Changes apply immediately and survive restarts; *Reset Defaults* restores the original seven.
+- **Sleep & wake** — the *Off When Mac Sleeps* / *On When Mac Wakes* checkboxes. On wake, KeylightBar applies the time-appropriate preset if *Time Of Day* is on, otherwise your last-used one.
+- **Time Of Day** — the *Switch Presets By Time* toggle plus day/evening presets and the hours they start (defaults: Work from 08:00, Chill from 19:00).
 
-Presets live under the `keylight.presets` UserDefaults key (JSON); the Key Light address under `keylight.host`:
+For the curious, the settings live in UserDefaults and the light's address under `keylight.host`:
 
 ```sh
 defaults read com.cedricscherer.keylightbar
 ```
 
-### For source-level tweakers
+## Compatibility
 
-Everything else lives in the configuration block at the top of `main.swift`. Edit and rebuild.
+KeylightBar works with all Elgato WiFi lights — **Key Light, Key Light Air, Key Light Mini, Ring Light, and Light Strip** — because they all speak the same local API. On the RGB **Light Strip**, the temperature value has no visible effect (brightness and on/off work as expected).
+
+## For tinkerers
+
+Two things still live in the configuration block at the top of `main.swift` (edit and rebuild):
 
 ```swift
 let pollInterval: TimeInterval = 30      // state sync every N seconds
@@ -77,13 +74,13 @@ let iconOn  = "💡"                       // menubar icon while on
 let iconOff = "🌑"                       // menubar icon while off
 ```
 
-Preset sets, sleep/wake handling, and the day/evening switch are all adjustable from the menubar menu itself — no source edit needed. The `daytimePreset`/`eveningPreset` constants in the source are only the fallback defaults. If a configured preset no longer exists (renamed/removed in the manager), the switch falls back to the first preset in the list.
+If a configured preset no longer exists (renamed or removed in the manager), the time switch falls back to the first preset in the list.
 
 ## Troubleshooting
 
 - **Nothing happens on click** → check Local Network permission (see above), and that the Mac and Key Light are on the same network.
 - **Icon shows 🌑 although the light is on** → the launch sync couldn't reach the light. Most common cause: a freshly compiled binary hasn't been granted *Local Network* access yet — approve it and the icon corrects itself within seconds (the app retries shortly after launch). If it stays wrong for over a minute, check the address via *Configure…*.
-- **Discovery doesn't find the light** → *Find Key Light* runs both a Bonjour search and a scan of your local subnet (every address, port 9123). If that still fails, the light likely isn't reachable at all — use *Configure…* and enter `IP:9123` directly. Both methods need the Local Network permission granted once.
+- **Discovery doesn't find the light** → *Find Key Light* searches twice: via Bonjour and via a scan of your local network. If both fail, the light likely isn't reachable at all — use *Configure…* and enter `IP:9123` directly.
 - **Compile warnings about NetService deprecation** → expected and accepted; the API works fine and keeps the app single-file. Migrating to `NWBrowser` (Network.framework) is the modern alternative.
 
 ## License
