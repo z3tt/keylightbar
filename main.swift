@@ -531,12 +531,16 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
         table = NSTableView()
         let nameColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("name"))
         nameColumn.title = "Preset"
-        nameColumn.width = 140
-        let valueColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("values"))
-        valueColumn.title = "Brightness / Temp"
-        valueColumn.width = 100
+        nameColumn.width = 110
+        let brightColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("bright"))
+        brightColumn.title = "Brightness"
+        brightColumn.width = 70
+        let tempColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("temp"))
+        tempColumn.title = "Temp"
+        tempColumn.width = 58
         table.addTableColumn(nameColumn)
-        table.addTableColumn(valueColumn)
+        table.addTableColumn(brightColumn)
+        table.addTableColumn(tempColumn)
         table.dataSource = self
         table.delegate = self
         scroll.documentView = table
@@ -621,10 +625,12 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
     func tableView(_ tableView: NSTableView,
                    objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
         let preset = app.presets[row]
-        if tableColumn?.identifier.rawValue == "name" {
-            return preset.name
+        switch tableColumn?.identifier.rawValue {
+        case "name":   return preset.name
+        case "bright": return "\(preset.brightness)"
+        case "temp":   return "\(preset.temperature)"
+        default:       return nil
         }
-        return "\(preset.brightness) / \(preset.temperature)"
     }
 
     func tableViewSelectionDidChange(_ notification: Notification) {
