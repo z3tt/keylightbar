@@ -1,0 +1,6 @@
+# Build artifacts
+KeylightBar
+KeylightBar.app/
+
+# macOS
+.DS_Store
