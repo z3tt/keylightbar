@@ -80,6 +80,7 @@ If a configured preset no longer exists (renamed or removed in the manager), the
 
 - **Nothing happens on click** → check Local Network permission (see above), and that the Mac and Key Light are on the same network.
 - **Icon shows 🌑 although the light is on** → the launch sync couldn't reach the light. Most common cause: a freshly compiled binary hasn't been granted *Local Network* access yet — approve it and the icon corrects itself within seconds (the app retries shortly after launch). If it stays wrong for over a minute, check the address via *Configure…*.
+- **Light doesn't turn on after wake** → right after wake, the Mac's network often isn't up yet. KeylightBar checks the light's real state and retries for about 20 seconds, so it turns on as soon as the network is back — no action needed. If it never comes on, check Local Network permission and the address via *Configure…*.
 - **Discovery doesn't find the light** → *Find Key Light* searches twice: via Bonjour and via a scan of your local network. If both fail, the light likely isn't reachable at all — use *Configure…* and enter `IP:9123` directly.
 - **Compile warnings about NetService deprecation** → expected and accepted; the API works fine and keeps the app single-file. Migrating to `NWBrowser` (Network.framework) is the modern alternative.
 

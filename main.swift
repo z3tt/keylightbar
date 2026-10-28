@@ -677,13 +677,41 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func wakeUp() {
+        applyWakePresetIfNeeded(remaining: 5)
+    }
+
+    private func wakePresetName() -> String {
         // Time-appropriate preset when time-switching is on
         // ("Bright" at 22:00 yesterday shouldn't blind you this morning),
         // otherwise the last-used preset.
         if timeSwitchEnabled {
-            evaluateTimeSwitch(force: true)
-        } else {
-            applyPreset(lastPreset ?? presets.first?.name ?? "")
+            return dayPartNow() == 1 ? dayPresetName : eveningPresetName
+        }
+        return lastPreset ?? presets.first?.name ?? ""
+    }
+
+    /// Turns the light on after wake — but only if it is actually off, and
+    /// with retries: right after wake the Mac's network often isn't up yet,
+    /// so the first request can fail silently.
+    private func applyWakePresetIfNeeded(remaining: Int) {
+        api("GET", nil) { [weak self] json in
+            guard let self = self, self.wakeOnEnabled, self.isConfigured else { return }
+            guard let lights = json?["lights"] as? [[String: Any]],
+                  let light = lights.first else {
+                // Light unreachable — network probably still waking up.
+                self.scheduleWakeRetry(remaining: remaining)
+                return
+            }
+            if (light["on"] as? Int) == 1 { return }   // already on: leave it alone
+            self.applyPreset(self.wakePresetName())
+            self.scheduleWakeRetry(remaining: remaining)
+        }
+    }
+
+    private func scheduleWakeRetry(remaining: Int) {
+        guard remaining > 0 else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+            self?.applyWakePresetIfNeeded(remaining: remaining - 1)
         }
     }
 
