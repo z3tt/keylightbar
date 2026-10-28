@@ -17,12 +17,13 @@ That two-state click is the whole point. macOS itself won't let one menu bar ite
 ## Features
 
 - **Hybrid menubar icon** — off → one-click on with last preset; on → native preset menu with a ✓ on the active preset
-- **7 presets** out of the box: `meet`, `work`, `bright`, `cold`, `warm`, `night`, `chill`
-- **Bonjour auto-discovery** (`_elgato._tcp`) on first launch, or set the address manually via *Configure…*
+- **7 presets** out of the box: `meet`, `work`, `bright`, `cold`, `warm`, `night`, `chill` — **add, rename, and edit your own in-app** via *Manage Presets…* (no source editing, no command line)
+- **Two-way discovery** — Bonjour (`_elgato._tcp`) *plus* a local subnet scan, for routers that don't propagate Bonjour advertisements (they exist — that's why the scan is there)
+- **No light, no menu actions** — preset picking stays disabled until a Key Light is actually configured, so the app never pretends to control something it can't reach
 - **Stays in sync** with the light's real state: at launch, every 30 s, and freshly before every menu open — even if you change the light from Elgato's own app or its physical controls
 - **Remembers your last preset** across restarts
 - **Sleep-aware**: turns the light off when your Mac sleeps, and picks a time-of-day preset (work by day, chill by night) on wake
-- No Dock icon, no dependencies, no Xcode project — **one Swift file** (~330 lines) compiled with plain `swiftc`
+- No Dock icon, no dependencies, no Xcode project — **one Swift file** compiled with plain `swiftc`
 
 ## Build & run
 
@@ -50,19 +51,21 @@ Also note: macOS grants **Local Network** access per binary. A freshly compiled 
 
 ## Configuration
 
-Everything lives in the configuration block at the top of `main.swift`. Edit and rebuild.
+### Presets
+
+Open the menubar menu while the light is on (or anytime via *Configure…* → *Manage Presets…*) to **add, rename, remove, and edit presets**: pick a preset in the table, then adjust name, brightness (0–100), and temperature (143 = coldest, 344 = warmest) with the sliders. Changes apply immediately and survive restarts — they're stored in UserDefaults. *Reset Defaults* restores the original seven.
+
+Presets live under the `keylight.presets` UserDefaults key (JSON); the Key Light address under `keylight.host`:
+
+```sh
+defaults read com.cedricscherer.keylightbar
+```
+
+### For source-level tweakers
+
+Everything else lives in the configuration block at the top of `main.swift`. Edit and rebuild.
 
 ```swift
-let presets: [(name: String, brightness: Int, temperature: Int)] = [
-    ("meet",   60,  180),   // (name, brightness 0–100, temperature 143–344)
-    ("work",   45,  220),
-    ("bright", 100, 220),
-    ("cold",   50,  143),   // 143 = coldest, 344 = warmest
-    ("warm",   50,  344),
-    ("night",  10,  220),
-    ("chill",  15,  300),
-]
-
 let pollInterval: TimeInterval = 30      // state sync every N seconds
 let daytimePreset  = "work"              // applied on wake, 08:00–18:59
 let eveningPreset = "chill"             // applied on wake, otherwise
@@ -71,16 +74,12 @@ let iconOn  = "💡"                       // menubar icon while on
 let iconOff = "🌑"                       // menubar icon while off
 ```
 
-The Key Light's address (found via discovery or entered via *Configure…*) is stored in UserDefaults under `keylight.host`, e.g. `192.168.178.33:9123`. Inspect with:
-
-```sh
-defaults read com.cedricscherer.keylightbar
-```
+If a configured wake preset no longer exists (renamed/removed in the manager), wake falls back to the first preset in the list.
 
 ## Troubleshooting
 
 - **Nothing happens on click** → check Local Network permission (see above), and that the Mac and Key Light are on the same network.
-- **Discovery doesn't find the light** → some routers don't propagate Bonjour/mDNS advertisements. Use the menu: *Configure…* and enter `IP:9123` directly (the port is printed on the Key Light's accessory settings or discoverable via the Elgato Control Center app).
+- **Discovery doesn't find the light** → *Find Key Light* runs both a Bonjour search and a scan of your local subnet (every address, port 9123). If that still fails, the light likely isn't reachable at all — use *Configure…* and enter `IP:9123` directly. Both methods need the Local Network permission granted once.
 - **Compile warnings about NetService deprecation** → expected and accepted; the API works fine and keeps the app single-file. Migrating to `NWBrowser` (Network.framework) is the modern alternative.
 
 ## License

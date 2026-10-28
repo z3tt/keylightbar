@@ -5,15 +5,19 @@
 //   * light on   -> click opens a preset picker (including "off")
 //
 // Extras:
-//   * finds your Key Light automatically via Bonjour on first launch
-//     (or set it manually via "Configure…")
+//   * finds your Key Light automatically on first launch — via Bonjour and,
+//     for networks where Bonjour doesn't propagate, via a local subnet scan
+//     (or set the address manually via "Configure…")
+//   * presets are managed in-app via "Manage Presets…" (no source editing,
+//     no command line); they persist in UserDefaults
+//   * preset picking is disabled until a Key Light is actually configured
 //   * syncs with the light's real state at launch, every 30 s,
 //     and freshly every time the menu opens
 //   * remembers the last preset across restarts (UserDefaults)
 //   * turns the light off on sleep, picks a time-of-day preset on wake
 //
-// Build:  swiftc main.swift -o KeylightBar
-// Run:    ./KeylightBar   (or wrap in a KeylightBar.app bundle)
+// Build:  make bundle   (or: swiftc main.swift -o KeylightBar.app/Contents/MacOS/KeylightBar)
+// Run:    open KeylightBar.app
 //
 // Share: single file, MIT license, no dependencies beyond macOS itself.
 
@@ -21,27 +25,55 @@ import AppKit
 
 // MARK: - Configuration
 
-let presets: [(name: String, brightness: Int, temperature: Int)] = [
-    ("meet",   60,  180),
-    ("work",   45,  220),
-    ("bright", 100, 220),
-    ("cold",   50,  143),
-    ("warm",   50,  344),
-    ("night",  10,  220),
-    ("chill",  15,  300),
-]
-
-let appVersion = "1.2"
+let appVersion = "1.3"
 
 let pollInterval: TimeInterval = 30
 let daytimePreset  = "work"    // applied on wake, 08:00-18:59
 let eveningPreset = "chill"   // applied on wake, otherwise
 
-let iconOn  = "\u{1F4A1}"     // 💡
-let iconOff = "\u{1F311}"     // 🌑
+let iconOn  = "\u{1F4A1}"      // 💡
+let iconOff = "\u{1F311}"      // 🌑
 
-let hostKey = "keylight.host"          // e.g. "192.168.178.33:9123" or "Elgato Key Light.local.:9123"
-let lastPresetKey = "keylight.lastPreset"
+let hostKey          = "keylight.host"          // e.g. "192.168.178.33:9123" or "Elgato Key Light.local.:9123"
+let lastPresetKey    = "keylight.lastPreset"
+let presetsKey       = "keylight.presets"
+
+struct Preset: Codable {
+    let name: String
+    let brightness: Int        // 0...100
+    let temperature: Int       // 143 = coldest, 344 = warmest
+
+    init(name: String, brightness: Int, temperature: Int) {
+        self.name = name
+        self.brightness = brightness
+        self.temperature = temperature
+    }
+}
+
+let defaultPresets: [Preset] = [
+    Preset(name: "meet",   brightness: 60,  temperature: 180),
+    Preset(name: "work",   brightness: 45,  temperature: 220),
+    Preset(name: "bright", brightness: 100, temperature: 220),
+    Preset(name: "cold",   brightness: 50,  temperature: 143),
+    Preset(name: "warm",   brightness: 50,  temperature: 344),
+    Preset(name: "night",  brightness: 10,  temperature: 220),
+    Preset(name: "chill",  brightness: 15,  temperature: 300),
+]
+
+func loadPresets() -> [Preset] {
+    if let data = UserDefaults.standard.data(forKey: presetsKey),
+       let decoded = try? JSONDecoder().decode([Preset].self, from: data),
+       !decoded.isEmpty {
+        return decoded
+    }
+    return defaultPresets
+}
+
+func savePresets(_ presets: [Preset]) {
+    if let data = try? JSONEncoder().encode(presets) {
+        UserDefaults.standard.set(data, forKey: presetsKey)
+    }
+}
 
 // MARK: - App
 
@@ -51,10 +83,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var pollTimer: Timer?
     private var browser: NetServiceBrowser?
     private var resolvingServices: [NetService] = []
+    private var discoveryTimer: Timer?
+    private var scanSession: URLSession?
+    private var scanGeneration = 0
+    private var presetManager: PresetManager?
 
+    var presets = loadPresets()
     private var currentOn     = false
     private var currentPreset: String?
-    private var lastPreset   = UserDefaults.standard.string(forKey: lastPresetKey) ?? "meet"
+    private var lastPreset   = UserDefaults.standard.string(forKey: lastPresetKey)
+
+    private var isConfigured: Bool {
+        UserDefaults.standard.string(forKey: hostKey) != nil
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)   // no Dock icon
@@ -79,10 +120,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: Click behavior (the hybrid)
 
     @objc private func iconAction(_ sender: Any?) {
-        if currentOn {
-            showPresetMenu()
+        if currentOn || !isConfigured {
+            showPresetMenu()          // unconfigured: menu shows how to fix that
         } else {
-            applyPreset(lastPreset)
+            applyPreset(lastPreset ?? presets.first?.name ?? "")
         }
     }
 
@@ -92,12 +133,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let menu = NSMenu()
         menu.autoenablesItems = false
 
+        if !isConfigured {
+            let hint = NSMenuItem(title: "No Key Light configured yet",
+                                  action: nil, keyEquivalent: "")
+            hint.isEnabled = false
+            menu.addItem(hint)
+            menu.addItem(.separator())
+        }
+
         for preset in presets {
             let item = NSMenuItem(title: preset.name,
                                   action: #selector(presetChosen(_:)),
                                   keyEquivalent: "")
             item.target = self
             item.representedObject = preset.name
+            item.isEnabled = isConfigured
             item.state = (preset.name == currentPreset) ? .on : .off
             menu.addItem(item)
         }
@@ -108,7 +158,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                              action: #selector(turnOffViaMenu(_:)),
                              keyEquivalent: "")
         off.target = self
-        off.isEnabled = currentOn
+        off.isEnabled = isConfigured && currentOn
         menu.addItem(off)
 
         menu.addItem(.separator())
@@ -120,10 +170,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(discover)
 
         let configure = NSMenuItem(title: "Configure\u{2026}",
-                                   action: #selector(configureViaMenu(_:)),
-                                   keyEquivalent: "")
+                                    action: #selector(configureViaMenu(_:)),
+                                    keyEquivalent: "")
         configure.target = self
         menu.addItem(configure)
+
+        let manage = NSMenuItem(title: "Manage Presets\u{2026}",
+                                action: #selector(managePresetsViaMenu(_:)),
+                                keyEquivalent: "")
+        manage.target = self
+        menu.addItem(manage)
 
         menu.addItem(.separator())
 
@@ -163,6 +219,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         configure()
     }
 
+    @objc private func managePresetsViaMenu(_ sender: NSMenuItem) {
+        if presetManager == nil {
+            presetManager = PresetManager(app: self)
+        }
+        presetManager?.show()
+    }
+
     @objc private func aboutViaMenu(_ sender: NSMenuItem) {
         let alert = NSAlert()
         alert.messageText = "KeylightBar \(appVersion)"
@@ -176,16 +239,116 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.button?.title = "\u{1F50D}"   // 🔍 while searching
         resolvingServices.removeAll()
 
+        // Backstop: reset the icon if neither method finds anything.
+        discoveryTimer?.invalidate()
+        discoveryTimer = Timer.scheduledTimer(withTimeInterval: 15, repeats: false) { [weak self] _ in
+            guard let self = self, !self.isConfigured else { return }
+            self.statusItem.button?.title = iconOff
+        }
+
+        // Method 1: Bonjour (works on well-behaved networks).
         let b = NetServiceBrowser()
         b.delegate = self
         b.searchForServices(ofType: "_elgato._tcp.", inDomain: "")
         browser = b
+
+        // Method 2: local subnet scan (for networks where Bonjour
+        // advertisements don't propagate — verified to happen).
+        scanNetwork()
+    }
+
+    private func discoveryFinished() {
+        discoveryTimer?.invalidate()
+        browser?.stop()
+        browser = nil
+        scanSession?.invalidateAndCancel()
+        scanSession = nil
+        scanGeneration += 1   // stop any in-flight probes from claiming
+        statusItem.button?.title = iconOff
+        syncFromLight()
+    }
+
+    /// Probes every address on the local IPv4 subnet for an Elgato Key Light
+    /// HTTP API (port 9123) and stores the first hit as the host.
+    private func scanNetwork() {
+        guard let local = localIPv4Address() else { return }
+        let parts = local.split(separator: ".").map(String.init)
+        guard parts.count == 4 else { return }
+        let subnet = parts[0...2].joined(separator: ".")
+
+        scanGeneration += 1
+        let generation = scanGeneration
+        scanSession?.invalidateAndCancel()
+
+        let config = URLSessionConfiguration.ephemeral
+        config.timeoutIntervalForRequest = 2
+        config.timeoutIntervalForResource = 12
+        config.httpMaximumConnectionsPerHost = 64
+        let session = URLSession(configuration: config)
+        scanSession = session
+
+        let lock = NSLock()
+        var pending = 254
+
+        func probeDone() {
+            lock.lock()
+            pending -= 1
+            let finished = pending <= 0
+            lock.unlock()
+            guard finished else { return }
+            DispatchQueue.main.async {
+                guard generation == self.scanGeneration, !self.isConfigured else { return }
+                self.statusItem.button?.title = iconOff
+            }
+        }
+
+        for i in 1...254 {
+            guard let url = URL(string: "http://\(subnet).\(i):9123/elgato/accessory-info") else { continue }
+            session.dataTask(with: url) { [weak self] data, response, _ in
+                guard let self = self,
+                      generation == self.scanGeneration,
+                      !self.isConfigured,
+                      (response as? HTTPURLResponse)?.statusCode == 200,
+                      let data = data,
+                      let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                      (json["productName"] as? String)?.contains("Key Light") == true else {
+                    probeDone(); return
+                }
+                DispatchQueue.main.async {
+                    guard generation == self.scanGeneration, !self.isConfigured else { return }
+                    UserDefaults.standard.set("\(subnet).\(i):9123", forKey: hostKey)
+                    self.discoveryFinished()
+                }
+                probeDone()
+            }.resume()
+        }
+    }
+
+    /// First non-loopback IPv4 address of this Mac (e.g. "192.168.178.20").
+    private func localIPv4Address() -> String? {
+        var ifaddr: UnsafeMutablePointer<ifaddrs>?
+        guard getifaddrs(&ifaddr) == 0, let first = ifaddr else { return nil }
+        defer { freeifaddrs(ifaddr) }
+
+        var ptr: UnsafeMutablePointer<ifaddrs>? = first
+        while let p = ptr {
+            let ifa = p.pointee
+            ptr = ifa.ifa_next
+            guard let sa = ifa.ifa_addr, sa.pointee.sa_family == sa_family_t(AF_INET) else { continue }
+            var addr = sa.pointee
+            var host = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+            guard getnameinfo(&addr, socklen_t(addr.sa_len), &host, socklen_t(host.count),
+                              nil, 0, NI_NUMERICHOST) == 0 else { continue }
+            let ip = String(cString: host)
+            if !ip.hasPrefix("127.") { return ip }
+        }
+        return nil
     }
 
     private func configure() {
         let alert = NSAlert()
         alert.messageText = "Key Light address"
-        alert.informativeText = "Hostname or IP of your Elgato Key Light, with port (usually 9123).\nOr choose Discover to search the network."
+        alert.informativeText = "Hostname or IP of your Elgato Key Light, with port (usually 9123).\nOr choose Discover to search the network (Bonjour + subnet scan)."
         let input = NSTextField(frame: NSRect(x: 0, y: 0, width: 260, height: 24))
         input.stringValue = UserDefaults.standard.string(forKey: hostKey) ?? ""
         alert.accessoryView = input
@@ -240,7 +403,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self.currentOn = on
             self.currentPreset = nil
             if on, let b = brightness, let t = temperature,
-               let match = presets.first(where: { $0.brightness == b && $0.temperature == t }) {
+               let match = self.presets.first(where: { $0.brightness == b && $0.temperature == t }) {
                 self.currentPreset = match.name
                 self.lastPreset = match.name
                 UserDefaults.standard.set(match.name, forKey: lastPresetKey)
@@ -251,6 +414,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func updateIcon() {
         statusItem.button?.title = currentOn ? iconOn : iconOff
+    }
+
+    // MARK: Presets (shared with PresetManager)
+
+    func presetsChanged() {
+        savePresets(presets)
+        if let last = lastPreset, !presets.contains(where: { $0.name == last }) {
+            lastPreset = presets.first?.name
+            if let last = lastPreset {
+                UserDefaults.standard.set(last, forKey: lastPresetKey)
+            }
+        }
     }
 
     // MARK: Sleep / wake
@@ -269,7 +444,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func wakeUp() {
         let hour = Calendar.current.component(.hour, from: Date())
-        applyPreset((hour >= 8 && hour < 19) ? daytimePreset : eveningPreset)
+        let preferred = (hour >= 8 && hour < 19) ? daytimePreset : eveningPreset
+        // Fall back to the first preset if the configured wake preset was
+        // renamed or deleted in the manager.
+        let name = presets.contains(where: { $0.name == preferred })
+            ? preferred
+            : (presets.first?.name ?? "")
+        applyPreset(name)
     }
 
     // MARK: HTTP
@@ -312,13 +493,245 @@ extension AppDelegate: NetServiceBrowserDelegate, NetServiceDelegate {
         guard let host = sender.hostName, !host.isEmpty else { return }
         let address = "\(host):\(sender.port)"
         UserDefaults.standard.set(address, forKey: hostKey)
-        statusItem.button?.title = iconOff
-        syncFromLight()
+        discoveryFinished()
     }
 
     func netServiceBrowser(_ browser: NetServiceBrowser,
                            didNotSearch errorDict: [String: NSNumber]) {
         statusItem.button?.title = iconOff
+    }
+}
+
+// MARK: - Preset manager window ("Manage Presets…")
+
+final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate {
+
+    private weak var app: AppDelegate!
+    private var window: NSWindow!
+    private var table: NSTableView!
+    private var nameField: NSTextField!
+    private var brightSlider: NSSlider!
+    private var tempSlider: NSSlider!
+    private var brightValue: NSTextField!
+    private var tempValue: NSTextField!
+
+    init(app: AppDelegate) {
+        super.init()
+        self.app = app
+
+        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 380, height: 430),
+                          styleMask: [.titled, .closable],
+                          backing: .buffered, defer: false)
+        window.title = "KeylightBar Presets"
+        window.isReleasedWhenClosed = false
+        window.center()
+        let content = window.contentView!
+
+        let scroll = NSScrollView(frame: NSRect(x: 20, y: 160, width: 240, height: 240))
+        table = NSTableView()
+        let nameColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("name"))
+        nameColumn.title = "Preset"
+        nameColumn.width = 140
+        let valueColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("values"))
+        valueColumn.title = "Brightness / Temp"
+        valueColumn.width = 100
+        table.addTableColumn(nameColumn)
+        table.addTableColumn(valueColumn)
+        table.dataSource = self
+        table.delegate = self
+        scroll.documentView = table
+        scroll.hasVerticalScroller = true
+        content.addSubview(scroll)
+
+        let add = NSButton(title: "+ Add", target: self, action: #selector(addPreset(_:)))
+        add.frame = NSRect(x: 270, y: 370, width: 90, height: 30)
+        content.addSubview(add)
+
+        let remove = NSButton(title: "− Remove", target: self, action: #selector(removePreset(_:)))
+        remove.frame = NSRect(x: 270, y: 335, width: 90, height: 30)
+        content.addSubview(remove)
+
+        content.addSubview(NSTextField(labelWithString: "Name:"))
+        let nameLabel = content.subviews.last! as! NSTextField
+        nameLabel.frame = NSRect(x: 20, y: 128, width: 60, height: 18)
+
+        nameField = NSTextField(frame: NSRect(x: 85, y: 125, width: 275, height: 24))
+        nameField.placeholderString = "preset name"
+        nameField.target = self
+        nameField.action = #selector(nameChanged(_:))
+        content.addSubview(nameField)
+
+        content.addSubview(NSTextField(labelWithString: "Brightness:"))
+        let brightLabel = content.subviews.last! as! NSTextField
+        brightLabel.frame = NSRect(x: 20, y: 94, width: 100, height: 18)
+
+        brightSlider = NSSlider(value: 50, minValue: 0, maxValue: 100,
+                                target: self, action: #selector(brightChanged(_:)))
+        brightSlider.frame = NSRect(x: 125, y: 92, width: 175, height: 22)
+        content.addSubview(brightSlider)
+        brightValue = NSTextField(labelWithString: "50")
+        brightValue.frame = NSRect(x: 305, y: 94, width: 40, height: 18)
+        content.addSubview(brightValue)
+
+        content.addSubview(NSTextField(labelWithString: "Temperature:"))
+        let tempLabel = content.subviews.last! as! NSTextField
+        tempLabel.frame = NSRect(x: 20, y: 60, width: 100, height: 18)
+
+        tempSlider = NSSlider(value: 220, minValue: 143, maxValue: 344,
+                              target: self, action: #selector(tempChanged(_:)))
+        tempSlider.frame = NSRect(x: 125, y: 58, width: 175, height: 22)
+        content.addSubview(tempSlider)
+        tempValue = NSTextField(labelWithString: "220")
+        tempValue.frame = NSRect(x: 305, y: 60, width: 40, height: 18)
+        content.addSubview(tempValue)
+
+        let hint = NSTextField(labelWithString: "143 = coldest \u{00B7} 344 = warmest")
+        hint.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+        hint.textColor = .secondaryLabelColor
+        hint.frame = NSRect(x: 125, y: 40, width: 220, height: 14)
+        content.addSubview(hint)
+
+        let reset = NSButton(title: "Reset Defaults", target: self, action: #selector(resetDefaults(_:)))
+        reset.frame = NSRect(x: 20, y: 10, width: 130, height: 28)
+        content.addSubview(reset)
+
+        let done = NSButton(title: "Done", target: self, action: #selector(closeWindow(_:)))
+        done.bezelStyle = .rounded
+        done.keyEquivalent = "\r"
+        done.frame = NSRect(x: 280, y: 10, width: 80, height: 28)
+        content.addSubview(done)
+    }
+
+    func show() {
+        table.reloadData()
+        if app.presets.count > 0 {
+            table.selectRowIndexes(IndexSet(integer: 0), byExtendingSelection: false)
+        }
+        refreshEditor()
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    // MARK: Table
+
+    func numberOfRows(in tableView: NSTableView) -> Int {
+        app.presets.count
+    }
+
+    func tableView(_ tableView: NSTableView,
+                   objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
+        let preset = app.presets[row]
+        if tableColumn?.identifier.rawValue == "name" {
+            return preset.name
+        }
+        return "\(preset.brightness) / \(preset.temperature)"
+    }
+
+    func tableViewSelectionDidChange(_ notification: Notification) {
+        refreshEditor()
+    }
+
+    // MARK: Editor
+
+    private func refreshEditor() {
+        let row = table.selectedRow
+        guard row >= 0, row < app.presets.count else {
+            nameField.stringValue = ""
+            brightValue.stringValue = "-"
+            tempValue.stringValue = "-"
+            return
+        }
+        let preset = app.presets[row]
+        nameField.stringValue = preset.name
+        brightSlider.intValue = Int32(preset.brightness)
+        tempSlider.intValue = Int32(preset.temperature)
+        brightValue.stringValue = "\(preset.brightness)"
+        tempValue.stringValue = "\(preset.temperature)"
+    }
+
+    private func selectedRow() -> Preset? {
+        let row = table.selectedRow
+        guard row >= 0, row < app.presets.count else { return nil }
+        return app.presets[row]
+    }
+
+    private func commit() {
+        table.reloadData()
+        app.presetsChanged()
+    }
+
+    // MARK: Actions
+
+    @objc private func nameChanged(_ sender: NSTextField) {
+        guard let preset = selectedRow() else { return }
+        let row = table.selectedRow
+        let newName = sender.stringValue.trimmingCharacters(in: .whitespaces)
+        // Ignore empty names and names that would collide with another preset.
+        let collides = app.presets.enumerated().contains {
+            $0.offset != row && $0.element.name == newName
+        }
+        guard !newName.isEmpty, !collides else {
+            refreshEditor()
+            return
+        }
+        app.presets[row] = Preset(name: newName,
+                                  brightness: preset.brightness,
+                                  temperature: preset.temperature)
+        commit()
+    }
+
+    @objc private func brightChanged(_ sender: NSSlider) {
+        guard let preset = selectedRow() else { return }
+        app.presets[table.selectedRow] = Preset(name: preset.name,
+                                                 brightness: Int(sender.intValue),
+                                                 temperature: preset.temperature)
+        brightValue.stringValue = "\(Int(sender.intValue))"
+        commit()
+    }
+
+    @objc private func tempChanged(_ sender: NSSlider) {
+        guard let preset = selectedRow() else { return }
+        app.presets[table.selectedRow] = Preset(name: preset.name,
+                                                brightness: preset.brightness,
+                                                temperature: Int(sender.intValue))
+        tempValue.stringValue = "\(Int(sender.intValue))"
+        commit()
+    }
+
+    @objc private func addPreset(_ sender: Any?) {
+        var n = app.presets.count + 1
+        var newName = "preset \(n)"
+        while app.presets.contains(where: { $0.name == newName }) {
+            n += 1
+            newName = "preset \(n)"
+        }
+        app.presets.append(Preset(name: newName, brightness: 50, temperature: 220))
+        commit()
+        let idx = app.presets.count - 1
+        table.selectRowIndexes(IndexSet(integer: idx), byExtendingSelection: false)
+        table.scrollRowToVisible(idx)
+        nameField.selectText(nil)
+    }
+
+    @objc private func removePreset(_ sender: Any?) {
+        let row = table.selectedRow
+        guard row >= 0, row < app.presets.count, app.presets.count > 1 else { return }
+        app.presets.remove(at: row)
+        commit()
+        let next = min(row, app.presets.count - 1)
+        table.selectRowIndexes(IndexSet(integer: next), byExtendingSelection: false)
+        refreshEditor()
+    }
+
+    @objc private func resetDefaults(_ sender: Any?) {
+        app.presets = defaultPresets
+        commit()
+        table.selectRowIndexes(IndexSet(integer: 0), byExtendingSelection: false)
+        refreshEditor()
+    }
+
+    @objc private func closeWindow(_ sender: Any?) {
+        window.orderOut(nil)
     }
 }
 
