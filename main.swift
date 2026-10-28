@@ -2,7 +2,7 @@
 //
 // One icon, hybrid behavior (the thing macOS menu bars don't give you for free):
 //   * light off  -> click turns it ON with the last-used preset
-//   * light on   -> click opens a preset picker (including "off")
+//   * light on   -> click opens a preset picker (including "Turn Off")
 //
 // Extras:
 //   * finds your Key Light automatically on first launch — via Bonjour and,
@@ -228,7 +228,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(.separator())
 
-        let off = NSMenuItem(title: "off",
+        let off = NSMenuItem(title: "Turn Off",
                              action: #selector(turnOffViaMenu(_:)),
                              keyEquivalent: "")
         off.target = self
