@@ -14,7 +14,8 @@
 //   * syncs with the light's real state at launch, every 30 s,
 //     and freshly every time the menu opens
 //   * remembers the last preset across restarts (UserDefaults)
-//   * turns the light off on sleep, picks a time-of-day preset on wake
+//   * sleep/wake handling as two independent rules: off when the Mac
+//     sleeps, on (time-appropriate or last preset) when it wakes
 //   * auto-switches between a day and an evening preset at set times
 //     (on/off, presets, and hours adjustable via the "Time Of Day" menu)
 //
@@ -43,7 +44,8 @@ let iconOff = "\u{1F311}"      // 🌑
 let hostKey          = "keylight.host"          // e.g. "192.168.178.33:9123" or "Elgato Key Light.local.:9123"
 let lastPresetKey    = "keylight.lastPreset"
 let presetsKey       = "keylight.presets"
-let autoSleepWakeKey = "keylight.autoSleepWake"  // off-on-sleep + preset-on-wake (default: on)
+let sleepOffKey = "keylight.sleepOff"    // turn the light off when the Mac sleeps (default: on)
+let wakeOnKey   = "keylight.wakeOn"      // turn the light on when the Mac wakes (default: on)
 let timeSwitchKey   = "keylight.timeSwitch"    // auto-switch presets by time of day (default: on)
 let dayPresetKey    = "keylight.dayPreset"      // preset applied during day hours
 let eveningPresetKey = "keylight.eveningPreset"  // preset applied during evening hours
@@ -120,11 +122,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         UserDefaults.standard.string(forKey: hostKey) != nil
     }
 
-    /// Turn off on sleep + apply a preset on wake. On by default.
-    private var autoSleepWakeEnabled: Bool {
-        UserDefaults.standard.object(forKey: autoSleepWakeKey) == nil
+    /// Turn off on sleep / turn on on wake — two independent rules.
+    private var sleepOffEnabled: Bool {
+        UserDefaults.standard.object(forKey: sleepOffKey) == nil
             ? true
-            : UserDefaults.standard.bool(forKey: autoSleepWakeKey)
+            : UserDefaults.standard.bool(forKey: sleepOffKey)
+    }
+
+    private var wakeOnEnabled: Bool {
+        UserDefaults.standard.object(forKey: wakeOnKey) == nil
+            ? true
+            : UserDefaults.standard.bool(forKey: wakeOnKey)
     }
 
     /// Auto-switch between a day and an evening preset at set times.
@@ -229,12 +237,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(.separator())
 
-        let auto = NSMenuItem(title: "Auto: off on sleep, preset on wake",
-                              action: #selector(toggleAutoSleepWake(_:)),
-                              keyEquivalent: "")
-        auto.target = self
-        auto.state = autoSleepWakeEnabled ? .on : .off
-        menu.addItem(auto)
+        let sleepOff = NSMenuItem(title: "Off When Mac Sleeps",
+                                  action: #selector(toggleSleepOff(_:)),
+                                  keyEquivalent: "")
+        sleepOff.target = self
+        sleepOff.state = sleepOffEnabled ? .on : .off
+        menu.addItem(sleepOff)
+
+        let wakeOn = NSMenuItem(title: "On When Mac Wakes",
+                                action: #selector(toggleWakeOn(_:)),
+                                keyEquivalent: "")
+        wakeOn.target = self
+        wakeOn.state = wakeOnEnabled ? .on : .off
+        menu.addItem(wakeOn)
 
         let timeOfDay = NSMenuItem(title: "Time Of Day", action: nil, keyEquivalent: "")
         timeOfDay.submenu = buildTimeMenu()
@@ -305,9 +320,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         presetManager?.show()
     }
 
-    @objc private func toggleAutoSleepWake(_ sender: NSMenuItem) {
-        UserDefaults.standard.set(!autoSleepWakeEnabled, forKey: autoSleepWakeKey)
-        sender.state = autoSleepWakeEnabled ? .on : .off
+    @objc private func toggleSleepOff(_ sender: NSMenuItem) {
+        UserDefaults.standard.set(!sleepOffEnabled, forKey: sleepOffKey)
+        sender.state = sleepOffEnabled ? .on : .off
+    }
+
+    @objc private func toggleWakeOn(_ sender: NSMenuItem) {
+        UserDefaults.standard.set(!wakeOnEnabled, forKey: wakeOnKey)
+        sender.state = wakeOnEnabled ? .on : .off
     }
 
     // MARK: Time of day
@@ -316,7 +336,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let m = NSMenu()
         m.autoenablesItems = false
 
-        let toggle = NSMenuItem(title: "Auto-switch by time of day",
+        let toggle = NSMenuItem(title: "Switch Presets By Time",
                                 action: #selector(toggleTimeSwitch(_:)),
                                 keyEquivalent: "")
         toggle.target = self
@@ -636,19 +656,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let center = NSWorkspace.shared.notificationCenter
         center.addObserver(forName: NSWorkspace.willSleepNotification,
                            object: nil, queue: .main) { [weak self] _ in
-            guard let self = self, self.autoSleepWakeEnabled else { return }
+            guard let self = self, self.sleepOffEnabled else { return }
             self.turnOff()
         }
         center.addObserver(forName: NSWorkspace.screensDidWakeNotification,
                            object: nil, queue: .main) { [weak self] _ in
-            guard let self = self, self.autoSleepWakeEnabled else { return }
+            guard let self = self, self.wakeOnEnabled else { return }
             self.wakeUp()
         }
     }
 
     private func wakeUp() {
+        // Time-appropriate preset when time-switching is on
+        // ("Bright" at 22:00 yesterday shouldn't blind you this morning),
+        // otherwise the last-used preset.
         if timeSwitchEnabled {
-            evaluateTimeSwitch(force: true)   // wake picks the time-appropriate preset
+            evaluateTimeSwitch(force: true)
         } else {
             applyPreset(lastPreset ?? presets.first?.name ?? "")
         }
