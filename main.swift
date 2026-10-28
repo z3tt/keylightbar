@@ -28,8 +28,8 @@ import AppKit
 let appVersion = "1.3"
 
 let pollInterval: TimeInterval = 30
-let daytimePreset  = "work"    // applied on wake, 08:00-18:59
-let eveningPreset = "chill"   // applied on wake, otherwise
+let daytimePreset  = "WORK"    // applied on wake, 08:00-18:59
+let eveningPreset = "CHILL"   // applied on wake, otherwise
 
 let iconOn  = "\u{1F4A1}"      // 💡
 let iconOff = "\u{1F311}"      // 🌑
@@ -51,20 +51,29 @@ struct Preset: Codable {
 }
 
 let defaultPresets: [Preset] = [
-    Preset(name: "meet",   brightness: 60,  temperature: 180),
-    Preset(name: "work",   brightness: 45,  temperature: 220),
-    Preset(name: "bright", brightness: 100, temperature: 220),
-    Preset(name: "cold",   brightness: 50,  temperature: 143),
-    Preset(name: "warm",   brightness: 50,  temperature: 344),
-    Preset(name: "night",  brightness: 10,  temperature: 220),
-    Preset(name: "chill",  brightness: 15,  temperature: 300),
+    Preset(name: "MEET",   brightness: 60,  temperature: 180),
+    Preset(name: "WORK",   brightness: 45,  temperature: 220),
+    Preset(name: "BRIGHT", brightness: 100, temperature: 220),
+    Preset(name: "COLD",   brightness: 50,  temperature: 143),
+    Preset(name: "WARM",   brightness: 50,  temperature: 344),
+    Preset(name: "NIGHT",  brightness: 10,  temperature: 220),
+    Preset(name: "CHILL",  brightness: 15,  temperature: 300),
 ]
 
 func loadPresets() -> [Preset] {
     if let data = UserDefaults.standard.data(forKey: presetsKey),
        let decoded = try? JSONDecoder().decode([Preset].self, from: data),
        !decoded.isEmpty {
-        return decoded
+        // Uppercase legacy names (v1.3 and earlier stored mixed case),
+        // dropping duplicates that collide after uppercasing.
+        var seen = Set<String>()
+        return decoded.compactMap { preset in
+            let name = preset.name.uppercased()
+            guard !seen.contains(name) else { return nil }
+            seen.insert(name)
+            return Preset(name: name, brightness: preset.brightness,
+                          temperature: preset.temperature)
+        }
     }
     return defaultPresets
 }
@@ -91,7 +100,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var presets = loadPresets()
     private var currentOn     = false
     private var currentPreset: String?
-    private var lastPreset   = UserDefaults.standard.string(forKey: lastPresetKey)
+    private var lastPreset   = UserDefaults.standard.string(forKey: lastPresetKey)?.uppercased()
 
     private var isConfigured: Bool {
         UserDefaults.standard.string(forKey: hostKey) != nil
@@ -637,6 +646,20 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
         refreshEditor()
     }
 
+    // In-table renaming: double-click the "Preset" column to edit in place.
+
+    func tableView(_ tableView: NSTableView,
+                   shouldEdit tableColumn: NSTableColumn?, row: Int) -> Bool {
+        tableColumn?.identifier.rawValue == "name"
+    }
+
+    func tableView(_ tableView: NSTableView,
+                   setObjectValue object: Any?,
+                   for tableColumn: NSTableColumn?, row: Int) {
+        guard tableColumn?.identifier.rawValue == "name" else { return }
+        renamePreset(at: row, to: object as? String ?? "")
+    }
+
     // MARK: Editor
 
     private func refreshEditor() {
@@ -669,10 +692,14 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
     // MARK: Actions
 
     @objc private func nameChanged(_ sender: NSTextField) {
-        guard let preset = selectedRow() else { return }
-        let row = table.selectedRow
-        let newName = sender.stringValue.trimmingCharacters(in: .whitespaces)
-        // Ignore empty names and names that would collide with another preset.
+        renamePreset(at: table.selectedRow, to: sender.stringValue)
+    }
+
+    /// Shared validation for the name field and in-table renames:
+    /// names are uppercased, never empty, never duplicates.
+    private func renamePreset(at row: Int, to rawName: String) {
+        guard row >= 0, row < app.presets.count else { return }
+        let newName = rawName.trimmingCharacters(in: .whitespaces).uppercased()
         let collides = app.presets.enumerated().contains {
             $0.offset != row && $0.element.name == newName
         }
@@ -680,9 +707,10 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
             refreshEditor()
             return
         }
+        let old = app.presets[row]
         app.presets[row] = Preset(name: newName,
-                                  brightness: preset.brightness,
-                                  temperature: preset.temperature)
+                                  brightness: old.brightness,
+                                  temperature: old.temperature)
         commit()
     }
 
@@ -706,10 +734,10 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
 
     @objc private func addPreset(_ sender: Any?) {
         var n = app.presets.count + 1
-        var newName = "preset \(n)"
+        var newName = "PRESET \(n)"
         while app.presets.contains(where: { $0.name == newName }) {
             n += 1
-            newName = "preset \(n)"
+            newName = "PRESET \(n)"
         }
         app.presets.append(Preset(name: newName, brightness: 50, temperature: 220))
         commit()
