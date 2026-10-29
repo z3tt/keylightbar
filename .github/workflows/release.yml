@@ -17,7 +17,9 @@ jobs:
         run: make bundle
 
       - name: Zip app bundle
-        run: ditto -c -k -X KeylightBar.app KeylightBar.zip
+        # --keepParent preserves the KeylightBar.app/ wrapper in the archive;
+        # without it the zip unpacks to a bare "Contents" folder, not an app.
+        run: ditto -c -k -X --keepParent KeylightBar.app KeylightBar.zip
 
       - name: Create release
         env:
