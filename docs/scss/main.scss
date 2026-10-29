@@ -213,7 +213,7 @@ strong { font-weight: 600; }
 
   &-sub {
     max-width: 36rem;
-    margin: 0 auto 2.5rem;
+    margin: 0 auto 2.75rem;
     color: var(--muted);
     font-size: 1.2rem;
 
@@ -225,7 +225,7 @@ strong { font-weight: 600; }
     flex-wrap: wrap;
     justify-content: center;
     gap: .9rem;
-    margin-bottom: 2rem;
+    margin-bottom: 2.75rem;
   }
 
   &-compat {
@@ -343,6 +343,21 @@ strong { font-weight: 600; }
     &:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
   }
 }
+
+// dim the page behind the open preset menu, so it reads as an
+// intentional layer instead of colliding with content below
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  background: rgba(11, 12, 16, .45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+}
+
+body.menu-open::before { opacity: 1; pointer-events: auto; }
 
 // macOS-style preset popover, anchored to the 💡 card
 .preset-menu {
