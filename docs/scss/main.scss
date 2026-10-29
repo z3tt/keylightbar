@@ -293,7 +293,7 @@ strong { font-weight: 600; }
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1.25rem;
-  max-width: 50rem;
+  max-width: 40rem;
   margin: 0 auto;
 }
 
@@ -389,7 +389,7 @@ strong { font-weight: 600; }
 // ---- Features ----
 .features {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 1.25rem;
 }
 
