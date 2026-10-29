@@ -239,7 +239,7 @@ strong { font-weight: 600; }
     flex-wrap: wrap;
     justify-content: center;
     gap: .6rem;
-    margin: 0 0 3.5rem;
+    margin: 0 0 2rem;
     padding: 0;
     list-style: none;
 
@@ -277,7 +277,7 @@ strong { font-weight: 600; }
 
   &-demo {
     max-width: 480px;
-    margin: 0 auto;
+    margin: 3.5rem auto 0;
     padding: 1rem;
     background: var(--bg-soft);
     border: 1px solid var(--card-edge);
