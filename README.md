@@ -47,7 +47,7 @@ Note that macOS grants **Local Network** access per binary: a freshly compiled K
 
 ## Make it yours
 
-Everything is adjustable from the menu bar menu itself — no source editing, no terminal.
+Everything is adjustable right from the 💡 menu — no source editing, no terminal.
 
 - **Presets** — *Manage Presets…* opens a small editor: pick a preset in the table (or double-click its name to rename it), then set name, brightness (0–100), and temperature (143 = coldest, 344 = warmest) with the sliders. *+ Add* asks for a name right away and starts from the selected preset's settings. Names are always title-cased (e.g. "Night Mode"). Changes apply immediately and survive restarts; *Reset Defaults* restores the original seven.
 - **Sleep & Wake** — the *Off When Mac Sleeps* / *On When Mac Wakes* checkboxes. On wake, KeylightBar applies the time-appropriate preset if *Time Of Day* is on, otherwise your last-used one.
