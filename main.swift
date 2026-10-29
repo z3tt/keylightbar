@@ -25,6 +25,7 @@
 // Share: single file, MIT license, no dependencies beyond macOS itself.
 
 import AppKit
+import ServiceManagement
 
 // MARK: - Configuration
 
@@ -289,6 +290,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         manage.target = self
         menu.addItem(manage)
 
+        let loginItem = NSMenuItem(title: "Start At Login",
+                                   action: #selector(toggleLoginItem(_:)),
+                                   keyEquivalent: "")
+        loginItem.target = self
+        loginItem.state = loginItemEnabled ? .on : .off
+        menu.addItem(loginItem)
+
         menu.addItem(.separator())
 
         let about = NSMenuItem(title: "About KeylightBar",
@@ -342,6 +350,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func toggleWakeOn(_ sender: NSMenuItem) {
         UserDefaults.standard.set(!wakeOnEnabled, forKey: wakeOnKey)
         sender.state = wakeOnEnabled ? .on : .off
+    }
+
+    // MARK: Login item
+
+    private var loginItemEnabled: Bool {
+        if #available(macOS 13.0, *) {
+            return SMAppService.mainApp.status == .enabled
+        }
+        return false
+    }
+
+    @objc private func toggleLoginItem(_ sender: NSMenuItem) {
+        guard #available(macOS 13.0, *) else { return }
+        let service = SMAppService.mainApp
+        do {
+            if service.status == .enabled {
+                try service.unregister()
+            } else {
+                try service.register()
+            }
+        } catch {
+            NSLog("KeylightBar: login item toggle failed: \(error.localizedDescription)")
+        }
+        sender.state = loginItemEnabled ? .on : .off
     }
 
     // MARK: Time of day

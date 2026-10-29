@@ -19,7 +19,7 @@ Control any [Elgato Key Light](https://www.elgato.com/key-light) in your macOS m
 2. Try to open **KeylightBar.app** once (macOS will block it), then go to **System Settings → Privacy & Security**, scroll down, and click **Open Anyway**. The app is unsigned, so Gatekeeper needs that one-time approval; macOS remembers it afterwards. On older macOS versions, right-click **KeylightBar.app** → **Open** → **Open** works too.
 3. There's your 💡 in the menu bar. If macOS asks for **Local Network** access, say yes — without it, KeylightBar can't reach your light.
 
-To start it automatically at login, add **KeylightBar.app** to *System Settings → General → Login Items & Extensions*.
+To start it automatically at login, flip **Start At Login** in the 💡 menu — KeylightBar registers itself as a macOS Login Item.
 
 ## What you get
 
@@ -52,6 +52,7 @@ Everything is adjustable right from the 💡 menu — no source editing, no term
 - **Presets** — *Manage Presets…* opens a small editor: pick a preset in the table (or double-click its name to rename it), then set name, brightness (0–100), and temperature (143 = coldest, 344 = warmest) with the sliders. *+ Add* asks for a name right away and starts from the selected preset's settings. Names are always title-cased (e.g. "Night Mode"). Changes apply immediately and survive restarts; *Reset Defaults* restores the original seven.
 - **Sleep & Wake** — the *Off When Mac Sleeps* / *On When Mac Wakes* checkboxes. On wake, KeylightBar applies the time-appropriate preset if *Time Of Day* is on, otherwise your last-used one.
 - **Time Of Day** — the *Switch Presets By Time* toggle plus day/evening presets and the hours they start (defaults: Work from 08:00, Chill from 19:00).
+- **Start At Login** — one checkbox in the 💡 menu; no fiddling in System Settings.
 
 ## Build it yourself
 
