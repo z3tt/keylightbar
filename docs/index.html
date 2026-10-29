@@ -15,18 +15,16 @@
   <link href="https://api.fontshare.com/v2/css?f[]=supreme@400,500,600&display=swap" rel="stylesheet">
   <link href="https://api.fontshare.com/v2/css?f[]=tanker@400&display=swap" rel="stylesheet">
   <script>
-    // Set theme before first paint to avoid a flash of the wrong theme
+    // Apply the preset before first paint to avoid a flash of the wrong theme
     (function () {
       var t = localStorage.getItem('keylightbar-theme') ||
-        (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        (matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'work');
       document.documentElement.dataset.theme = t;
     })();
   </script>
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-
-  <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch theme"></button>
 
   <header class="hero">
     <p class="hero-badge">Free &amp; open source · macOS menu bar</p>
@@ -76,13 +74,13 @@
           <p>While it's on, the next click opens the preset menu: Meet, Work, Chill — or your own.</p>
           <ul class="preset-menu" id="preset-menu" hidden aria-label="Presets">
             <li class="menu-title">Presets</li>
-            <li><button type="button" data-theme="light">Meet <span aria-hidden="true">💡</span></button></li>
-            <li><button type="button" data-theme="light">Work <span aria-hidden="true">💡</span></button></li>
-            <li><button type="button" data-theme="light">Bright <span aria-hidden="true">💡</span></button></li>
-            <li><button type="button" data-theme="light">Cold <span aria-hidden="true">💡</span></button></li>
-            <li><button type="button" data-theme="dark">Warm <span aria-hidden="true">🌑</span></button></li>
-            <li><button type="button" data-theme="dark">Night <span aria-hidden="true">🌑</span></button></li>
-            <li><button type="button" data-theme="dark">Chill <span aria-hidden="true">🌑</span></button></li>
+            <li><button type="button" data-theme="meet">Meet <span aria-hidden="true">💡</span></button></li>
+            <li><button type="button" data-theme="work">Work <span aria-hidden="true">💡</span></button></li>
+            <li><button type="button" data-theme="bright">Bright <span aria-hidden="true">💡</span></button></li>
+            <li><button type="button" data-theme="cold">Cold <span aria-hidden="true">💡</span></button></li>
+            <li><button type="button" data-theme="warm">Warm <span aria-hidden="true">🌑</span></button></li>
+            <li><button type="button" data-theme="night">Night <span aria-hidden="true">🌑</span></button></li>
+            <li><button type="button" data-theme="chill">Chill <span aria-hidden="true">🌑</span></button></li>
           </ul>
         </article>
       </div>
@@ -166,26 +164,18 @@
   <script>
     (function () {
       var root = document.documentElement;
-      var toggle = document.getElementById('theme-toggle');
       var meta = document.querySelector('meta[name="theme-color"]');
+      var LIGHT = ['meet', 'work', 'bright', 'cold'];
 
       function setTheme(t) {
         root.dataset.theme = t;
         localStorage.setItem('keylightbar-theme', t);
-        // mirror the app: 🌑 while the site's light is on (click dims it),
-        // 💡 while it's off (click switches it on)
-        toggle.textContent = t === 'dark' ? '💡' : '🌑';
-        toggle.title = t === 'dark' ? 'Turn the lights on' : 'Turn the lights off';
-        toggle.setAttribute('aria-label',
-          t === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+        if (LIGHT.indexOf(t) > -1) localStorage.setItem('keylightbar-day', t);
         if (meta) meta.content = getComputedStyle(document.body).backgroundColor;
       }
 
-      toggle.addEventListener('click', function () {
-        setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark');
-      });
-
-      // the two live cards: 🌑 turns the site's light on, 💡 opens the preset menu
+      // the two live cards: 🌑 turns the site's light on (with your last-used
+      // day preset), 💡 opens the preset menu
       var menu = document.getElementById('preset-menu');
       var cardOn = document.getElementById('card-on');
       var cardMenu = document.getElementById('card-menu');
@@ -202,7 +192,9 @@
         cardMenu.setAttribute('aria-expanded', 'false');
       }
 
-      activate(cardOn, function () { setTheme('light'); });
+      activate(cardOn, function () {
+        setTheme(localStorage.getItem('keylightbar-day') || 'work');
+      });
 
       activate(cardMenu, function (e) {
         e.stopPropagation();
@@ -225,6 +217,7 @@
         if (e.key === 'Escape' && !menu.hidden) closeMenu();
       });
 
+      // register the restored preset so 🌑 can bring back your last day setup
       setTheme(root.dataset.theme);
     })();
   </script>
