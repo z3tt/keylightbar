@@ -32,8 +32,7 @@
     <p class="hero-badge">Free &amp; open source · macOS menu bar</p>
     <h1>KeylightBar <span class="hero-bulb" aria-hidden="true">💡</span></h1>
     <p class="hero-sub">
-      Your Elgato Key Light, one click away. <strong>🌑 turns the light on. 💡 opens the preset menu.</strong>
-      No Dock icon, no companion windows, no dependencies.
+      Your Elgato Key Light, one click away in the macOS menu bar.
     </p>
     <div class="hero-actions">
       <a class="btn btn-primary" href="https://github.com/z3tt/keylightbar/releases/latest">
@@ -60,24 +59,30 @@
     <section class="section" id="what">
       <h2>What it does</h2>
       <p class="section-lead">
-        One click when you sit down — after that, KeylightBar manages itself.
-        Two independent rules do the daily work:
+        One icon in your menu bar, four behaviors — no Dock app, no windows, no config.
       </p>
       <div class="states">
-        <article class="state-card" data-theme-card="dark" tabindex="0" role="button"
-                 aria-label="Switch the site to dark mode">
+        <article class="state-card">
           <span class="state-icon" aria-hidden="true">🌑</span>
-          <h3>Off When Mac Sleeps</h3>
-          <p>Your Mac goes to sleep, your light goes off. No second thought, no glowing desk at midnight.</p>
+          <h3>Light off? One click on</h3>
+          <p>Your light is off, you click, it's on — with your last-used preset. That's the whole idea.</p>
         </article>
-        <article class="state-card" data-theme-card="light" tabindex="0" role="button"
-                 aria-label="Switch the site to light mode">
+        <article class="state-card">
           <span class="state-icon state-icon--on" aria-hidden="true">💡</span>
-          <h3>On When Mac Wakes</h3>
-          <p>Come back to your desk and your light is already on again — the one thing even Elgato's own app doesn't do.</p>
+          <h3>Light on? One click to presets</h3>
+          <p>While it's on, the next click opens the preset menu: Meet, Work, Chill — or your own.</p>
+        </article>
+        <article class="state-card">
+          <span class="state-icon" aria-hidden="true">🌗</span>
+          <h3>Sleeps and wakes with your Mac</h3>
+          <p>Off when your Mac sleeps, back on when you return. The wake half is what even Elgato's own app doesn't do.</p>
+        </article>
+        <article class="state-card">
+          <span class="state-icon" aria-hidden="true">🕑</span>
+          <h3>Day and night on schedule</h3>
+          <p>Work until 19:00, Chill after — your presets switch by time of day, all by themselves.</p>
         </article>
       </div>
-      <p class="states-hint">psst — the cards are the site's light switch, too: 🌑 dims it, 💡 lights it up.</p>
     </section>
 
     <section class="section" id="why">
@@ -89,9 +94,9 @@
           <p>Flip <strong>Start At Login</strong> in the 💡 menu and it's in your menu bar from the first boot — no Login Items fiddling in System Settings.</p>
         </article>
         <article class="feature">
-          <span aria-hidden="true">🕑</span>
-          <h3>A light that knows the time</h3>
-          <p>Work preset until 19:00, Chill after — Time Of Day switches between your day and evening setups on schedule, all by itself.</p>
+          <span aria-hidden="true">🫥</span>
+          <h3>Invisible by design</h3>
+          <p>No Dock icon, no companion windows, no dependencies. If it weren't for the 💡 in your menu bar, you'd forget it exists.</p>
         </article>
         <article class="feature">
           <span aria-hidden="true">🎚️</span>
@@ -164,14 +169,6 @@
 
       toggle.addEventListener('click', function () {
         setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark');
-      });
-
-      document.querySelectorAll('[data-theme-card]').forEach(function (card) {
-        function flip() { setTheme(card.dataset.themeCard); }
-        card.addEventListener('click', flip);
-        card.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); }
-        });
       });
 
       setTheme(root.dataset.theme);
