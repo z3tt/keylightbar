@@ -261,10 +261,11 @@ strong {
 
   &-bulb {
     display: inline-block;
-    // optical compensation: measure the line without bulb + space
-    // (≈1.2em), so the wordmark — not bulb-inclusive line — centers
-    // on the page axis, aligned with the badge below
-    margin-right: -1.2em;
+    // optical compensation, half strength: the centered line treats
+    // the bulb at half its advance, so the word sits slightly left
+    // of the axis and the bulb slightly right — the pair reads
+    // balanced against the centered badge below
+    margin-right: -0.6em;
     filter: drop-shadow(0 2px 10px var(--bulb-glow));
     animation: flicker 4s ease-in-out infinite;
   }
