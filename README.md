@@ -5,20 +5,10 @@ Your [Elgato Key Light](https://www.elgato.com/key-light), in your macOS menu ba
 No Dock icon, no companion windows, no dependencies. Just a 💡 in your menu bar.
 
 <p align="center">
-  <img src="docs/menubar.png" alt="KeylightBar in the menu bar: the icon shows 🌑 when the light is off and 💡 when it is on" width="49%">
-  &nbsp;
-  <img src="docs/menu.png" alt="The preset menu with a checkmark on the active preset, the Turn Off command, and the sleep/wake and time-of-day settings" width="49%">
+  <img src="docs/keylightbar.gif" alt="KeylightBar in the menu bar: the icon switches between 🌑 and 💡, one click turns the light on, clicking while on opens the preset menu with the sleep/wake and time-of-day settings, and the Manage Presets editor" width="720">
   <br>
-  <em>The menu bar icon in both states — and the preset menu behind the 💡 click.</em>
-  <br><br>
-  <img src="docs/time-of-day.png" alt="The Time Of Day submenu with day and evening presets and their start hours" width="49%">
-  &nbsp;
-  <img src="docs/presets-window.png" alt="The Manage Presets window with the preset table and brightness and temperature sliders" width="49%">
-  <br>
-  <em>Time-of-day scheduling and the built-in preset editor.</em>
+  <em>One click on, one click for everything else.</em>
 </p>
-
-*(screenshots not taken yet — the four files above are the slots; see `docs/`)*
 
 ## What you get
 
