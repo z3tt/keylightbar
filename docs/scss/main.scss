@@ -225,54 +225,7 @@ strong { font-weight: 600; }
     flex-wrap: wrap;
     justify-content: center;
     gap: .9rem;
-    margin-bottom: 2.75rem;
-  }
-
-  &-compat {
-    margin: 0 0 1rem;
-    color: var(--muted);
-    font-size: 1rem;
-  }
-
-  &-lights {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: .6rem;
-    margin: 0 0 2rem;
-    padding: 0;
-    list-style: none;
-
-    a {
-      display: inline-flex;
-      align-items: baseline;
-      gap: .4rem;
-      font-size: .9rem;
-      font-weight: 500;
-      color: var(--text);
-      background: var(--card);
-      border: 1px solid var(--card-edge);
-      border-radius: 12px;
-      padding: .45rem .9rem;
-      box-shadow: var(--shadow-card);
-      text-decoration: none;
-      transition: background .35s ease, color .35s ease, border-color .15s ease, transform .15s ease, box-shadow .15s ease;
-
-      span {
-        font-size: .75rem;
-        color: var(--muted);
-        transition: color .15s ease;
-      }
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px var(--bulb-glow);
-
-        span { color: var(--amber); }
-      }
-
-      &:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
-    }
+    margin-bottom: 0;
   }
 
   &-demo {
@@ -301,6 +254,48 @@ strong { font-weight: 600; }
 @keyframes flicker {
   0%, 92%, 96%, 100% { opacity: 1; }
   94%, 98%            { opacity: .55; }
+}
+
+// compatible-light mini link-cards (Get it section)
+.lights {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .6rem;
+  margin: 0 auto 2.25rem;
+  padding: 0;
+  list-style: none;
+
+  a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: .4rem;
+    font-size: .9rem;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--card);
+    border: 1px solid var(--card-edge);
+    border-radius: 12px;
+    padding: .45rem .9rem;
+    box-shadow: var(--shadow-card);
+    text-decoration: none;
+    transition: background .35s ease, color .35s ease, border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+
+    span {
+      font-size: .75rem;
+      color: var(--muted);
+      transition: color .15s ease;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--bulb-glow);
+
+      span { color: var(--amber); }
+    }
+
+    &:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+  }
 }
 
 // ---- States (what it does — the four main behaviors) ----

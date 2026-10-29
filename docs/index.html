@@ -1,239 +1,404 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#faf8f3">
-  <title>KeylightBar 💡 — Your Elgato Key Light, one click away</title>
-  <meta name="description" content="KeylightBar puts your Elgato Key Light in the macOS menu bar. One click to switch it on — and it turns off when your Mac sleeps, back on when you wake it, and follows your day on schedule.">
-  <meta property="og:title" content="KeylightBar 💡">
-  <meta property="og:description" content="Your Elgato Key Light, one click away in the macOS menu bar.">
-  <meta property="og:image" content="keylightbar.gif">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💡</text></svg>">
-  <link rel="preconnect" href="https://api.fontshare.com">
-  <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
-  <link href="https://api.fontshare.com/v2/css?f[]=supreme@400,500,600&display=swap" rel="stylesheet">
-  <link href="https://api.fontshare.com/v2/css?f[]=tanker@400&display=swap" rel="stylesheet">
-  <script>
-    // Apply the preset before first paint to avoid a flash of the wrong theme
-    (function () {
-      var t = localStorage.getItem('keylightbar-theme') ||
-        (matchMedia('(prefers-color-scheme: dark)').matches ? 'off' : 'work');
-      document.documentElement.dataset.theme = t;
-    })();
-  </script>
-  <link rel="stylesheet" href="css/main.css">
-</head>
-<body>
-
-  <header class="hero">
-    <p class="hero-badge">Free &amp; open source · macOS menu bar</p>
-    <h1>KeylightBar <span class="hero-bulb" aria-hidden="true">💡</span></h1>
-    <p class="hero-sub">
-      Your Elgato Key Light, one click away in the macOS menu bar.
-    </p>
-    <div class="hero-actions">
-      <a class="btn btn-primary" href="https://github.com/z3tt/keylightbar/releases/latest">
-        ⬇︎ Download KeylightBar
-      </a>
-      <a class="btn btn-ghost" href="https://github.com/z3tt/keylightbar">View on GitHub</a>
-    </div>
-    <p class="hero-compat">Works with every Elgato WiFi light on macOS</p>
-    <ul class="hero-lights" aria-label="Compatible Elgato lights">
-      <li><a href="https://www.elgato.com/key-light" target="_blank" rel="noopener">Key Light <span aria-hidden="true">↗</span></a></li>
-      <li><a href="https://www.elgato.com/key-light-air" target="_blank" rel="noopener">Key Light Air <span aria-hidden="true">↗</span></a></li>
-      <li><a href="https://www.elgato.com/key-light-mini" target="_blank" rel="noopener">Key Light Mini <span aria-hidden="true">↗</span></a></li>
-      <li><a href="https://www.elgato.com/ring-light" target="_blank" rel="noopener">Ring Light <span aria-hidden="true">↗</span></a></li>
-      <li><a href="https://www.elgato.com/light-strip" target="_blank" rel="noopener">Light Strip <span aria-hidden="true">↗</span></a></li>
-    </ul>
-  </header>
-
-  <main>
-
-    <section class="section" id="what">
-      <h2>What it does</h2>
-      <p class="section-lead">
-        One icon, two states: 🌑 turns the light on with your last-used preset, 💡 opens the preset menu.
-        No Dock icon, no companion windows, no dependencies.
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#faf8f3" />
+    <title>KeylightBar 💡 — Your Elgato Key Light, one click away</title>
+    <meta
+      name="description"
+      content="KeylightBar puts your Elgato Key Light in the macOS menu bar. One click to switch it on — and it turns off when your Mac sleeps, back on when you wake it, and follows your day on schedule."
+    />
+    <meta property="og:title" content="KeylightBar 💡" />
+    <meta
+      property="og:description"
+      content="Your Elgato Key Light, one click away in the macOS menu bar."
+    />
+    <meta property="og:image" content="keylightbar.gif" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💡</text></svg>"
+    />
+    <link rel="preconnect" href="https://api.fontshare.com" />
+    <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=supreme@400,500,600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=tanker@400&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      // Apply the preset before first paint to avoid a flash of the wrong theme
+      (function () {
+        var t =
+          localStorage.getItem("keylightbar-theme") ||
+          (matchMedia("(prefers-color-scheme: dark)").matches ? "off" : "work");
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
+    <link rel="stylesheet" href="css/main.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <p class="hero-badge">Free &amp; open source · macOS menu bar</p>
+      <h1>KeylightBar <span class="hero-bulb" aria-hidden="true">💡</span></h1>
+      <p class="hero-sub">
+        Your Elgato Key Light, one click away in the macOS menu bar.
       </p>
-      <div class="states">
-        <article class="state-card state-card--live" id="card-on" tabindex="0" role="button"
-                 aria-label="Turn the site's light on">
-          <span class="state-icon" aria-hidden="true">🌑</span>
-          <h3>Light off? One click on</h3>
-          <p>Your light is off, you click, it's on — with your last-used preset. That's the whole idea.</p>
-        </article>
-        <article class="state-card state-card--live" id="card-menu" tabindex="0" role="button"
-                 aria-haspopup="menu" aria-expanded="false" aria-label="Open the preset menu">
-          <span class="state-icon state-icon--on" aria-hidden="true">💡</span>
-          <h3>Light on? One click to presets</h3>
-          <p>While it's on, the next click opens the preset menu: Meet, Work, Chill — or your own.</p>
-          <ul class="preset-menu" id="preset-menu" hidden aria-label="Presets">
-            <li class="menu-title">Presets</li>
-            <li><button type="button" data-theme="work">Work <span class="dot dot--work" aria-hidden="true"></span></button></li>
-            <li><button type="button" data-theme="bright">Bright <span class="dot dot--bright" aria-hidden="true"></span></button></li>
-            <li><button type="button" data-theme="cold">Cold <span class="dot dot--cold" aria-hidden="true"></span></button></li>
-            <li><button type="button" data-theme="warm">Warm <span class="dot dot--warm" aria-hidden="true"></span></button></li>
-            <li><button type="button" data-theme="night">Night <span class="dot dot--night" aria-hidden="true"></span></button></li>
-            <li class="menu-sep" role="separator"></li>
-            <li><button type="button" data-theme="off">Turn Off <span aria-hidden="true">🌑</span></button></li>
-          </ul>
-        </article>
+      <div class="hero-actions">
+        <a
+          class="btn btn-primary"
+          href="https://github.com/z3tt/keylightbar/releases/latest"
+        >
+          ⬇︎ Download KeylightBar
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/z3tt/keylightbar"
+          >View on GitHub</a
+        >
       </div>
-      <p class="states-hint">psst — this page is your light: click 🌑 to switch it on, 💡 to open the preset menu.</p>
-    </section>
+    </header>
 
-    <section class="section" id="why">
-      <h2>Why you'll keep it</h2>
-      <div class="features">
-        <article class="feature">
-          <span aria-hidden="true">🌗</span>
-          <h3>Sleeps and wakes with your Mac</h3>
-          <p>Off when your Mac sleeps, back on when you return — the wake half is what even Elgato's own app doesn't do.</p>
-        </article>
-        <article class="feature">
-          <span aria-hidden="true">🕑</span>
-          <h3>Day and night on schedule</h3>
-          <p>Work until 19:00, Chill after — your presets switch by time of day, on their own.</p>
-        </article>
-        <article class="feature">
-          <span aria-hidden="true">🚀</span>
-          <h3>Starts at login</h3>
-          <p>Flip <strong>Start At Login</strong> in the 💡 menu and it's in your menu bar from the first boot — no Login Items fiddling in System Settings.</p>
-        </article>
-        <article class="feature">
-          <span aria-hidden="true">🫥</span>
-          <h3>Invisible by design</h3>
-          <p>No Dock icon, no companion windows, no dependencies. If it weren't for the 💡 in your menu bar, you'd forget it exists.</p>
-        </article>
-        <article class="feature">
-          <span aria-hidden="true">🎚️</span>
-          <h3>Presets, built in-app</h3>
-          <p>Seven sensible presets ship with it — Meet, Work, Bright, Cold, Warm, Night, Chill — and a tiny editor for your own. No config files, no terminal.</p>
-        </article>
-        <article class="feature">
-          <span aria-hidden="true">🔄</span>
-          <h3>Always in sync</h3>
-          <p>Change the light from Elgato's app or its physical controls — the icon keeps up with the real state, not just its own.</p>
-        </article>
-        <article class="feature">
-          <span aria-hidden="true">🔍</span>
-          <h3>Zero setup</h3>
-          <p>It finds your light by itself; on stubborn networks it scans for it anyway. And it never pretends to control a light it can't reach.</p>
-        </article>
-        <article class="feature">
-          <span aria-hidden="true">🤏</span>
-          <h3>Tiny and private</h3>
-          <p>One Swift file, zero dependencies, and it talks only to your light over your local network. Nothing leaves your house.</p>
-        </article>
+    <main>
+      <section class="section" id="what">
+        <h2>What it does</h2>
+        <p class="section-lead">
+          One icon, two states: 🌑 turns the light on with your last-used
+          preset, 💡 opens the preset menu. No Dock icon, no companion windows,
+          no dependencies.
+        </p>
+        <div class="states">
+          <article
+            class="state-card state-card--live"
+            id="card-on"
+            tabindex="0"
+            role="button"
+            aria-label="Turn the site's light on"
+          >
+            <span class="state-icon" aria-hidden="true">🌑</span>
+            <h3>Light off? One click on</h3>
+            <p>
+              Your light is off, you click, it's on — with your last-used
+              preset. That's the whole idea.
+            </p>
+          </article>
+          <article
+            class="state-card state-card--live"
+            id="card-menu"
+            tabindex="0"
+            role="button"
+            aria-haspopup="menu"
+            aria-expanded="false"
+            aria-label="Open the preset menu"
+          >
+            <span class="state-icon state-icon--on" aria-hidden="true">💡</span>
+            <h3>Light on? One click to presets</h3>
+            <p>
+              While it's on, the next click opens the preset menu: Meet, Work,
+              Chill — or your own.
+            </p>
+            <ul
+              class="preset-menu"
+              id="preset-menu"
+              hidden
+              aria-label="Presets"
+            >
+              <li class="menu-title">Presets</li>
+              <li>
+                <button type="button" data-theme="work">
+                  Work <span class="dot dot--work" aria-hidden="true"></span>
+                </button>
+              </li>
+              <li>
+                <button type="button" data-theme="bright">
+                  Bright
+                  <span class="dot dot--bright" aria-hidden="true"></span>
+                </button>
+              </li>
+              <li>
+                <button type="button" data-theme="cold">
+                  Cold <span class="dot dot--cold" aria-hidden="true"></span>
+                </button>
+              </li>
+              <li>
+                <button type="button" data-theme="warm">
+                  Warm <span class="dot dot--warm" aria-hidden="true"></span>
+                </button>
+              </li>
+              <li>
+                <button type="button" data-theme="night">
+                  Night <span class="dot dot--night" aria-hidden="true"></span>
+                </button>
+              </li>
+              <li class="menu-sep" role="separator"></li>
+              <li>
+                <button type="button" data-theme="off">
+                  Turn Off <span aria-hidden="true">🌑</span>
+                </button>
+              </li>
+            </ul>
+          </article>
+        </div>
+        <p class="states-hint">
+          psst — this page acts as your light: click 🌑 to switch it on, 💡 to
+          open the preset menu.
+        </p>
+      </section>
+
+      <section class="section" id="why">
+        <h2>Why you'll keep it</h2>
+        <div class="features">
+          <article class="feature">
+            <span aria-hidden="true">🌗</span>
+            <h3>Sleeps + wakes as your Mac</h3>
+            <p>
+              Off when your Mac sleeps, back on when you return — the wake half
+              is what even Elgato's own app doesn't do.
+            </p>
+          </article>
+          <article class="feature">
+            <span aria-hidden="true">🕑</span>
+            <h3>Day and night on schedule</h3>
+            <p>
+              with bright light until 19:00 — chill mode after. Your presets
+              switch by time of day, on their own.
+            </p>
+          </article>
+          <article class="feature">
+            <span aria-hidden="true">🚀</span>
+            <h3>Starts at login</h3>
+            <p>
+              Flip <strong>Start At Login</strong> in the 💡 menu and it's in
+              your menu bar from the first boot — no Login Items fiddling in
+              System Settings.
+            </p>
+          </article>
+          <article class="feature">
+            <span aria-hidden="true">🫥</span>
+            <h3>Invisible by design</h3>
+            <p>
+              No Dock icon, no companion windows, no dependencies. If it weren't
+              for the 💡 in your menu bar, you'd forget it exists.
+            </p>
+          </article>
+          <article class="feature">
+            <span aria-hidden="true">🎚️</span>
+            <h3>Presets, built in-app</h3>
+            <p>
+              Seven sensible presets ship with it — Meet, Work, Bright, Cold,
+              Warm, Night, Chill — and a tiny editor for your own. No config
+              files, no terminal.
+            </p>
+          </article>
+          <article class="feature">
+            <span aria-hidden="true">🔄</span>
+            <h3>Always in sync</h3>
+            <p>
+              Change the light from Elgato's app or its physical controls — the
+              icon keeps up with the real state, not just its own.
+            </p>
+          </article>
+          <article class="feature">
+            <span aria-hidden="true">🔍</span>
+            <h3>Zero setup</h3>
+            <p>
+              It finds your light by itself; on stubborn networks it scans for
+              it anyway. And it never pretends to control a light it can't
+              reach.
+            </p>
+          </article>
+          <article class="feature">
+            <span aria-hidden="true">🤏</span>
+            <h3>Tiny and private</h3>
+            <p>
+              One Swift file, zero dependencies, and it talks only to your light
+              over your local network. Nothing leaves your house.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section section--showcase" id="showcase">
+        <h2>The real thing</h2>
+        <p class="section-lead">
+          Everything you just tried is real: a single menu bar icon, the actual
+          preset menu, on your Mac.
+        </p>
+        <figure class="hero-demo">
+          <img
+            src="keylightbar.gif"
+            alt="KeylightBar in the macOS menu bar: the icon switches between 🌑 and 💡, one click turns the light on, and clicking while on opens the preset menu with sleep/wake and time-of-day settings"
+            width="422"
+          />
+          <figcaption>One icon. Two states. That's the whole app.</figcaption>
+        </figure>
+      </section>
+
+      <section class="section section--download" id="download">
+        <h2>Get it</h2>
+        <p class="section-lead">
+          Works with every Elgato WiFi light on macOS. Free, open source, and
+          ready in three steps.
+        </p>
+        <ul class="lights" aria-label="Compatible Elgato lights">
+          <li>
+            <a
+              href="https://www.elgato.com/key-light"
+              target="_blank"
+              rel="noopener"
+              >Key Light <span aria-hidden="true">↗</span></a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.elgato.com/key-light-air"
+              target="_blank"
+              rel="noopener"
+              >Key Light Air <span aria-hidden="true">↗</span></a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.elgato.com/key-light-mini"
+              target="_blank"
+              rel="noopener"
+              >Key Light Mini <span aria-hidden="true">↗</span></a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.elgato.com/ring-light"
+              target="_blank"
+              rel="noopener"
+              >Ring Light <span aria-hidden="true">↗</span></a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.elgato.com/light-strip"
+              target="_blank"
+              rel="noopener"
+              >Light Strip <span aria-hidden="true">↗</span></a
+            >
+          </li>
+        </ul>
+        <ol class="steps">
+          <li>
+            <strong>Download</strong>
+            <a href="https://github.com/z3tt/keylightbar/releases/latest"
+              >KeylightBar.zip</a
+            >
+            from the Releases page and unzip it.
+          </li>
+          <li>
+            <strong>Open it once</strong> — macOS will ask (the app is
+            unsigned). Approve via
+            <em>System Settings → Privacy &amp; Security → Open Anyway</em>.
+          </li>
+          <li>
+            <strong>Say yes</strong> if macOS asks for
+            <em>Local Network</em> access — that's how KeylightBar reaches your
+            light.
+          </li>
+        </ol>
+        <a
+          class="btn btn-primary btn-big"
+          href="https://github.com/z3tt/keylightbar/releases/latest"
+          >⬇︎ Download from GitHub Releases</a
+        >
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="coffee">
+        <h2>Enjoying KeylightBar?</h2>
+        <p>It's free and open source — but coffee keeps the 💡 on.</p>
+        <a class="btn btn-coffee" href="https://buymeacoffee.com/z3tt"
+          >☕ Buy me a coffee</a
+        >
       </div>
-    </section>
-
-    <section class="section section--showcase" id="showcase">
-      <h2>The real thing</h2>
-      <p class="section-lead">
-        Everything you just tried is real: a single menu bar icon, the actual preset menu, on your Mac.
+      <p class="footer-meta">
+        KeylightBar by <a href="https://cedricscherer.com">Cédric Scherer</a> ·
+        <a href="https://github.com/z3tt/keylightbar">GitHub</a> · MIT License ·
+        Built with one Swift file and no dependencies
       </p>
-      <figure class="hero-demo">
-        <img src="keylightbar.gif" alt="KeylightBar in the macOS menu bar: the icon switches between 🌑 and 💡, one click turns the light on, and clicking while on opens the preset menu with sleep/wake and time-of-day settings" width="422">
-        <figcaption>One icon. Two states. That's the whole app.</figcaption>
-      </figure>
-    </section>
+    </footer>
 
-    <section class="section section--download" id="download">
-      <h2>Get it</h2>
-      <p class="section-lead">
-        Free, open source, and ready in three steps.
-      </p>
-      <ol class="steps">
-        <li><strong>Download</strong> <a href="https://github.com/z3tt/keylightbar/releases/latest">KeylightBar.zip</a> from the Releases page and unzip it.</li>
-        <li><strong>Open it once</strong> — macOS will ask (the app is unsigned). Approve via <em>System Settings → Privacy &amp; Security → Open Anyway</em>.</li>
-        <li><strong>Say yes</strong> if macOS asks for <em>Local Network</em> access — that's how KeylightBar reaches your light.</li>
-      </ol>
-      <a class="btn btn-primary btn-big" href="https://github.com/z3tt/keylightbar/releases/latest">⬇︎ Download from GitHub Releases</a>
-    </section>
+    <script>
+      (function () {
+        var root = document.documentElement;
+        var meta = document.querySelector('meta[name="theme-color"]');
+        var LIGHT = ["work", "bright", "cold", "warm", "night"];
 
-  </main>
+        function setTheme(t) {
+          root.dataset.theme = t;
+          localStorage.setItem("keylightbar-theme", t);
+          if (LIGHT.indexOf(t) > -1) localStorage.setItem("keylightbar-day", t);
+          if (meta)
+            meta.content = getComputedStyle(document.body).backgroundColor;
+        }
 
-  <footer class="footer">
-    <div class="coffee">
-      <h2>Enjoying KeylightBar?</h2>
-      <p>It's free and open source — but coffee keeps the 💡 on.</p>
-      <a class="btn btn-coffee" href="https://buymeacoffee.com/z3tt">☕ Buy me a coffee</a>
-    </div>
-    <p class="footer-meta">
-      KeylightBar by <a href="https://cedricscherer.com">Cédric Scherer</a> ·
-      <a href="https://github.com/z3tt/keylightbar">GitHub</a> ·
-      MIT License · Built with one Swift file and no dependencies
-    </p>
-  </footer>
+        // the two live cards: 🌑 turns the site's light on (with your last-used
+        // day preset), 💡 opens the preset menu
+        var menu = document.getElementById("preset-menu");
+        var cardOn = document.getElementById("card-on");
+        var cardMenu = document.getElementById("card-menu");
 
-  <script>
-    (function () {
-      var root = document.documentElement;
-      var meta = document.querySelector('meta[name="theme-color"]');
-      var LIGHT = ['work', 'bright', 'cold', 'warm', 'night'];
+        function activate(card, fn) {
+          card.addEventListener("click", fn);
+          card.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              fn(e);
+            }
+          });
+        }
 
-      function setTheme(t) {
-        root.dataset.theme = t;
-        localStorage.setItem('keylightbar-theme', t);
-        if (LIGHT.indexOf(t) > -1) localStorage.setItem('keylightbar-day', t);
-        if (meta) meta.content = getComputedStyle(document.body).backgroundColor;
-      }
+        function openMenu() {
+          menu.hidden = false;
+          document.body.classList.add("menu-open");
+          cardMenu.setAttribute("aria-expanded", "true");
+        }
 
-      // the two live cards: 🌑 turns the site's light on (with your last-used
-      // day preset), 💡 opens the preset menu
-      var menu = document.getElementById('preset-menu');
-      var cardOn = document.getElementById('card-on');
-      var cardMenu = document.getElementById('card-menu');
+        function closeMenu() {
+          menu.hidden = true;
+          document.body.classList.remove("menu-open");
+          cardMenu.setAttribute("aria-expanded", "false");
+        }
 
-      function activate(card, fn) {
-        card.addEventListener('click', fn);
-        card.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(e); }
+        activate(cardOn, function () {
+          setTheme(localStorage.getItem("keylightbar-day") || "work");
         });
-      }
 
-      function openMenu() {
-        menu.hidden = false;
-        document.body.classList.add('menu-open');
-        cardMenu.setAttribute('aria-expanded', 'true');
-      }
+        activate(cardMenu, function (e) {
+          e.stopPropagation();
+          menu.hidden ? openMenu() : closeMenu();
+        });
 
-      function closeMenu() {
-        menu.hidden = true;
-        document.body.classList.remove('menu-open');
-        cardMenu.setAttribute('aria-expanded', 'false');
-      }
+        menu.addEventListener("click", function (e) {
+          e.stopPropagation();
+          var item = e.target.closest("[data-theme]");
+          if (!item) return;
+          setTheme(item.dataset.theme);
+          closeMenu();
+        });
 
-      activate(cardOn, function () {
-        setTheme(localStorage.getItem('keylightbar-day') || 'work');
-      });
+        document.addEventListener("click", function (e) {
+          if (
+            !menu.hidden &&
+            !menu.contains(e.target) &&
+            !cardMenu.contains(e.target)
+          )
+            closeMenu();
+        });
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && !menu.hidden) closeMenu();
+        });
 
-      activate(cardMenu, function (e) {
-        e.stopPropagation();
-        menu.hidden ? openMenu() : closeMenu();
-      });
-
-      menu.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var item = e.target.closest('[data-theme]');
-        if (!item) return;
-        setTheme(item.dataset.theme);
-        closeMenu();
-      });
-
-      document.addEventListener('click', function (e) {
-        if (!menu.hidden && !menu.contains(e.target) && !cardMenu.contains(e.target)) closeMenu();
-      });
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && !menu.hidden) closeMenu();
-      });
-
-      // register the restored preset so 🌑 can bring back your last day setup
-      setTheme(root.dataset.theme);
-    })();
-  </script>
-
-</body>
+        // register the restored preset so 🌑 can bring back your last day setup
+        setTheme(root.dataset.theme);
+      })();
+    </script>
+  </body>
 </html>
