@@ -210,7 +210,14 @@ strong { font-weight: 600; }
     flex-wrap: wrap;
     justify-content: center;
     gap: .9rem;
-    margin-bottom: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  &-compat {
+    max-width: 34rem;
+    margin: 0 auto 3rem;
+    color: var(--muted);
+    font-size: .95rem;
   }
 
   &-demo {
@@ -295,17 +302,22 @@ strong { font-weight: 600; }
 .feature {
   background: var(--card);
   border: 1px solid var(--card-edge);
+  border-top: 3px solid transparent;
   border-radius: $radius;
   padding: 1.6rem 1.5rem;
   box-shadow: var(--shadow-card);
-  transition: background .35s ease, color .35s ease;
+  transition: background .35s ease, color .35s ease, border-color .25s ease, transform .15s ease, box-shadow .2s ease;
 
   > span { font-size: 1.8rem; }
 
   h3 { font-size: 1.25rem; margin: .5rem 0 .4rem; }
   p  { color: var(--muted); margin: 0; font-size: .98rem; }
 
-  &:nth-child(1) { border-top: 3px solid var(--amber); }
+  &:hover {
+    transform: translateY(-3px);
+    border-top-color: var(--amber);
+    box-shadow: 0 8px 24px var(--bulb-glow);
+  }
 }
 
 // ---- Download ----
