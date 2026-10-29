@@ -300,14 +300,16 @@ strong { font-weight: 600; }
 
 // ---- States (what it does — the four main behaviors) ----
 .states {
-  position: relative;   // above the menu scrim: the live cards stay crisp and clickable
-  z-index: 18;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1.25rem;
   max-width: 40rem;
   margin: 0 auto;
 }
+
+// while the preset menu is open, only its host card stays above the
+// scrim; the 🌑 card dims with the rest of the page
+body.menu-open #card-menu { z-index: 18; }
 
 .state-card {
   position: relative;
