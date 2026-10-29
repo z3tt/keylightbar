@@ -300,6 +300,8 @@ strong { font-weight: 600; }
 
 // ---- States (what it does — the four main behaviors) ----
 .states {
+  position: relative;   // above the menu scrim: the live cards stay crisp and clickable
+  z-index: 18;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1.25rem;
@@ -339,8 +341,9 @@ strong { font-weight: 600; }
   }
 }
 
-// dim the page behind the open preset menu, so it reads as an
-// intentional layer instead of colliding with content below
+// dim the page behind the open preset menu. Purely visual — the
+// live cards sit above it (like the macOS menu bar above a dimmed
+// screen) and stay fully clickable.
 body::before {
   content: '';
   position: fixed;
@@ -352,7 +355,7 @@ body::before {
   transition: opacity .25s ease;
 }
 
-body.menu-open::before { opacity: 1; pointer-events: auto; }
+body.menu-open::before { opacity: 1; }
 
 // macOS-style preset popover, anchored to the 💡 card
 .preset-menu {
