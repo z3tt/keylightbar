@@ -16,7 +16,7 @@ Control any [Elgato Key Light](https://www.elgato.com/key-light) in your macOS m
 
 
 
-## Get the app
+## How to install the app
 
 1. Download **KeylightBar.zip** from the [Releases page](https://github.com/z3tt/keylightbar/releases) and unzip it.
 2. Right-click **KeylightBar.app** → **Open** → **Open**. The app is unsigned, so Gatekeeper needs that one-time approval. macOS remembers it afterwards.
@@ -32,6 +32,8 @@ An icon to control your keylight, simple but versatile thanks to the 2-state con
 | --- | --- |
 | 🌑 light is **off** | Click turns it **on** with the last-used preset |
 | 💡 light is **on** | Click opens the **preset menu** to choose predefined setups |
+
+### Additional features:
 
 - **Your presets, built in-app.** Seven sensible presets ship with it — *Meet, Work, Bright, Cold, Warm, Night, Chill* — and you can add, rename, and tune your own with sliders. No config files, no command line.
 - **A light that sleeps and wakes with your Mac.** Two independent rules you can toggle: *Off When Mac Sleeps* and *On When Mac Wakes*. This is the gap KeylightBar was born to fill — Elgato's own Control Center can switch your light off automatically, but nothing switches it back on when you return to your desk.
