@@ -63,9 +63,8 @@ body {
   font-size: 1.0625rem;
   line-height: 1.65;
   color: var(--text);
-  background:
-    radial-gradient(60rem 32rem 60% -12rem, var(--hero-glow), transparent 70%),
-    var(--bg);
+  background-color: var(--bg); // separate from background-image so a broken gradient can never drop the theme color
+  background-image: radial-gradient(60rem 32rem at 60% -12rem, var(--hero-glow), transparent 70%);
   transition: background .35s ease, color .35s ease;
   -webkit-font-smoothing: antialiased;
 }
