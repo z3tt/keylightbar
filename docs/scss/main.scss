@@ -131,8 +131,8 @@ strong { font-weight: 600; }
     color: var(--text);
     border: 1px solid var(--card-edge);
     background: var(--card);
-    transition: transform .15s ease, background .35s ease, color .35s ease;
-    &:hover { background: var(--bg-soft); }
+    transition: transform .15s ease, background .35s ease, color .35s ease, box-shadow .15s ease;
+    &:hover { background: var(--bg-soft); box-shadow: 0 8px 24px var(--bulb-glow); }
   }
 
   &-big { font-size: 1.2rem; padding: .95rem 2.1rem; }
@@ -251,8 +251,7 @@ strong { font-weight: 600; }
 
       &:hover {
         transform: translateY(-2px);
-        border-color: var(--amber);
-        box-shadow: 0 4px 14px var(--bulb-glow);
+        box-shadow: 0 8px 24px var(--bulb-glow);
 
         span { color: var(--amber); }
       }
