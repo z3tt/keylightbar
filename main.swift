@@ -169,7 +169,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)   // no Dock icon
 
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        // Fixed square slot: 💡/🌑/🔍 have different glyph widths, and a
+        // variable-length item would shift the neighboring menubar icons
+        // every time the emoji changes.
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        statusItem.button?.alignment = .center
         statusItem.button?.title = iconOff
         statusItem.button?.target = self
         statusItem.button?.action = #selector(iconAction(_:))
@@ -986,18 +990,41 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
     }
 
     @objc private func addPreset(_ sender: Any?) {
+        // Ask for the name up front instead of appending a stub preset
+        // that needs to be found and renamed afterwards. New presets
+        // inherit the brightness/temperature of the selected one.
+        let alert = NSAlert()
+        alert.messageText = "New Preset"
+        alert.informativeText = "Starts from the selected preset's brightness and temperature — adjust with the sliders afterwards."
+        let input = NSTextField(frame: NSRect(x: 0, y: 0, width: 240, height: 24))
+        alert.accessoryView = input
+        alert.addButton(withTitle: "Add")
+        alert.addButton(withTitle: "Cancel")
+
         var n = app.presets.count + 1
-        var newName = "Preset \(n)"
-        while app.presets.contains(where: { $0.name == newName }) {
+        var suggestion = "Preset \(n)"
+        while app.presets.contains(where: { $0.name == suggestion }) {
             n += 1
-            newName = "Preset \(n)"
+            suggestion = "Preset \(n)"
         }
-        app.presets.append(Preset(name: newName, brightness: 50, temperature: 220))
-        commit()
-        let idx = app.presets.count - 1
-        table.selectRowIndexes(IndexSet(integer: idx), byExtendingSelection: false)
-        table.scrollRowToVisible(idx)
-        nameField.selectText(nil)
+        input.stringValue = suggestion
+        let template = selectedRow()
+
+        alert.beginSheetModal(for: window) { [weak self] response in
+            guard let self = self, response == .alertFirstButtonReturn else { return }
+            var newName = input.stringValue.trimmingCharacters(in: .whitespaces).capitalized
+            // Empty or duplicate names fall back to the unique suggestion.
+            if newName.isEmpty || self.app.presets.contains(where: { $0.name == newName }) {
+                newName = suggestion
+            }
+            self.app.presets.append(Preset(name: newName,
+                                           brightness: template?.brightness ?? 50,
+                                           temperature: template?.temperature ?? 220))
+            self.commit()
+            let idx = self.app.presets.count - 1
+            self.table.selectRowIndexes(IndexSet(integer: idx), byExtendingSelection: false)
+            self.table.scrollRowToVisible(idx)
+        }
     }
 
     @objc private func removePreset(_ sender: Any?) {
