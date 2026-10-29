@@ -1,0 +1,25 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Build KeylightBar.app
+        run: make bundle
+
+      - name: Zip app bundle
+        run: ditto -c -k -X KeylightBar.app KeylightBar.zip
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" KeylightBar.zip --title "${{ github.ref_name }}" --generate-notes

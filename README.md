@@ -14,6 +14,16 @@ Control any [Elgato Key Light](https://www.elgato.com/key-light) in your macOS m
   No Dock icon, no companion windows, no dependencies. Just a 💡 in your menu bar.
 </p>
 
+## Get the app
+
+No developer tools needed:
+
+1. Download **KeylightBar.zip** from the [Releases page](https://github.com/z3tt/keylightbar/releases) and unzip it.
+2. Right-click **KeylightBar.app** → **Open** → **Open**. The app is unsigned, so Gatekeeper needs that one-time approval — macOS remembers it afterwards.
+3. There's your 💡 in the menu bar. If macOS asks for **Local Network** access, say yes — without it, KeylightBar can't reach your light.
+
+To start it automatically at login, add **KeylightBar.app** to *System Settings → General → Login Items & Extensions*.
+
 ## What you get
 
 - **One click to a perfect light.** Light off? Click the 🌑 and it comes on with your last-used preset. Light on? Click the 💡 for the full preset picker.
@@ -39,7 +49,7 @@ macOS itself won't let one menu bar item act as a *button* when you want a butto
 
 KeylightBar works with all Elgato WiFi lights — **Key Light, Key Light Air, Key Light Mini, Ring Light, and Light Strip** — because they all speak the same local API. On the RGB **Light Strip**, the temperature value has no visible effect (brightness and on/off work as expected).
 
-## Install & run
+## Build it yourself
 
 Requirements: a Mac with the Swift toolchain (ships with Xcode Command Line Tools: `xcode-select --install`).
 
@@ -48,13 +58,7 @@ make bundle        # compiles the app and (re)builds KeylightBar.app
 open KeylightBar.app
 ```
 
-To start it automatically at login, add **KeylightBar.app** to *System Settings → General → Login Items & Extensions*.
-
-### If you downloaded the app instead of building it
-
-The binary is unsigned, so **Gatekeeper** will block the first launch. Right-click **KeylightBar.app** → **Open** → **Open** in the confirmation dialog (macOS remembers your approval afterwards). This is unavoidable without an Apple Developer ID for signing + notarization.
-
-Also note: macOS grants **Local Network** access per binary. A freshly compiled KeylightBar needs its own permission — if commands silently do nothing, check *System Settings → Privacy & Security → Local Network* and enable KeylightBar there.
+Note that macOS grants **Local Network** access per binary: a freshly compiled KeylightBar needs its own permission, even if a previous build had one. If commands silently do nothing, check *System Settings → Privacy & Security → Local Network* and enable KeylightBar there.
 
 ## Make it yours
 
