@@ -4,14 +4,13 @@
   <a href="https://github.com/z3tt/keylightbar/actions/workflows/build.yml"><img src="https://github.com/z3tt/keylightbar/actions/workflows/build.yml/badge.svg" alt="Build status"></a>
 </p>
 
-Control any [Elgato Key Light](https://www.elgato.com/key-light) in your macOS menu bar — one click to switch it on exactly how you like it, and from there it manages itself: it turns off when your Mac sleeps, comes back on when you wake it, and moves between your daytime and evening setups on schedule.
-
-🌑 turns the light on. 💡 opens the preset menu.
+Control any [Elgato Key Light](https://www.elgato.com/key-light) in your macOS menu bar — one click to switch it on, and from there it manages itself: it turns off when your Mac sleeps, comes back on when you wake it, and moves between your daytime and evening setups on schedule.
 
 <p align="center">
   <img src="docs/keylightbar.gif" alt="KeylightBar in the menu bar: the icon switches between 🌑 and 💡, one click turns the light on, clicking while on opens the preset menu with the sleep/wake and time-of-day settings, and the Manage Presets editor" width="422">
   <br>
-  No Dock icon, no companion windows, no dependencies. Just a 💡 in your menu bar.
+  <b>🌑 turns the light on. 💡 opens the preset menu.</b><br/>
+  No Dock icon, no companion windows, no dependencies.
 </p>
 
 ## Get the app
