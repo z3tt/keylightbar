@@ -1,23 +1,23 @@
-// KeylightBar one-pager — dark, menu-bar vibe, amber glow
+// KeylightBar one-pager — light, warm paper vibe with amber accents
+// Fonts: Tanker (display) + Supreme (body) via Fontshare
 // Compile: npx sass scss/main.scss css/main.css --style compressed
 
 @use "sass:color";
 
 // ---- Tokens ----
-$bg:        #0b0c10;
-$bg-soft:   #12141a;
-$card:      #161923;
-$card-edge: #23273a;
-$text:      #e8eaf2;
-$muted:     #9aa0b4;
-$amber:     #f5b642;
-$amber-dim: #b57e1f;
-$bulb-glow: rgba(245, 182, 66, .45);
+$bg:        #faf8f3;
+$bg-soft:   #f2eee4;
+$card:      #ffffff;
+$card-edge: #e7e2d4;
+$text:      #221f18;
+$muted:     #5d584b;
+$amber:     #f0a92e;
+$amber-deep: #8a5f0b;
 $radius:    16px;
 $maxw:      1080px;
 
-$font-head: "Space Grotesk", system-ui, sans-serif;
-$font-body: "Inter", system-ui, sans-serif;
+$font-head: "Tanker", "Supreme", system-ui, sans-serif;
+$font-body: "Supreme", system-ui, sans-serif;
 
 // ---- Base ----
 * { box-sizing: border-box; }
@@ -31,56 +31,59 @@ body {
   line-height: 1.65;
   color: $text;
   background:
-    radial-gradient(60rem 32rem 60% -12rem, rgba(245, 182, 66, .10), transparent 70%),
+    radial-gradient(60rem 32rem 60% -12rem, rgba(240, 169, 46, .14), transparent 70%),
     $bg;
   -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3 {
   font-family: $font-head;
+  font-weight: 400;
   line-height: 1.15;
   margin: 0 0 .5em;
+  letter-spacing: .01em;
 }
 
-a { color: $amber; }
+a { color: $amber-deep; }
 
 img { max-width: 100%; height: auto; }
 
-strong { color: $text; font-weight: 600; }
+strong { font-weight: 600; }
 
 // ---- Shared bits ----
 .btn {
   display: inline-block;
-  font-family: $font-head;
-  font-size: 1rem;
-  font-weight: 500;
+  font-family: $font-body;
+  font-size: 1.0625rem;
+  font-weight: 600;
   text-decoration: none;
-  padding: .7rem 1.4rem;
+  padding: .7rem 1.5rem;
   border-radius: 999px;
   transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
   &:hover  { transform: translateY(-2px); }
   &:active { transform: translateY(0); }
 
   &-primary {
-    color: #14100a;
-    background: linear-gradient(135deg, $amber, #ffd97a);
-    box-shadow: 0 4px 24px $bulb-glow;
-    &:hover { box-shadow: 0 6px 32px $bulb-glow; }
+    color: #241a05;
+    background: linear-gradient(135deg, $amber, #ffca5f);
+    box-shadow: 0 4px 16px rgba(240, 169, 46, .45);
+    &:hover { box-shadow: 0 6px 22px rgba(240, 169, 46, .55); }
   }
 
   &-ghost {
     color: $text;
     border: 1px solid $card-edge;
+    background: $card;
     &:hover { background: $bg-soft; }
   }
 
-  &-big { font-size: 1.125rem; padding: .9rem 2rem; }
+  &-big { font-size: 1.2rem; padding: .95rem 2.1rem; }
 
   &-coffee {
     color: #fff;
-    background: #ff813f;
-    box-shadow: 0 4px 24px rgba(255, 129, 63, .35);
-    &:hover { box-shadow: 0 6px 32px rgba(255, 129, 63, .45); }
+    background: #e0632d;
+    box-shadow: 0 4px 16px rgba(224, 99, 45, .35);
+    &:hover { box-shadow: 0 6px 22px rgba(224, 99, 45, .45); }
   }
 }
 
@@ -90,7 +93,7 @@ strong { color: $text; font-weight: 600; }
   padding: clamp(3rem, 8vw, 5.5rem) 1.5rem;
 
   h2 {
-    font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
     text-align: center;
   }
 
@@ -113,25 +116,25 @@ strong { color: $text; font-weight: 600; }
   &-badge {
     display: inline-block;
     font-size: .8rem;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: .08em;
     text-transform: uppercase;
-    color: $amber;
-    border: 1px solid color.adjust($amber, $alpha: -.6);
+    color: $amber-deep;
+    border: 1px solid color.adjust($amber, $alpha: -.5);
+    background: rgba(240, 169, 46, .12);
     border-radius: 999px;
     padding: .3rem .9rem;
     margin: 0 0 1.5rem;
   }
 
   h1 {
-    font-size: clamp(2.6rem, 6vw, 4rem);
-    font-weight: 700;
+    font-size: clamp(2.8rem, 7vw, 4.4rem);
     margin-bottom: .4em;
   }
 
   &-bulb {
     display: inline-block;
-    filter: drop-shadow(0 0 18px $bulb-glow);
+    filter: drop-shadow(0 2px 10px rgba(240, 169, 46, .6));
     animation: flicker 4s ease-in-out infinite;
   }
 
@@ -141,7 +144,7 @@ strong { color: $text; font-weight: 600; }
     color: $muted;
     font-size: 1.2rem;
 
-    strong { display: block; margin-top: .35rem; color: $text; }
+    strong { display: block; margin-top: .35rem; color: $text; font-weight: 600; }
   }
 
   &-actions {
@@ -159,7 +162,7 @@ strong { color: $text; font-weight: 600; }
     background: $bg-soft;
     border: 1px solid $card-edge;
     border-radius: $radius + 4;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, .45);
+    box-shadow: 0 16px 40px rgba(64, 52, 20, .14);
 
     img {
       display: block;
@@ -195,16 +198,17 @@ strong { color: $text; font-weight: 600; }
   border-radius: $radius;
   padding: 1.75rem 1.5rem;
   text-align: center;
+  box-shadow: 0 2px 10px rgba(64, 52, 20, .06);
 
   .state-icon {
     font-size: 2.6rem;
     display: block;
     margin-bottom: .5rem;
 
-    &--on { filter: drop-shadow(0 0 14px $bulb-glow); }
+    &--on { filter: drop-shadow(0 2px 8px rgba(240, 169, 46, .7)); }
   }
 
-  h3 { font-size: 1.2rem; margin-bottom: .35rem; }
+  h3 { font-size: 1.3rem; margin-bottom: .35rem; }
   p  { color: $muted; margin: 0; }
 }
 
@@ -220,13 +224,14 @@ strong { color: $text; font-weight: 600; }
   border: 1px solid $card-edge;
   border-radius: $radius;
   padding: 1.6rem 1.5rem;
+  box-shadow: 0 2px 10px rgba(64, 52, 20, .06);
 
   > span { font-size: 1.8rem; }
 
-  h3 { font-size: 1.15rem; margin: .5rem 0 .4rem; }
+  h3 { font-size: 1.25rem; margin: .5rem 0 .4rem; }
   p  { color: $muted; margin: 0; font-size: .98rem; }
 
-  &:nth-child(1) { border-top: 2px solid $amber-dim; }
+  &:nth-child(1) { border-top: 3px solid $amber; }
 }
 
 // ---- Download ----
@@ -238,9 +243,10 @@ strong { color: $text; font-weight: 600; }
     margin: 0 auto 2.25rem;
     padding: 1.5rem 1.5rem 1.5rem 2.5rem;
     text-align: left;
-    background: $bg-soft;
+    background: $card;
     border: 1px solid $card-edge;
     border-radius: $radius;
+    box-shadow: 0 2px 10px rgba(64, 52, 20, .06);
     color: $muted;
 
     li { margin-bottom: .75rem; }
@@ -258,7 +264,7 @@ strong { color: $text; font-weight: 600; }
 
 .coffee {
   background:
-    radial-gradient(24rem 14rem at 50% 0%, rgba(245, 182, 66, .08), transparent 70%),
+    radial-gradient(24rem 14rem at 50% 0%, rgba(240, 169, 46, .16), transparent 70%),
     $bg-soft;
   border: 1px solid $card-edge;
   border-radius: $radius + 4;
@@ -273,8 +279,8 @@ strong { color: $text; font-weight: 600; }
   color: color.adjust($muted, $lightness: -8%);
   font-size: .9rem;
 
-  a { color: $muted; }
-  a:hover { color: $text; }
+  a { color: $muted; text-decoration: none; }
+  a:hover { color: $text; text-decoration: underline; }
 }
 
 // ---- Small screens ----
