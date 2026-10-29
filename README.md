@@ -85,4 +85,4 @@ If a configured preset no longer exists (renamed or removed in the manager), the
 
 ## License
 
-[MIT](LICENSE) — © Cédric Scherer
+[MIT](LICENSE) — Cédric Scherer
