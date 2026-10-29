@@ -16,7 +16,7 @@ Control any [Elgato Key Light](https://www.elgato.com/key-light) in your macOS m
 ## How to install the app
 
 1. Download **KeylightBar.zip** from the [Releases page](https://github.com/z3tt/keylightbar/releases) and unzip it.
-2. Right-click **KeylightBar.app** → **Open** → **Open**. The app is unsigned, so Gatekeeper needs that one-time approval. macOS remembers it afterwards.
+2. Try to open **KeylightBar.app** once (macOS will block it), then go to **System Settings → Privacy & Security**, scroll down, and click **Open Anyway**. The app is unsigned, so Gatekeeper needs that one-time approval; macOS remembers it afterwards. On older macOS versions, right-click **KeylightBar.app** → **Open** → **Open** works too.
 3. There's your 💡 in the menu bar. If macOS asks for **Local Network** access, say yes — without it, KeylightBar can't reach your light.
 
 To start it automatically at login, add **KeylightBar.app** to *System Settings → General → Login Items & Extensions*.
@@ -77,6 +77,7 @@ If a configured preset no longer exists (renamed or removed in the manager), the
 
 ## Troubleshooting
 
+- **macOS offers only "Move to Bin"** → Gatekeeper blocking the unsigned app. Approve it via **System Settings → Privacy & Security → Open Anyway**, or clear the quarantine flag before launching: `xattr -d com.apple.quarantine KeylightBar.app`. Only a notarized build would avoid the prompt entirely (see #3).
 - **Nothing happens on click** → check Local Network permission (see above), and that the Mac and Key Light are on the same network.
 - **Icon shows 🌑 although the light is on** → the launch sync couldn't reach the light. Most common cause: a freshly compiled binary hasn't been granted *Local Network* access yet — approve it and the icon corrects itself within seconds (the app retries shortly after launch). If it stays wrong for over a minute, check the address via *Configure…*.
 - **Light doesn't turn on after wake** → right after wake, the Mac's network often isn't up yet. KeylightBar checks the light's real state and retries for about 20 seconds, so it turns on as soon as the network is back — no action needed. If it never comes on, check Local Network permission and the address via *Configure…*.
