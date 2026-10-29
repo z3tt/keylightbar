@@ -18,6 +18,7 @@ build:
 bundle: build
 	@mkdir -p $(CONTENTS)
 	@printf '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n<dict>\n    <key>CFBundleName</key>\n    <string>$(APP_NAME)</string>\n    <key>CFBundleIdentifier</key>\n    <string>$(BUNDLE_ID)</string>\n    <key>CFBundleShortVersionString</key>\n    <string>$(VERSION)</string>\n    <key>CFBundleVersion</key>\n    <string>$(VERSION)</string>\n    <key>CFBundleExecutable</key>\n    <string>$(APP_NAME)</string>\n    <key>CFBundleIconFile</key>\n    <string>KeylightBar.icns</string>\n    <key>LSUIElement</key>\n    <true/>\n</dict>\n</plist>\n' > $(PLIST)
+	@codesign --force --sign - $(APP_DIR)
 	@echo "$(APP_DIR) v$(VERSION) built."
 
 run: bundle
