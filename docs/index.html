@@ -18,7 +18,7 @@
     // Apply the preset before first paint to avoid a flash of the wrong theme
     (function () {
       var t = localStorage.getItem('keylightbar-theme') ||
-        (matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'work');
+        (matchMedia('(prefers-color-scheme: dark)').matches ? 'off' : 'work');
       document.documentElement.dataset.theme = t;
     })();
   </script>
@@ -74,13 +74,13 @@
           <p>While it's on, the next click opens the preset menu: Meet, Work, Chill — or your own.</p>
           <ul class="preset-menu" id="preset-menu" hidden aria-label="Presets">
             <li class="menu-title">Presets</li>
-            <li><button type="button" data-theme="meet">Meet <span aria-hidden="true">💡</span></button></li>
-            <li><button type="button" data-theme="work">Work <span aria-hidden="true">💡</span></button></li>
-            <li><button type="button" data-theme="bright">Bright <span aria-hidden="true">💡</span></button></li>
-            <li><button type="button" data-theme="cold">Cold <span aria-hidden="true">💡</span></button></li>
-            <li><button type="button" data-theme="warm">Warm <span aria-hidden="true">🌑</span></button></li>
-            <li><button type="button" data-theme="night">Night <span aria-hidden="true">🌑</span></button></li>
-            <li><button type="button" data-theme="chill">Chill <span aria-hidden="true">🌑</span></button></li>
+            <li><button type="button" data-theme="work">Work <span class="dot dot--work" aria-hidden="true"></span></button></li>
+            <li><button type="button" data-theme="bright">Bright <span class="dot dot--bright" aria-hidden="true"></span></button></li>
+            <li><button type="button" data-theme="cold">Cold <span class="dot dot--cold" aria-hidden="true"></span></button></li>
+            <li><button type="button" data-theme="warm">Warm <span class="dot dot--warm" aria-hidden="true"></span></button></li>
+            <li><button type="button" data-theme="night">Night <span class="dot dot--night" aria-hidden="true"></span></button></li>
+            <li class="menu-sep" role="separator"></li>
+            <li><button type="button" data-theme="off">Turn Off <span aria-hidden="true">🌑</span></button></li>
           </ul>
         </article>
       </div>
@@ -165,7 +165,7 @@
     (function () {
       var root = document.documentElement;
       var meta = document.querySelector('meta[name="theme-color"]');
-      var LIGHT = ['meet', 'work', 'bright', 'cold'];
+      var LIGHT = ['work', 'bright', 'cold', 'warm', 'night'];
 
       function setTheme(t) {
         root.dataset.theme = t;

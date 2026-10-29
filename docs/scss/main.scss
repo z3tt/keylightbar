@@ -9,12 +9,13 @@ $maxw: 1080px;
 $font-head: "Tanker", "Supreme", system-ui, sans-serif;
 $font-body: "Supreme", system-ui, sans-serif;
 
-// ---- Theme tokens (CSS vars) — one background mood per preset ----
-// Shades stay inside their text family: light-family presets
-// (meet, work, bright, cold) always render dark text, dark-family
-// presets (warm, night, chill) always render light text.
+// ---- Theme tokens (CSS vars) — the page is your light ----
+// Presets mirror the app's actual values (brightness 0-100,
+// temperature 143 coldest - 344 warmest): every preset is a lit
+// page, only Turn Off is dark. Shades stay light enough for the
+// dark ink family throughout.
 :root {
-  --bg:          #faf8f3;   // meet + work (the default paper)
+  --bg:          #faf8f3;   // Work (45/220) — the default paper
   --bg-soft:     #f2eee4;
   --card:        #ffffff;
   --card-edge:   #e7e2d4;
@@ -31,65 +32,63 @@ $font-body: "Supreme", system-ui, sans-serif;
   --shadow-deep: 0 16px 40px rgba(64, 52, 20, .14);
 }
 
+// Bright (100/220) — maximum brightness
 :root[data-theme="bright"] {
-  --bg:        #fffefa;
-  --bg-soft:   #f7f4ea;
-  --hero-glow: rgba(240, 169, 46, .17);
+  --bg:        #fffdf6;
+  --bg-soft:   #f8f5ea;
+  --hero-glow: rgba(240, 169, 46, .18);
 }
 
+// Cold (50/143) — coldest temperature
 :root[data-theme="cold"] {
-  --bg:        #f5f6f4;
-  --bg-soft:   #ecefec;
-  --card-edge: #dfe3dd;
+  --bg:        #f3f5f4;
+  --bg-soft:   #ebefee;
+  --card-edge: #dde3e0;
   --muted:     #56606b;
   --muted-dim: #424b54;
-  --hero-glow: rgba(110, 150, 190, .12);
+  --hero-glow: rgba(110, 150, 190, .14);
   --icon-glow: rgba(110, 150, 190, .55);
 }
 
-// dark family: shared ink and shadow tokens
-:root[data-theme="warm"],
-:root[data-theme="night"],
-:root[data-theme="chill"] {
+// Warm (50/344) — warmest temperature
+:root[data-theme="warm"] {
+  --bg:        #fbf1dd;
+  --bg-soft:   #f3e7cd;
+  --card-edge: #e9dcbc;
+  --muted:     #6b5c3f;
+  --muted-dim: #51452f;
+  --hero-glow: rgba(240, 169, 46, .24);
+  --bulb-glow: rgba(240, 169, 46, .55);
+}
+
+// Night (10/220) — dim, but still on
+:root[data-theme="night"] {
+  --bg:        #e7e3d8;
+  --bg-soft:   #ddd8cb;
+  --card:      #f4f1e9;
+  --card-edge: #cfc9b9;
+  --muted:     #4c473c;
+  --muted-dim: #3b372f;
+  --hero-glow: rgba(240, 169, 46, .08);
+}
+
+// Turn Off — the only dark state, like the light being out
+:root[data-theme="off"] {
+  --bg:          #0b0c10;
+  --bg-soft:     #12141a;
+  --card:        #161923;
+  --card-edge:   #23273a;
   --text:        #e8eaf2;
   --muted:       #9aa0b4;
   --muted-dim:   #7d8296;
   --amber:       #f5b642;
   --amber-ink:   #f5b642;
   --bulb-ink:    #14100a;
+  --hero-glow:   rgba(245, 182, 66, .10);
   --bulb-glow:   rgba(245, 182, 66, .45);
   --icon-glow:   rgba(245, 182, 66, .45);
   --shadow-card: 0 2px 10px rgba(0, 0, 0, .25);
   --shadow-deep: 0 24px 60px rgba(0, 0, 0, .45);
-}
-
-:root[data-theme="warm"] {
-  --text:      #f0eadd;
-  --muted:     #b0a58e;
-  --muted-dim: #8d8574;
-  --bg:        #14100a;
-  --bg-soft:   #1c1710;
-  --card:      #211a11;
-  --card-edge: #332a1d;
-  --hero-glow: rgba(245, 182, 66, .20);
-  --shadow-card: 0 2px 10px rgba(20, 14, 6, .35);
-}
-
-:root[data-theme="night"] {
-  --bg:        #0b0c10;
-  --bg-soft:   #12141a;
-  --card:      #161923;
-  --card-edge: #23273a;
-  --hero-glow: rgba(245, 182, 66, .10);
-}
-
-:root[data-theme="chill"] {
-  --bg:        #121521;
-  --bg-soft:   #191d2e;
-  --card:      #1d2235;
-  --card-edge: #2a3050;
-  --hero-glow: rgba(120, 140, 210, .10);
-  --icon-glow: rgba(120, 140, 210, .45);
 }
 
 // ---- Base ----
@@ -372,6 +371,24 @@ strong { font-weight: 600; }
     text-transform: uppercase;
     color: var(--muted);
     padding: .3rem .6rem .4rem;
+  }
+
+  .menu-sep {
+    border-top: 1px solid var(--card-edge);
+    margin: .35rem .3rem;
+  }
+
+  // temperature dots: cold = blue, warm = amber, dim = darker
+  .dot {
+    width: .6rem;
+    height: .6rem;
+    border-radius: 50%;
+
+    &--work   { background: #d9b469; }
+    &--bright { background: #f7cf6b; }
+    &--cold   { background: #8fb3dd; }
+    &--warm   { background: #f0a92e; }
+    &--night  { background: #a89878; }
   }
 
   button {
