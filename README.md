@@ -13,36 +13,32 @@ Control any [Elgato Key Light](https://www.elgato.com/key-light) in your macOS m
   No Dock icon, no companion windows, no dependencies.
 </p>
 
+
+
+
 ## Get the app
 
-No developer tools needed:
-
 1. Download **KeylightBar.zip** from the [Releases page](https://github.com/z3tt/keylightbar/releases) and unzip it.
-2. Right-click **KeylightBar.app** → **Open** → **Open**. The app is unsigned, so Gatekeeper needs that one-time approval — macOS remembers it afterwards.
+2. Right-click **KeylightBar.app** → **Open** → **Open**. The app is unsigned, so Gatekeeper needs that one-time approval. macOS remembers it afterwards.
 3. There's your 💡 in the menu bar. If macOS asks for **Local Network** access, say yes — without it, KeylightBar can't reach your light.
 
 To start it automatically at login, add **KeylightBar.app** to *System Settings → General → Login Items & Extensions*.
 
 ## What you get
 
-- **One click to a perfect light.** Light off? Click the 🌑 and it comes on with your last-used preset. Light on? Click the 💡 for the full preset picker.
+An icon to control your keylight, simple but versatile thanks to the 2-state configuration:
+
+| State | Action |
+| --- | --- |
+| 🌑 light is **off** | Click turns it **on** with the last-used preset |
+| 💡 light is **on** | Click opens the **preset menu** to choose predefined setups |
+
 - **Your presets, built in-app.** Seven sensible presets ship with it — *Meet, Work, Bright, Cold, Warm, Night, Chill* — and you can add, rename, and tune your own with sliders. No config files, no command line.
 - **A light that sleeps and wakes with your Mac.** Two independent rules you can toggle: *Off When Mac Sleeps* and *On When Mac Wakes*. This is the gap KeylightBar was born to fill — Elgato's own Control Center can switch your light off automatically, but nothing switches it back on when you return to your desk.
 - **A light that knows the time.** *Time Of Day* switches between a day preset and an evening preset automatically — Work until 19:00, Chill after (presets and hours are yours to choose). It applies on its own while you work, and on wake.
 - **Always in sync.** The icon and menu reflect the light's *real* state — even if you changed it from Elgato's app or the physical controls, KeylightBar keeps up.
 - **Zero setup on normal networks.** It finds your light by itself; on networks where auto-discovery fails, it scans the local network and finds it anyway. And it never pretends to control what it can't reach: preset picking stays disabled until your light is actually connected.
 - **Tiny and private.** One Swift file, no dependencies, and it talks only to your light over your local network.
-
-## The trick behind the click
-
-The menu bar icon behaves differently depending on your light's state:
-
-| State | Click does |
-| --- | --- |
-| 🌑 light **off** | turns it **on** with the last-used preset |
-| 💡 light **on** | opens the **preset picker** |
-
-macOS itself won't let one menu bar item act as a *button* when you want a button and a *menu* when you want a menu — that hybrid is what got this project started, and it's still the fastest way to a good light: no click path takes more than one step.
 
 ## Compatibility
 
