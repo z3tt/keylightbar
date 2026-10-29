@@ -42,8 +42,8 @@
   </head>
   <body>
     <header class="hero">
-      <p class="hero-badge">Free &amp; open source · macOS menu bar</p>
       <h1>KeylightBar <span class="hero-bulb" aria-hidden="true">💡</span></h1>
+      <p class="hero-badge">Free &amp; open source Elgato keylight control</p>
       <p class="hero-sub">
         Your Elgato Key Light, one click away in the macOS menu bar.
       </p>
@@ -63,11 +63,6 @@
     <main>
       <section class="section" id="what">
         <h2>What it does</h2>
-        <p class="section-lead">
-          One icon, two states: 🌑 turns the light on with your last-used
-          preset, 💡 opens the preset menu. No Dock icon, no companion windows,
-          no dependencies.
-        </p>
         <div class="states">
           <article
             class="state-card state-card--live"
@@ -227,8 +222,9 @@
       <section class="section section--showcase" id="showcase">
         <h2>The real thing</h2>
         <p class="section-lead">
-          Everything you just tried is real: a single menu bar icon, the actual
-          preset menu, on your Mac.
+          Everything you just tried, on your Mac: control your light, define and
+          schedule presets, all in a single menu bar icon. No Dock icon, no
+          companion windows, no dependencies.
         </p>
         <figure class="hero-demo">
           <img
@@ -236,7 +232,7 @@
             alt="KeylightBar in the macOS menu bar: the icon switches between 🌑 and 💡, one click turns the light on, and clicking while on opens the preset menu with sleep/wake and time-of-day settings"
             width="422"
           />
-          <figcaption>One icon. Two states. That's the whole app.</figcaption>
+          <figcaption>One icon. Two states. Lots of features.</figcaption>
         </figure>
       </section>
 
@@ -349,14 +345,12 @@
         // checkmark on the currently active preset, like the real menu
         function markActive() {
           var current = root.dataset.theme;
-          menu
-            .querySelectorAll("button[data-theme]")
-            .forEach(function (b) {
-              var active = b.dataset.theme === current;
-              b.classList.toggle("active", active);
-              if (active) b.setAttribute("aria-current", "true");
-              else b.removeAttribute("aria-current");
-            });
+          menu.querySelectorAll("button[data-theme]").forEach(function (b) {
+            var active = b.dataset.theme === current;
+            b.classList.toggle("active", active);
+            if (active) b.setAttribute("aria-current", "true");
+            else b.removeAttribute("aria-current");
+          });
         }
 
         // the two live cards mirror the app's states: 🌑 is the way on
@@ -368,9 +362,9 @@
         var hint = document.getElementById("states-hint");
 
         var HINT_OFF =
-          "psst — this page is your light. It's off: click 🌑 to switch it on.";
+          "psst — this page acts as your light. It's off: click 🌑 to switch it on.";
         var HINT_ON =
-          "psst — this page is your light. It's on: click 💡 to open the preset menu.";
+          "psst — this page acts as your light. It's on: click 💡 to open the preset menu.";
         var NUDGE_ON = "the light is already on — pick a preset instead 💡";
         var NUDGE_OFF = "the light is off — switch it on first 🌑";
 
