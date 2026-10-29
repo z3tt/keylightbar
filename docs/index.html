@@ -145,7 +145,7 @@
             </ul>
           </article>
         </div>
-        <p class="states-hint">
+        <p class="states-hint" id="states-hint">
           psst — this page acts as your light: click 🌑 to switch it on, 💡 to
           open the preset menu.
         </p>
@@ -343,6 +343,7 @@
           if (meta)
             meta.content = getComputedStyle(document.body).backgroundColor;
           markActive();
+          updateState();
         }
 
         // checkmark on the currently active preset, like the real menu
@@ -358,11 +359,20 @@
             });
         }
 
-        // the two live cards: 🌑 turns the site's light on (with your last-used
-        // day preset), 💡 opens the preset menu
+        // the two live cards mirror the app's states: 🌑 is the way on
+        // while the light is off, 💡 opens the menu while it is on —
+        // the card for the other state dims and nudges you instead
         var menu = document.getElementById("preset-menu");
         var cardOn = document.getElementById("card-on");
         var cardMenu = document.getElementById("card-menu");
+        var hint = document.getElementById("states-hint");
+
+        var HINT_OFF =
+          "psst — this page is your light. It's off: click 🌑 to switch it on.";
+        var HINT_ON =
+          "psst — this page is your light. It's on: click 💡 to open the preset menu.";
+        var NUDGE_ON = "the light is already on — pick a preset instead 💡";
+        var NUDGE_OFF = "the light is off — switch it on first 🌑";
 
         function activate(card, fn) {
           card.addEventListener("click", fn);
@@ -374,25 +384,59 @@
           });
         }
 
+        function flashHint(msg) {
+          hint.textContent = msg;
+          hint.classList.remove("flash");
+          void hint.offsetWidth; // restart the animation
+          hint.classList.add("flash");
+        }
+
+        function setActive(card, active, nudge) {
+          card.classList.toggle("state-card--inactive", !active);
+          if (active) {
+            card.removeAttribute("aria-disabled");
+            card.removeAttribute("title");
+            card.setAttribute("tabindex", "0");
+          } else {
+            card.setAttribute("aria-disabled", "true");
+            card.setAttribute("tabindex", "-1");
+            card.title = nudge;
+          }
+        }
+
+        function updateState() {
+          var off = root.dataset.theme === "off";
+          setActive(cardOn, off, NUDGE_ON);
+          setActive(cardMenu, !off, NUDGE_OFF);
+          hint.classList.remove("flash");
+          hint.textContent = off ? HINT_OFF : HINT_ON;
+        }
+
         function openMenu() {
           markActive();
           menu.hidden = false;
-          document.body.classList.add("menu-open");
           cardMenu.setAttribute("aria-expanded", "true");
         }
 
         function closeMenu() {
           menu.hidden = true;
-          document.body.classList.remove("menu-open");
           cardMenu.setAttribute("aria-expanded", "false");
         }
 
         activate(cardOn, function () {
+          if (cardOn.classList.contains("state-card--inactive")) {
+            flashHint(NUDGE_ON);
+            return;
+          }
           setTheme(localStorage.getItem("keylightbar-day") || "work");
         });
 
         activate(cardMenu, function (e) {
           e.stopPropagation();
+          if (cardMenu.classList.contains("state-card--inactive")) {
+            flashHint(NUDGE_OFF);
+            return;
+          }
           menu.hidden ? openMenu() : closeMenu();
         });
 

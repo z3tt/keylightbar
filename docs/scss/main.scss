@@ -307,10 +307,6 @@ strong { font-weight: 600; }
   margin: 0 auto;
 }
 
-// while the preset menu is open, only its host card stays above the
-// scrim; the 🌑 card dims with the rest of the page
-body.menu-open #card-menu { z-index: 18; }
-
 .state-card {
   position: relative;
   background: var(--card);
@@ -319,7 +315,7 @@ body.menu-open #card-menu { z-index: 18; }
   padding: 1.75rem 1.5rem;
   text-align: center;
   box-shadow: var(--shadow-card);
-  transition: background .35s ease, color .35s ease, transform .15s ease, box-shadow .2s ease;
+  transition: background .35s ease, color .35s ease, transform .15s ease, box-shadow .2s ease, opacity .35s ease;
 
   .state-icon {
     font-size: 2.6rem;
@@ -343,21 +339,17 @@ body.menu-open #card-menu { z-index: 18; }
   }
 }
 
-// dim the page behind the open preset menu. Purely visual — the
-// live cards sit above it (like the macOS menu bar above a dimmed
-// screen) and stay fully clickable.
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 15;
-  background: rgba(11, 12, 16, .45);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .25s ease;
-}
+// the card for the state you're not in: dimmed, inert, explains itself
+.state-card--live.state-card--inactive {
+  cursor: default;
+  opacity: .55;
 
-body.menu-open::before { opacity: 1; }
+  &:hover, &:focus-visible {
+    transform: none;
+    box-shadow: var(--shadow-card);
+  }
+  &:focus-visible { outline: none; }
+}
 
 // macOS-style preset popover, anchored to the 💡 card
 .preset-menu {
@@ -448,6 +440,15 @@ body.menu-open::before { opacity: 1; }
   text-align: center;
   font-size: .85rem;
   color: var(--muted-dim);
+  transition: color .35s ease;
+
+  // brief amber pulse when a nudge message replaces the text
+  &.flash { animation: hint-flash .9s ease; }
+}
+
+@keyframes hint-flash {
+  0%   { color: var(--amber); }
+  100% { color: var(--muted-dim); }
 }
 
 // ---- Features ----
