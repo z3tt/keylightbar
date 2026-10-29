@@ -298,13 +298,14 @@ strong { font-weight: 600; }
 }
 
 .state-card {
+  position: relative;
   background: var(--card);
   border: 1px solid var(--card-edge);
   border-radius: $radius;
   padding: 1.75rem 1.5rem;
   text-align: center;
   box-shadow: var(--shadow-card);
-  transition: background .35s ease, color .35s ease;
+  transition: background .35s ease, color .35s ease, transform .15s ease, box-shadow .2s ease;
 
   .state-icon {
     font-size: 2.6rem;
@@ -316,6 +317,73 @@ strong { font-weight: 600; }
 
   h3 { font-size: 1.25rem; margin-bottom: .35rem; }
   p  { color: var(--muted); margin: 0; }
+
+  &--live {
+    cursor: pointer;
+
+    &:hover, &:focus-visible {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px var(--bulb-glow);
+    }
+    &:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+  }
+}
+
+// macOS-style preset popover, anchored to the 💡 card
+.preset-menu {
+  position: absolute;
+  top: calc(100% + .55rem);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  width: 12rem;
+  margin: 0;
+  padding: .45rem;
+  list-style: none;
+  text-align: left;
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-edge);
+  border-radius: 12px;
+  box-shadow: var(--shadow-deep);
+  transition: background .35s ease, color .35s ease;
+
+  &[hidden] { display: none; }
+
+  .menu-title {
+    font-size: .7rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: .3rem .6rem .4rem;
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: .35rem .6rem;
+    font-family: inherit;
+    font-size: .9rem;
+    color: var(--text);
+    background: transparent;
+    border: 0;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background .15s ease;
+
+    &:hover, &:focus-visible { background: var(--hero-glow); }
+    &:focus-visible { outline: 2px solid var(--amber); outline-offset: -2px; }
+  }
+}
+
+.states-hint {
+  max-width: 40rem;
+  margin: 1.1rem auto 0;
+  text-align: center;
+  font-size: .85rem;
+  color: var(--muted-dim);
 }
 
 // ---- Features ----
