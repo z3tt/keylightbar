@@ -1,6 +1,6 @@
 # KeylightBar 💡
 
-<p align="center">
+<p align="left">
   <a href="https://github.com/z3tt/keylightbar/actions/workflows/build.yml"><img src="https://github.com/z3tt/keylightbar/actions/workflows/build.yml/badge.svg" alt="Build status"></a>
 </p>
 
@@ -35,6 +35,10 @@ The menu bar icon behaves differently depending on your light's state:
 
 macOS itself won't let one menu bar item act as a *button* when you want a button and a *menu* when you want a menu — that hybrid is what got this project started, and it's still the fastest way to a good light: no click path takes more than one step.
 
+## Compatibility
+
+KeylightBar works with all Elgato WiFi lights — **Key Light, Key Light Air, Key Light Mini, Ring Light, and Light Strip** — because they all speak the same local API. On the RGB **Light Strip**, the temperature value has no visible effect (brightness and on/off work as expected).
+
 ## Install & run
 
 Requirements: a Mac with the Swift toolchain (ships with Xcode Command Line Tools: `xcode-select --install`).
@@ -65,10 +69,6 @@ For the curious, the settings live in UserDefaults and the light's address under
 ```sh
 defaults read com.cedricscherer.keylightbar
 ```
-
-## Compatibility
-
-KeylightBar works with all Elgato WiFi lights — **Key Light, Key Light Air, Key Light Mini, Ring Light, and Light Strip** — because they all speak the same local API. On the RGB **Light Strip**, the temperature value has no visible effect (brightness and on/off work as expected).
 
 ## For tinkerers
 
