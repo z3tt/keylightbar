@@ -363,9 +363,9 @@ strong { font-weight: 600; }
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: .35rem .6rem;
+    padding: .28rem .6rem;
     font-family: inherit;
-    font-size: .9rem;
+    font-size: .85rem;
     color: var(--text);
     background: transparent;
     border: 0;
@@ -375,6 +375,8 @@ strong { font-weight: 600; }
 
     &:hover, &:focus-visible { background: var(--hero-glow); }
     &:focus-visible { outline: 2px solid var(--amber); outline-offset: -2px; }
+
+    span { font-size: .8rem; }
   }
 }
 
