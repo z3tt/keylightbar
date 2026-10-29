@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Build KeylightBar.app
         run: make bundle
@@ -19,7 +19,7 @@ jobs:
           test -x KeylightBar.app/Contents/MacOS/KeylightBar
           /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' KeylightBar.app/Contents/Info.plist
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: KeylightBar.app
           path: KeylightBar.app
