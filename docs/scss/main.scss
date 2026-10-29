@@ -404,7 +404,7 @@ body.menu-open::before { opacity: 1; pointer-events: auto; }
   button {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: .45rem;
     width: 100%;
     padding: .28rem .6rem;
     font-family: inherit;
@@ -416,10 +416,24 @@ body.menu-open::before { opacity: 1; pointer-events: auto; }
     cursor: pointer;
     transition: background .15s ease;
 
+    // reserved check slot — visible on the active preset, like NSMenu state
+    &::before {
+      content: '✓';
+      width: 1rem;
+      text-align: center;
+      font-size: .8rem;
+      color: var(--amber);
+      opacity: 0;
+    }
+
+    &.active::before { opacity: 1; }
+
+    .name { flex: 1; text-align: left; }
+
     &:hover, &:focus-visible { background: var(--hero-glow); }
     &:focus-visible { outline: 2px solid var(--amber); outline-offset: -2px; }
 
-    span { font-size: .8rem; }
+    span:not(.name) { font-size: .8rem; }
   }
 }
 
