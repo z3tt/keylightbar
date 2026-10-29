@@ -785,7 +785,7 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
         super.init()
         self.app = app
 
-        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 380, height: 430),
+        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 410, height: 430),
                           styleMask: [.titled, .closable],
                           backing: .buffered, defer: false)
         window.title = "KeylightBar Presets"
@@ -793,7 +793,9 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
         window.center()
         let content = window.contentView!
 
-        let scroll = NSScrollView(frame: NSRect(x: 20, y: 160, width: 240, height: 240))
+        // Table needs 238pt of columns plus a scrollbar; 270pt keeps the
+        // whole table visible without horizontal scrolling.
+        let scroll = NSScrollView(frame: NSRect(x: 20, y: 168, width: 270, height: 240))
         table = NSTableView()
         let nameColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("name"))
         nameColumn.title = "Preset"
@@ -814,18 +816,18 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
         content.addSubview(scroll)
 
         let add = NSButton(title: "+ Add", target: self, action: #selector(addPreset(_:)))
-        add.frame = NSRect(x: 270, y: 370, width: 90, height: 30)
+        add.frame = NSRect(x: 300, y: 378, width: 90, height: 30)
         content.addSubview(add)
 
         let remove = NSButton(title: "− Remove", target: self, action: #selector(removePreset(_:)))
-        remove.frame = NSRect(x: 270, y: 335, width: 90, height: 30)
+        remove.frame = NSRect(x: 300, y: 343, width: 90, height: 30)
         content.addSubview(remove)
 
         content.addSubview(NSTextField(labelWithString: "Name:"))
         let nameLabel = content.subviews.last! as! NSTextField
-        nameLabel.frame = NSRect(x: 20, y: 128, width: 60, height: 18)
+        nameLabel.frame = NSRect(x: 20, y: 136, width: 60, height: 18)
 
-        nameField = NSTextField(frame: NSRect(x: 85, y: 125, width: 275, height: 24))
+        nameField = NSTextField(frame: NSRect(x: 85, y: 133, width: 305, height: 24))
         nameField.placeholderString = "preset name"
         nameField.target = self
         nameField.action = #selector(nameChanged(_:))
@@ -833,32 +835,32 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
 
         content.addSubview(NSTextField(labelWithString: "Brightness:"))
         let brightLabel = content.subviews.last! as! NSTextField
-        brightLabel.frame = NSRect(x: 20, y: 94, width: 100, height: 18)
+        brightLabel.frame = NSRect(x: 20, y: 102, width: 100, height: 18)
 
         brightSlider = NSSlider(value: 50, minValue: 0, maxValue: 100,
                                 target: self, action: #selector(brightChanged(_:)))
-        brightSlider.frame = NSRect(x: 125, y: 92, width: 175, height: 22)
+        brightSlider.frame = NSRect(x: 125, y: 100, width: 205, height: 22)
         content.addSubview(brightSlider)
         brightValue = NSTextField(labelWithString: "50")
-        brightValue.frame = NSRect(x: 305, y: 94, width: 40, height: 18)
+        brightValue.frame = NSRect(x: 335, y: 102, width: 55, height: 18)
         content.addSubview(brightValue)
 
         content.addSubview(NSTextField(labelWithString: "Temperature:"))
         let tempLabel = content.subviews.last! as! NSTextField
-        tempLabel.frame = NSRect(x: 20, y: 60, width: 100, height: 18)
+        tempLabel.frame = NSRect(x: 20, y: 68, width: 100, height: 18)
 
         tempSlider = NSSlider(value: 220, minValue: 143, maxValue: 344,
                               target: self, action: #selector(tempChanged(_:)))
-        tempSlider.frame = NSRect(x: 125, y: 58, width: 175, height: 22)
+        tempSlider.frame = NSRect(x: 125, y: 66, width: 205, height: 22)
         content.addSubview(tempSlider)
         tempValue = NSTextField(labelWithString: "220")
-        tempValue.frame = NSRect(x: 305, y: 60, width: 40, height: 18)
+        tempValue.frame = NSRect(x: 335, y: 68, width: 55, height: 18)
         content.addSubview(tempValue)
 
         let hint = NSTextField(labelWithString: "143 = coldest \u{00B7} 344 = warmest")
         hint.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
         hint.textColor = .secondaryLabelColor
-        hint.frame = NSRect(x: 125, y: 40, width: 220, height: 14)
+        hint.frame = NSRect(x: 125, y: 51, width: 220, height: 14)
         content.addSubview(hint)
 
         let reset = NSButton(title: "Reset Defaults", target: self, action: #selector(resetDefaults(_:)))
@@ -868,7 +870,7 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
         let done = NSButton(title: "Done", target: self, action: #selector(closeWindow(_:)))
         done.bezelStyle = .rounded
         done.keyEquivalent = "\r"
-        done.frame = NSRect(x: 280, y: 10, width: 80, height: 28)
+        done.frame = NSRect(x: 310, y: 10, width: 80, height: 28)
         content.addSubview(done)
     }
 
