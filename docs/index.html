@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KeylightBar 💡 — Your Elgato Key Light, one click away</title>
+  <meta name="description" content="KeylightBar puts your Elgato Key Light in the macOS menu bar. One click to switch it on — and it turns off when your Mac sleeps, back on when you wake it, and follows your day on schedule.">
+  <meta property="og:title" content="KeylightBar 💡">
+  <meta property="og:description" content="Your Elgato Key Light, one click away in the macOS menu bar.">
+  <meta property="og:image" content="keylightbar.gif">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💡</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <header class="hero">
+    <p class="hero-badge">Free &amp; open source · macOS menu bar</p>
+    <h1>KeylightBar <span class="hero-bulb" aria-hidden="true">💡</span></h1>
+    <p class="hero-sub">
+      Your Elgato Key Light, one click away. <strong>🌑 turns the light on. 💡 opens the preset menu.</strong>
+      No Dock icon, no companion windows, no dependencies.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="https://github.com/z3tt/keylightbar/releases/latest">
+        ⬇︎ Download KeylightBar
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/z3tt/keylightbar">View on GitHub</a>
+    </div>
+    <figure class="hero-demo">
+      <img src="keylightbar.gif" alt="KeylightBar in the macOS menu bar: the icon switches between 🌑 and 💡, one click turns the light on, and clicking while on opens the preset menu with sleep/wake and time-of-day settings" width="422">
+      <figcaption>One icon. Two states. That's the whole app.</figcaption>
+    </figure>
+  </header>
+
+  <main>
+
+    <section class="section" id="what">
+      <h2>What it does</h2>
+      <p class="section-lead">
+        A single icon in your menu bar that controls your Key Light — and from there,
+        it manages itself. Turn it on when you sit down; KeylightBar handles the rest of your day.
+      </p>
+      <div class="states">
+        <article class="state-card">
+          <span class="state-icon" aria-hidden="true">🌑</span>
+          <h3>Light is off</h3>
+          <p>Click to turn it <strong>on</strong> with your last-used preset.</p>
+        </article>
+        <article class="state-card">
+          <span class="state-icon state-icon--on" aria-hidden="true">💡</span>
+          <h3>Light is on</h3>
+          <p>Click to open the <strong>preset menu</strong> and pick a setup.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="why">
+      <h2>Why it's cool</h2>
+      <div class="features">
+        <article class="feature">
+          <span aria-hidden="true">😴</span>
+          <h3>It sleeps and wakes with your Mac</h3>
+          <p>Turns your light off when the Mac sleeps — and, unlike anything else, switches it back on when you return to your desk.</p>
+        </article>
+        <article class="feature">
+          <span aria-hidden="true">🕑</span>
+          <h3>A light that knows the time</h3>
+          <p>Work preset until 19:00, Chill after — Time Of Day switches between your day and evening setups on schedule, all by itself.</p>
+        </article>
+        <article class="feature">
+          <span aria-hidden="true">🎚️</span>
+          <h3>Presets, built in-app</h3>
+          <p>Seven sensible presets ship with it — Meet, Work, Bright, Cold, Warm, Night, Chill — and a tiny editor for your own. No config files, no terminal.</p>
+        </article>
+        <article class="feature">
+          <span aria-hidden="true">🔄</span>
+          <h3>Always in sync</h3>
+          <p>Change the light from Elgato's app or its physical controls — the icon keeps up with the real state, not just its own.</p>
+        </article>
+        <article class="feature">
+          <span aria-hidden="true">🔍</span>
+          <h3>Zero setup</h3>
+          <p>It finds your light by itself; on stubborn networks it scans for it anyway. And it never pretends to control a light it can't reach.</p>
+        </article>
+        <article class="feature">
+          <span aria-hidden="true">🤏</span>
+          <h3>Tiny and private</h3>
+          <p>One Swift file, zero dependencies, and it talks only to your light over your local network. Nothing leaves your house.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section section--download" id="download">
+      <h2>Get it</h2>
+      <p class="section-lead">
+        Works with every Elgato WiFi light — Key Light, Key Light Air, Key Light Mini,
+        Ring Light, and Light Strip — on macOS.
+      </p>
+      <ol class="steps">
+        <li><strong>Download</strong> <a href="https://github.com/z3tt/keylightbar/releases/latest">KeylightBar.zip</a> from the Releases page and unzip it.</li>
+        <li><strong>Open it once</strong> — macOS will ask (the app is unsigned). Approve via <em>System Settings → Privacy &amp; Security → Open Anyway</em>.</li>
+        <li><strong>Say yes</strong> if macOS asks for <em>Local Network</em> access — that's how KeylightBar reaches your light.</li>
+      </ol>
+      <a class="btn btn-primary btn-big" href="https://github.com/z3tt/keylightbar/releases/latest">⬇︎ Download from GitHub Releases</a>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="coffee">
+      <h2>Enjoying KeylightBar?</h2>
+      <p>It's free and open source — but coffee keeps the 💡 on.</p>
+      <a class="btn btn-coffee" href="https://www.buymeacoffee.com/YOUR-HANDLE">☕ Buy me a coffee</a>
+    </div>
+    <p class="footer-meta">
+      KeylightBar by <a href="https://cedricscherer.com">Cédric Scherer</a> ·
+      <a href="https://github.com/z3tt/keylightbar">GitHub</a> ·
+      MIT License · Built with one Swift file and no dependencies
+    </p>
+  </footer>
+
+</body>
+</html>
