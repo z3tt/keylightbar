@@ -28,7 +28,7 @@ import AppKit
 
 // MARK: - Configuration
 
-let appVersion = "1.4"
+let appVersion = "1.0"
 
 let pollInterval: TimeInterval = 30
 // Fallback defaults; the live values are adjustable in the "Time Of Day"
