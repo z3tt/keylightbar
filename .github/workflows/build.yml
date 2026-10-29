@@ -1,0 +1,26 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build KeylightBar.app
+        run: make bundle
+
+      - name: Verify bundle
+        run: |
+          test -x KeylightBar.app/Contents/MacOS/KeylightBar
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' KeylightBar.app/Contents/Info.plist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KeylightBar.app
+          path: KeylightBar.app
+          if-no-files-found: error
