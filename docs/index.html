@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#faf8f3">
   <title>KeylightBar 💡 — Your Elgato Key Light, one click away</title>
   <meta name="description" content="KeylightBar puts your Elgato Key Light in the macOS menu bar. One click to switch it on — and it turns off when your Mac sleeps, back on when you wake it, and follows your day on schedule.">
   <meta property="og:title" content="KeylightBar 💡">
@@ -13,9 +14,19 @@
   <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
   <link href="https://api.fontshare.com/v2/css?f[]=supreme@400,500,600&display=swap" rel="stylesheet">
   <link href="https://api.fontshare.com/v2/css?f[]=tanker@400&display=swap" rel="stylesheet">
+  <script>
+    // Set theme before first paint to avoid a flash of the wrong theme
+    (function () {
+      var t = localStorage.getItem('keylightbar-theme') ||
+        (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.dataset.theme = t;
+    })();
+  </script>
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
+
+  <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch theme"></button>
 
   <header class="hero">
     <p class="hero-badge">Free &amp; open source · macOS menu bar</p>
@@ -45,17 +56,20 @@
         it manages itself. Turn it on when you sit down; KeylightBar handles the rest of your day.
       </p>
       <div class="states">
-        <article class="state-card">
+        <article class="state-card" data-theme-card="dark" tabindex="0" role="button"
+                 aria-label="Switch the site to dark mode">
           <span class="state-icon" aria-hidden="true">🌑</span>
           <h3>Light is off</h3>
           <p>Click to turn it <strong>on</strong> with your last-used preset.</p>
         </article>
-        <article class="state-card">
+        <article class="state-card" data-theme-card="light" tabindex="0" role="button"
+                 aria-label="Switch the site to light mode">
           <span class="state-icon state-icon--on" aria-hidden="true">💡</span>
           <h3>Light is on</h3>
           <p>Click to open the <strong>preset menu</strong> and pick a setup.</p>
         </article>
       </div>
+      <p class="states-hint">psst — the cards are the site's light switch, too: 🌑 dims it, 💡 lights it up.</p>
     </section>
 
     <section class="section" id="why">
@@ -122,6 +136,40 @@
       MIT License · Built with one Swift file and no dependencies
     </p>
   </footer>
+
+  <script>
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('theme-toggle');
+      var meta = document.querySelector('meta[name="theme-color"]');
+
+      function setTheme(t) {
+        root.dataset.theme = t;
+        localStorage.setItem('keylightbar-theme', t);
+        // mirror the app: 🌑 while the site's light is on (click dims it),
+        // 💡 while it's off (click switches it on)
+        toggle.textContent = t === 'dark' ? '💡' : '🌑';
+        toggle.title = t === 'dark' ? 'Turn the lights on' : 'Turn the lights off';
+        toggle.setAttribute('aria-label',
+          t === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+        if (meta) meta.content = getComputedStyle(document.body).backgroundColor;
+      }
+
+      toggle.addEventListener('click', function () {
+        setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark');
+      });
+
+      document.querySelectorAll('[data-theme-card]').forEach(function (card) {
+        function flip() { setTheme(card.dataset.themeCard); }
+        card.addEventListener('click', flip);
+        card.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); }
+        });
+      });
+
+      setTheme(root.dataset.theme);
+    })();
+  </script>
 
 </body>
 </html>
