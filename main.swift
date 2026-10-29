@@ -995,7 +995,7 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
         // inherit the brightness/temperature of the selected one.
         let alert = NSAlert()
         alert.messageText = "New Preset"
-        alert.informativeText = "Starts from the selected preset's brightness and temperature — adjust with the sliders afterwards."
+        alert.informativeText = "Adjust brightness and temperature with the sliders afterwards."
         let input = NSTextField(frame: NSRect(x: 0, y: 0, width: 240, height: 24))
         alert.accessoryView = input
         alert.addButton(withTitle: "Add")
