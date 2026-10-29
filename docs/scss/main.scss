@@ -198,7 +198,7 @@ strong { font-weight: 600; }
 
   &-sub {
     max-width: 36rem;
-    margin: 0 auto 2rem;
+    margin: 0 auto 2.5rem;
     color: var(--muted);
     font-size: 1.2rem;
 
@@ -210,14 +210,34 @@ strong { font-weight: 600; }
     flex-wrap: wrap;
     justify-content: center;
     gap: .9rem;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
   }
 
   &-compat {
-    max-width: 34rem;
-    margin: 0 auto 3rem;
+    margin: 0 0 1rem;
     color: var(--muted);
-    font-size: .95rem;
+    font-size: 1rem;
+  }
+
+  &-lights {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .55rem;
+    margin: 0 0 3.5rem;
+    padding: 0;
+    list-style: none;
+
+    li {
+      font-size: .85rem;
+      font-weight: 500;
+      color: var(--muted);
+      background: var(--card);
+      border: 1px solid var(--card-edge);
+      border-radius: 999px;
+      padding: .3rem .85rem;
+      transition: background .35s ease, color .35s ease, border-color .35s ease;
+    }
   }
 
   &-demo {
