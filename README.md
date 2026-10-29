@@ -43,15 +43,6 @@ A single icon to control your Key Light — simple, but versatile thanks to its 
 
 KeylightBar works with all Elgato WiFi lights — **Key Light, Key Light Air, Key Light Mini, Ring Light, and Light Strip** — because they all speak the same local API. On the RGB **Light Strip**, the temperature value has no visible effect (brightness and on/off work as expected).
 
-## Build it yourself
-
-Requirements: a Mac with the Swift toolchain (ships with Xcode Command Line Tools: `xcode-select --install`).
-
-```sh
-make bundle        # compiles the app and (re)builds KeylightBar.app
-open KeylightBar.app
-```
-
 Note that macOS grants **Local Network** access per binary: a freshly compiled KeylightBar needs its own permission, even if a previous build had one. If commands silently do nothing, check *System Settings → Privacy & Security → Local Network* and enable KeylightBar there.
 
 ## Make it yours
@@ -59,13 +50,16 @@ Note that macOS grants **Local Network** access per binary: a freshly compiled K
 Everything is adjustable from the menu bar menu itself — no source editing, no terminal.
 
 - **Presets** — *Manage Presets…* opens a small editor: pick a preset in the table (or double-click its name to rename it), then set name, brightness (0–100), and temperature (143 = coldest, 344 = warmest) with the sliders. *+ Add* asks for a name right away and starts from the selected preset's settings. Names are always title-cased (e.g. "Night Mode"). Changes apply immediately and survive restarts; *Reset Defaults* restores the original seven.
-- **Sleep & wake** — the *Off When Mac Sleeps* / *On When Mac Wakes* checkboxes. On wake, KeylightBar applies the time-appropriate preset if *Time Of Day* is on, otherwise your last-used one.
+- **Sleep & Wake** — the *Off When Mac Sleeps* / *On When Mac Wakes* checkboxes. On wake, KeylightBar applies the time-appropriate preset if *Time Of Day* is on, otherwise your last-used one.
 - **Time Of Day** — the *Switch Presets By Time* toggle plus day/evening presets and the hours they start (defaults: Work from 08:00, Chill from 19:00).
 
-For the curious, the settings live in UserDefaults and the light's address under `keylight.host`:
+## Build it yourself
+
+Requirements: a Mac with the Swift toolchain (ships with Xcode Command Line Tools: `xcode-select --install`).
 
 ```sh
-defaults read com.cedricscherer.keylightbar
+make bundle        # compiles the app and (re)builds KeylightBar.app
+open KeylightBar.app
 ```
 
 ## For tinkerers
