@@ -142,7 +142,7 @@ func presetSwatchColor(preset: Preset) -> NSColor {
     }
 
     let bright = Double(min(max(preset.brightness, 0), 100))
-    let value = min(max(maxC + (bright - 50) * 0.005, 0.25), 1)
+    let value = min(max(maxC + (bright - 50) * 0.010, 0.15), 1)
     let sat = maxC > 0 ? delta / maxC : 0
     let saturation = min(sat * (bright / 50).squareRoot(), 1)
 
