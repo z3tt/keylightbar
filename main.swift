@@ -8,6 +8,8 @@
 //   * finds your Key Light automatically on first launch — via Bonjour and,
 //     for networks where Bonjour doesn't propagate, via a local subnet scan
 //     (or set the address manually via "Configure…")
+//   * every preset menu item carries a small swatch dot visualizing its
+//     brightness × temperature, regenerated on each menu build
 //   * presets are managed in-app via "Manage Presets…" (no source editing,
 //     no command line); they persist in UserDefaults
 //   * preset picking is disabled until a Key Light is actually configured
@@ -98,6 +100,81 @@ func savePresets(_ presets: [Preset]) {
         UserDefaults.standard.set(data, forKey: presetsKey)
     }
 }
+
+// MARK: - Preset swatch dots
+
+/// RGB anchors of the temperature scale (read at brightness 50), matching
+/// the colored preset dots on the website: cool blue → neutral tan → warm
+/// amber. Interpolated in RGB, so the cool-to-warm path never runs green.
+private let swatchTempAnchors: [(temp: Double, rgb: (Double, Double, Double))] = [
+    (143, (143, 179, 221)),   // #8fb3dd — coldest
+    (220, (217, 180, 105)),   // #d9b469 — neutral
+    (344, (240, 169, 46)),    // #f0a92e — warmest
+]
+
+/// Swatch color for a preset: the temperature interpolates the anchors'
+/// hue, the brightness scales how light and saturated the dot reads —
+/// dim presets get a darker, grayer dot. Brightness 50 keeps the anchor
+/// colors, so the defaults land on the website's reference dots.
+func presetSwatchColor(preset: Preset) -> NSColor {
+    let t = Double(min(max(preset.temperature, 143), 344))
+    var rgb = swatchTempAnchors[0].rgb
+    for i in 0..<(swatchTempAnchors.count - 1) {
+        let a = swatchTempAnchors[i], b = swatchTempAnchors[i + 1]
+        if t >= a.temp && t <= b.temp {
+            let f = (t - a.temp) / (b.temp - a.temp)
+            rgb = (a.rgb.0 + (b.rgb.0 - a.rgb.0) * f,
+                   a.rgb.1 + (b.rgb.1 - a.rgb.1) * f,
+                   a.rgb.2 + (b.rgb.2 - a.rgb.2) * f)
+            break
+        }
+    }
+
+    let (r, g, b) = (rgb.0 / 255, rgb.1 / 255, rgb.2 / 255)
+    let maxC = max(r, g, b), minC = min(r, g, b), delta = maxC - minC
+    var hue = 0.0
+    if delta > 0 {
+        if maxC == r { hue = (g - b) / delta }
+        else if maxC == g { hue = (b - r) / delta + 2 }
+        else { hue = (r - g) / delta + 4 }
+        hue *= 60
+        if hue < 0 { hue += 360 }
+    }
+
+    let bright = Double(min(max(preset.brightness, 0), 100))
+    let value = min(max(maxC + (bright - 50) * 0.005, 0.25), 1)
+    let sat = maxC > 0 ? delta / maxC : 0
+    let saturation = min(sat * (bright / 50).squareRoot(), 1)
+
+    return NSColor(hue: CGFloat(hue / 360), saturation: CGFloat(saturation),
+                   brightness: CGFloat(value), alpha: 1)
+}
+
+/// A small circular swatch dot for a preset menu item (~16 pt, drawn at 2x
+/// so it stays crisp on retina). Drawn as a fresh NSImage on every menu
+/// build, so added, renamed, and edited presets update their dot right away.
+func presetSwatchImage(preset: Preset) -> NSImage {
+    let points: CGFloat = 16
+    let pixels = 32
+    let image = NSImage(size: NSSize(width: points, height: points))
+    guard let rep = NSBitmapImageRep(bitmapDataPlanes: nil,
+                                     pixelsWide: pixels, pixelsHigh: pixels,
+                                     bitsPerSample: 8, samplesPerPixel: 4,
+                                     hasAlpha: true, isPlanar: false,
+                                     colorSpaceName: .deviceRGB,
+                                     bytesPerRow: 0, bitsPerPixel: 0) else {
+        return image
+    }
+    rep.size = NSSize(width: points, height: points)
+    NSGraphicsContext.saveGraphicsState()
+    NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
+    presetSwatchColor(preset: preset).setFill()
+    NSBezierPath(ovalIn: NSRect(x: 4, y: 4, width: pixels - 8, height: pixels - 8)).fill()
+    NSGraphicsContext.restoreGraphicsState()
+    image.addRepresentation(rep)
+    return image
+}
+
 
 // MARK: - App
 
@@ -236,6 +313,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                   keyEquivalent: "")
             item.target = self
             item.representedObject = preset.name
+            item.image = presetSwatchImage(preset: preset)
             item.isEnabled = isConfigured
             item.state = (preset.name == currentPreset) ? .on : .off
             menu.addItem(item)
@@ -414,6 +492,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let p = NSMenuItem(title: preset.name, action: action, keyEquivalent: "")
             p.target = self
             p.representedObject = preset.name
+            p.image = presetSwatchImage(preset: preset)
             p.state = (preset.name == current) ? .on : .off
             m.addItem(p)
         }
