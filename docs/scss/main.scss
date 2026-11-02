@@ -425,6 +425,7 @@ strong {
   p {
     color: var(--muted);
     margin: 0;
+    font-weight: 500; // medium reads better for small muted card text
   }
 
   &--live {
@@ -616,13 +617,14 @@ strong {
   }
 
   h3 {
-    font-size: 1.25rem;
+    font-size: 1.15rem; // one line for every heading, incl. 'Sleeps & wakes…'
     margin: 0.5rem 0 0.4rem;
   }
   p {
     color: var(--muted);
     margin: 0;
     font-size: 0.98rem;
+    font-weight: 500; // medium reads better for small muted card text
   }
 }
 
