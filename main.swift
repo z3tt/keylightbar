@@ -150,31 +150,20 @@ func presetSwatchColor(preset: Preset) -> NSColor {
                    brightness: CGFloat(value), alpha: 1)
 }
 
-/// A small circular swatch dot for a preset menu item (~16 pt, drawn at 2x
-/// so it stays crisp on retina). Drawn as a fresh NSImage on every menu
+/// A small circular swatch dot for a preset menu item (16 pt). The image
+/// draws via a lazy handler at whatever scale the screen needs (retina
+/// included), and its point size is fixed — AppKit clips menu item images
+/// whose bitmap exceeds the 16 pt slot, which an explicit 2x bitmap rep
+/// triggers by losing its point-size metadata. Drawn fresh on every menu
 /// build, so added, renamed, and edited presets update their dot right away.
 func presetSwatchImage(preset: Preset) -> NSImage {
-    let points: CGFloat = 16
-    let pixels = 32
-    let image = NSImage(size: NSSize(width: points, height: points))
-    guard let rep = NSBitmapImageRep(bitmapDataPlanes: nil,
-                                     pixelsWide: pixels, pixelsHigh: pixels,
-                                     bitsPerSample: 8, samplesPerPixel: 4,
-                                     hasAlpha: true, isPlanar: false,
-                                     colorSpaceName: .deviceRGB,
-                                     bytesPerRow: 0, bitsPerPixel: 0) else {
-        return image
+    let color = presetSwatchColor(preset: preset)
+    return NSImage(size: NSSize(width: 16, height: 16), flipped: false) { rect in
+        color.setFill()
+        NSBezierPath(ovalIn: rect.insetBy(dx: 2, dy: 2)).fill()
+        return true
     }
-    rep.size = NSSize(width: points, height: points)
-    NSGraphicsContext.saveGraphicsState()
-    NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
-    presetSwatchColor(preset: preset).setFill()
-    NSBezierPath(ovalIn: NSRect(x: 4, y: 4, width: pixels - 8, height: pixels - 8)).fill()
-    NSGraphicsContext.restoreGraphicsState()
-    image.addRepresentation(rep)
-    return image
 }
-
 
 // MARK: - App
 
