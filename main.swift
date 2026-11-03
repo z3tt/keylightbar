@@ -34,7 +34,10 @@ import ServiceManagement
 
 let appVersion = "1.1"
 
-let pollInterval: TimeInterval = 30
+// Short on purpose: physical presses and Elgato's app change the light
+// without telling us, and a stale icon reads as a broken app. One tiny
+// GET every few seconds on the LAN is effectively free.
+let pollInterval: TimeInterval = 5
 // Fallback defaults; the live values are adjustable in the "Time Of Day"
 // menu (UserDefaults) and apply on wake *and* continuously while running.
 let daytimePreset    = "Work"    // default day preset
@@ -176,6 +179,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var browser: NetServiceBrowser?
     private var resolvingServices: [NetService] = []
     private var discoveryTimer: Timer?
+
+    // when the light last stopped answering — a long enough silence that
+    // ends in a comeback reads as its power switch being flipped back on
+    private var lightSilentSince: Date?
     private var scanSession: URLSession?
     private var scanGeneration = 0
     private var presetManager: PresetManager?
@@ -279,7 +286,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if currentOn || !isConfigured {
             showPresetMenu()          // unconfigured: menu shows how to fix that
         } else {
-            applyPreset(lastPreset ?? presets.first?.name ?? "")
+            // The icon can lag the light: a physical press or Elgato's app
+            // since the last poll means the light may already be on. PUTting
+            // "on" then is a silent no-op on the light — ask it first, catch
+            // the icon up, and behave like an on-click instead.
+            api("GET", nil) { [weak self] json in
+                guard let self = self else { return }
+                if let light = (json?["lights"] as? [[String: Any]])?.first,
+                   (light["on"] as? Int) == 1 {
+                    self.applyLightState(light)
+                    self.showPresetMenu()
+                } else {
+                    self.applyPreset(self.lastPreset ?? self.presets.first?.name ?? "")
+                }
+            }
         }
     }
 
@@ -733,24 +753,45 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func syncFromLight() {
         api("GET", nil) { [weak self] json in
-            guard let self = self,
-                  let lights = json?["lights"] as? [[String: Any]],
-                  let light = lights.first else { return }
-
-            let on = (light["on"] as? Int) == 1
-            let brightness = light["brightness"] as? Int
-            let temperature = light["temperature"] as? Int
-
-            self.currentOn = on
-            self.currentPreset = nil
-            if on, let b = brightness, let t = temperature,
-               let match = self.presets.first(where: { $0.brightness == b && $0.temperature == t }) {
-                self.currentPreset = match.name
-                self.lastPreset = match.name
-                UserDefaults.standard.set(match.name, forKey: lastPresetKey)
+            guard let self = self else { return }
+            guard let lights = json?["lights"] as? [[String: Any]],
+                  let light = lights.first else {
+                // unreachable: remember when the silence began, so a
+                // later comeback can be read as a power switch flip
+                if self.lightSilentSince == nil { self.lightSilentSince = Date() }
+                return
             }
-            self.updateIcon()
+            let silentSince = self.lightSilentSince
+            self.lightSilentSince = nil
+            self.applyLightState(light)
+
+            // The Elgato restores its last state on power-up, so a light
+            // that was off before a power cut comes back dark. But a long
+            // silence that ends in a reachable light is someone flipping
+            // the switch back on: honor that like the switch promises.
+            // Short gaps stay ignored — those are network blips.
+            if let since = silentSince,
+               Date().timeIntervalSince(since) >= 15,
+               !self.currentOn {
+                self.applyPreset(self.lastPreset ?? self.presets.first?.name ?? "")
+            }
         }
+    }
+
+    private func applyLightState(_ light: [String: Any]) {
+        let on = (light["on"] as? Int) == 1
+        let brightness = light["brightness"] as? Int
+        let temperature = light["temperature"] as? Int
+
+        currentOn = on
+        currentPreset = nil
+        if on, let b = brightness, let t = temperature,
+           let match = presets.first(where: { $0.brightness == b && $0.temperature == t }) {
+            currentPreset = match.name
+            lastPreset = match.name
+            UserDefaults.standard.set(match.name, forKey: lastPresetKey)
+        }
+        updateIcon()
     }
 
     private func updateIcon() {
