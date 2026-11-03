@@ -179,6 +179,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var browser: NetServiceBrowser?
     private var resolvingServices: [NetService] = []
     private var discoveryTimer: Timer?
+
+    // when the light last stopped answering — a long enough silence that
+    // ends in a comeback reads as its power switch being flipped back on
+    private var lightSilentSince: Date?
     private var scanSession: URLSession?
     private var scanGeneration = 0
     private var presetManager: PresetManager?
@@ -749,10 +753,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func syncFromLight() {
         api("GET", nil) { [weak self] json in
-            guard let self = self,
-                  let lights = json?["lights"] as? [[String: Any]],
-                  let light = lights.first else { return }
+            guard let self = self else { return }
+            guard let lights = json?["lights"] as? [[String: Any]],
+                  let light = lights.first else {
+                // unreachable: remember when the silence began, so a
+                // later comeback can be read as a power switch flip
+                if self.lightSilentSince == nil { self.lightSilentSince = Date() }
+                return
+            }
+            let silentSince = self.lightSilentSince
+            self.lightSilentSince = nil
             self.applyLightState(light)
+
+            // The Elgato restores its last state on power-up, so a light
+            // that was off before a power cut comes back dark. But a long
+            // silence that ends in a reachable light is someone flipping
+            // the switch back on: honor that like the switch promises.
+            // Short gaps stay ignored — those are network blips.
+            if let since = silentSince,
+               Date().timeIntervalSince(since) >= 15,
+               !self.currentOn {
+                self.applyPreset(self.lastPreset ?? self.presets.first?.name ?? "")
+            }
         }
     }
 
