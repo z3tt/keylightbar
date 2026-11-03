@@ -15,6 +15,18 @@
 - Still ask first: version tags, GitHub releases, and anything destructive
   (force-push, branch deletion).
 
+## Multiple concurrent agent sessions
+- Branches isolate commits, not the working tree: all sessions on one clone
+  share the same checkout, and uncommitted edits collide across branch
+  switches.
+- For parallel sessions, give each its own checkout:
+  `git worktree add ../keylightbar-<topic> <branch>` (or a separate clone).
+  Sessions can then build, test, and switch branches independently.
+- Before another session switches branches in a shared clone: commit (or
+  stash) WIP first — never carry uncommitted edits across a switch.
+- One app instance at a time: quit other KeylightBar builds before testing
+  a fresh one, or the icon you're watching may not be the binary under test.
+
 ## Project conventions
 - Single-file Swift app (`main.swift`), dependency-free by design — keep it that
   way unless the owner asks otherwise.
