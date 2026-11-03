@@ -570,7 +570,18 @@ strong {
   }
 }
 
+// the invitation, above the cards so it's in view first on mobile
 .states-hint {
+  max-width: 40rem;
+  margin: 0 auto 1.1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted-dim);
+  transition: color 0.35s ease;
+}
+
+// tap feedback, below the cards near the point of interaction
+.states-nudge {
   max-width: 40rem;
   margin: 1.1rem auto 0;
   text-align: center;
@@ -578,7 +589,11 @@ strong {
   color: var(--muted-dim);
   transition: color 0.35s ease;
 
-  // brief amber pulse when a nudge message replaces the text
+  &:empty {
+    display: none;
+  }
+
+  // brief amber pulse when a nudge message appears
   &.flash {
     animation: hint-flash 0.9s ease;
   }
@@ -707,11 +722,39 @@ strong {
     color: var(--text);
     text-decoration: underline;
   }
+  // the author credit stands out with the theme's amber ink
+  a.author {
+    color: var(--amber-ink);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 2px;
+  }
+  a.author:hover {
+    color: var(--text);
+  }
 }
 
 // ---- Small screens ----
 @media (max-width: 480px) {
   .hero-actions .btn {
     width: 100%;
+  }
+
+  // slightly smaller badge so the text stays on one line
+  .hero-badge {
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    padding: 0.28rem 0.75rem;
+  }
+
+  // stack the hint's lead phrase above the state-specific part
+  .states-hint .hint-lead {
+    display: block;
+  }
+
+  // keep the credit line at three lines max
+  .footer-meta {
+    font-size: 0.8rem;
   }
 }
