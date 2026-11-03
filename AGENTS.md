@@ -3,11 +3,15 @@
 ## Git workflow
 - The owner also edits this repo on github.com: run `git pull --rebase origin main`
   before every push.
-- Commit locally whenever a change compiles (`swiftc main.swift` → 0 errors).
-  Small working steps are fine; one logical change per commit.
-- Push in logical packages: once a coherent unit of work is complete and runs,
-  push the batch — not after every micro-commit. No per-push permission needed;
-  that standing rule replaces asking.
+- Work with branches + PRs: for anything beyond a small fix (features,
+  behavior changes, multi-commit work), create a `feature/…` or `fix/…`
+  branch, push it, and open a PR for the owner to review. Merge only after
+  approval.
+- Working directly on `main` is fine for small fixes and docs tweaks —
+  commit locally whenever a change compiles (`swiftc main.swift` → 0
+  errors); small working steps are fine, one logical change per commit.
+- If it's unclear whether a change is small enough for `main`, ask the
+  owner once before committing.
 - Still ask first: version tags, GitHub releases, and anything destructive
   (force-push, branch deletion).
 
