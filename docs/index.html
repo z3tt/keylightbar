@@ -72,6 +72,11 @@
       <section class="section" id="what">
         <h2>What it does</h2>
 
+        <p class="states-hint" id="states-hint">
+          psst — this page acts as your light: click 🌑 to switch it on, 💡 to
+          open the preset menu.
+        </p>
+
         <div class="states">
           <article
             class="state-card state-card--live"
@@ -146,10 +151,7 @@
             </ul>
           </article>
         </div>
-        <p class="states-hint" id="states-hint">
-          psst — this page acts as your light: click 🌑 to switch it on, 💡 to
-          open the preset menu.
-        </p>
+        <p class="states-nudge" id="states-nudge" aria-live="polite"></p>
       </section>
 
       <section class="section" id="why">
@@ -250,7 +252,7 @@
         <a
           class="btn btn-primary btn-big"
           href="https://github.com/z3tt/keylightbar/releases/latest"
-          >⬇︎ Download from GitHub Releases</a
+          >⬇︎ Download from GitHub</a
         >
 
         <p class="section-lead">Free, open source, and ready in three steps.</p>
@@ -371,11 +373,12 @@
         var cardOn = document.getElementById("card-on");
         var cardMenu = document.getElementById("card-menu");
         var hint = document.getElementById("states-hint");
+        var nudge = document.getElementById("states-nudge");
 
         var HINT_OFF =
-          "psst — this page acts as your light. It's off: click 🌑 to switch it on.";
+          "psst — this page acts as your light: it's off — click 🌑 to switch it on.";
         var HINT_ON =
-          "psst — this page acts as your light. It's on: click 💡 to open the preset menu.";
+          "psst — this page acts as your light: it's on — click 💡 to open the preset menu.";
         var NUDGE_ON = "the light is already on — pick a preset instead 💡";
         var NUDGE_OFF = "the light is off — switch it on first 🌑";
 
@@ -390,10 +393,10 @@
         }
 
         function flashHint(msg) {
-          hint.textContent = msg;
-          hint.classList.remove("flash");
-          void hint.offsetWidth; // restart the animation
-          hint.classList.add("flash");
+          nudge.textContent = msg;
+          nudge.classList.remove("flash");
+          void nudge.offsetWidth; // restart the animation
+          nudge.classList.add("flash");
         }
 
         function setActive(card, active, nudge) {
@@ -413,8 +416,9 @@
           var off = root.dataset.theme === "off";
           setActive(cardOn, off, NUDGE_ON);
           setActive(cardMenu, !off, NUDGE_OFF);
-          hint.classList.remove("flash");
           hint.textContent = off ? HINT_OFF : HINT_ON;
+          nudge.textContent = "";
+          nudge.classList.remove("flash");
         }
 
         function openMenu() {
