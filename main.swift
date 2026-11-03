@@ -27,6 +27,7 @@
 // Share: single file, MIT license, no dependencies beyond macOS itself.
 
 import AppKit
+import IOKit
 import ServiceManagement
 
 // MARK: - Configuration
@@ -554,6 +555,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             currentDayPart = 0
             return
         }
+        // Timers fire the moment the Mac wakes — including unattended dark
+        // wakes with the lid closed — so don't touch the light unless the
+        // user is around (lid open, or input within the last 10 minutes).
+        if clamshellClosed(), !recentUserInput(within: 600) { return }
         let part = dayPartNow()
         defer { currentDayPart = part }
         guard force || part != currentDayPart else { return }
@@ -781,7 +786,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func wakeUp() {
+        // Unattended wakes (Power Nap, "Wake for network access", iPhone
+        // proximity wake) all happen with the lid closed and nobody at the
+        // keyboard; the light must stay off for those. An open lid, or
+        // fresh keyboard/mouse input in clamshell mode, reads as the user
+        // actually coming back.
+        if clamshellClosed(), !recentUserInput(within: 60) { return }
         applyWakePresetIfNeeded(remaining: 5)
+    }
+
+    /// Lid state straight from the power manager (true = closed);
+    /// false on desktops or if the sensor can't be read.
+    private func clamshellClosed() -> Bool {
+        let service = IOServiceGetMatchingService(kIOMasterPortDefault,
+                                                  IOServiceMatching("IOPMrootDomain"))
+        guard service != IO_OBJECT_NULL else { return false }
+        defer { IOObjectRelease(service) }
+        guard let prop = IORegistryEntryCreateCFProperty(service, "AppleClamshellState" as CFString,
+                                                         kCFAllocatorDefault, 0)?.takeUnretainedValue() as? Bool
+        else { return false }
+        return prop
+    }
+
+    /// Whether any keyboard/mouse/trackpad activity happened within the
+    /// given window, per the window server.
+    private func recentUserInput(within seconds: TimeInterval) -> Bool {
+        let anyInput = CGEventType(rawValue: ~UInt32(0))!   // kCGAnyInputEventType
+        let idle = CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: anyInput)
+        return idle >= 0 && idle <= seconds
     }
 
     private func wakePresetName() -> String {
