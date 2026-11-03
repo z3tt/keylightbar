@@ -30,6 +30,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --icon-glow: rgba(240, 169, 46, 0.7);
   --shadow-card: 0 2px 10px rgba(64, 52, 20, 0.06);
   --shadow-deep: 0 16px 40px rgba(64, 52, 20, 0.14);
+  --preset-accent: #d9b469; // the work preset's own dot color
 }
 
 // Bright (100/220) — maximum brightness
@@ -37,6 +38,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --bg: #fffdf6;
   --bg-soft: #f8f5ea;
   --hero-glow: rgba(240, 169, 46, 0.18);
+  --preset-accent: #f7cf6b;
 }
 
 // Cold (50/143) — coldest temperature
@@ -48,6 +50,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted-dim: #424b54;
   --hero-glow: rgba(110, 150, 190, 0.14);
   --icon-glow: rgba(110, 150, 190, 0.55);
+  --preset-accent: #8fb3dd;
 }
 
 // Warm (50/344) — warmest temperature
@@ -59,6 +62,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted-dim: #51452f;
   --hero-glow: rgba(240, 169, 46, 0.24);
   --bulb-glow: rgba(240, 169, 46, 0.55);
+  --preset-accent: #f0a92e;
 }
 
 // Night (10/220) — dim, but still on
@@ -70,6 +74,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted: #4c473c;
   --muted-dim: #3b372f;
   --hero-glow: rgba(240, 169, 46, 0.08);
+  --preset-accent: #a89878;
 }
 
 // Turn Off — the only dark state, like the light being out
@@ -89,6 +94,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --icon-glow: rgba(245, 182, 66, 0.45);
   --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.25);
   --shadow-deep: 0 24px 60px rgba(0, 0, 0, 0.45);
+  --preset-accent: var(--card-edge); // lights out: the stripe dissolves
 }
 
 // ---- Base ----
@@ -222,6 +228,7 @@ strong {
   h2 {
     font-size: clamp(1.9rem, 4vw, 2.6rem);
     text-align: center;
+    margin-top: 1.25rem; // breathing room above each section headline
   }
 
   &-lead {
@@ -240,20 +247,6 @@ strong {
   padding: clamp(4rem, 10vw, 7rem) 1.5rem 0;
   text-align: center;
 
-  &-badge {
-    display: inline-block;
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--amber-ink);
-    border: 1px solid var(--bulb-glow);
-    background: var(--hero-glow);
-    border-radius: 999px;
-    padding: 0.3rem 0.9rem;
-    margin: 0 0 1.5rem;
-  }
-
   h1 {
     font-size: clamp(2.8rem, 7vw, 4.4rem);
     margin-bottom: 0.4em;
@@ -264,7 +257,7 @@ strong {
     // optical compensation, half strength: the centered line treats
     // the bulb at half its advance, so the word sits slightly left
     // of the axis and the bulb slightly right — the pair reads
-    // balanced against the centered badge below
+    // balanced against the centered sub-copy below
     margin-right: -0.6em;
     filter: drop-shadow(0 2px 10px var(--bulb-glow));
     animation: flicker 4s ease-in-out infinite;
@@ -618,7 +611,8 @@ strong {
 .feature {
   background: var(--card);
   border: 1px solid var(--card-edge);
-  border-top: 3px solid var(--amber);
+  // left stripe in the active preset's own dot color; dissolves on off
+  border-left: 3px solid var(--preset-accent);
   border-radius: $radius;
   padding: 1.6rem 1.5rem;
   box-shadow: var(--shadow-card);
@@ -738,13 +732,6 @@ strong {
 @media (max-width: 480px) {
   .hero-actions .btn {
     width: 100%;
-  }
-
-  // slightly smaller badge so the text stays on one line
-  .hero-badge {
-    font-size: 0.72rem;
-    letter-spacing: 0.06em;
-    padding: 0.28rem 0.75rem;
   }
 
   // stack the hint's lead phrase above the state-specific part
