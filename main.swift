@@ -279,7 +279,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if currentOn || !isConfigured {
             showPresetMenu()          // unconfigured: menu shows how to fix that
         } else {
-            applyPreset(lastPreset ?? presets.first?.name ?? "")
+            // The icon can lag the light: a physical press or Elgato's app
+            // since the last poll means the light may already be on. PUTting
+            // "on" then is a silent no-op on the light — ask it first, catch
+            // the icon up, and behave like an on-click instead.
+            api("GET", nil) { [weak self] json in
+                guard let self = self else { return }
+                if let light = (json?["lights"] as? [[String: Any]])?.first,
+                   (light["on"] as? Int) == 1 {
+                    self.applyLightState(light)
+                    self.showPresetMenu()
+                } else {
+                    self.applyPreset(self.lastPreset ?? self.presets.first?.name ?? "")
+                }
+            }
         }
     }
 
@@ -736,21 +749,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             guard let self = self,
                   let lights = json?["lights"] as? [[String: Any]],
                   let light = lights.first else { return }
-
-            let on = (light["on"] as? Int) == 1
-            let brightness = light["brightness"] as? Int
-            let temperature = light["temperature"] as? Int
-
-            self.currentOn = on
-            self.currentPreset = nil
-            if on, let b = brightness, let t = temperature,
-               let match = self.presets.first(where: { $0.brightness == b && $0.temperature == t }) {
-                self.currentPreset = match.name
-                self.lastPreset = match.name
-                UserDefaults.standard.set(match.name, forKey: lastPresetKey)
-            }
-            self.updateIcon()
+            self.applyLightState(light)
         }
+    }
+
+    private func applyLightState(_ light: [String: Any]) {
+        let on = (light["on"] as? Int) == 1
+        let brightness = light["brightness"] as? Int
+        let temperature = light["temperature"] as? Int
+
+        currentOn = on
+        currentPreset = nil
+        if on, let b = brightness, let t = temperature,
+           let match = presets.first(where: { $0.brightness == b && $0.temperature == t }) {
+            currentPreset = match.name
+            lastPreset = match.name
+            UserDefaults.standard.set(match.name, forKey: lastPresetKey)
+        }
+        updateIcon()
     }
 
     private func updateIcon() {
