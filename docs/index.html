@@ -73,8 +73,10 @@
         <h2>What it does</h2>
 
         <p class="states-hint" id="states-hint">
-          psst — this page acts as your light: click 🌑 to switch it on, 💡 to
-          open the preset menu.
+          <span class="hint-lead">psst — this page acts as your light:</span>
+          <span class="hint-state" id="hint-state"
+            >click 🌑 to switch it on, 💡 to open the preset menu.</span
+          >
         </p>
 
         <div class="states">
@@ -373,13 +375,11 @@
         var menu = document.getElementById("preset-menu");
         var cardOn = document.getElementById("card-on");
         var cardMenu = document.getElementById("card-menu");
-        var hint = document.getElementById("states-hint");
+        var hintState = document.getElementById("hint-state");
         var nudge = document.getElementById("states-nudge");
 
-        var HINT_OFF =
-          "psst — this page acts as your light: it's off — click 🌑 to switch it on.";
-        var HINT_ON =
-          "psst — this page acts as your light: it's on — click 💡 to open the preset menu.";
+        var HINT_OFF = "it's off — click 🌑 to switch it on.";
+        var HINT_ON = "it's on — click 💡 to open the preset menu.";
         var NUDGE_ON = "the light is already on — pick a preset instead 💡";
         var NUDGE_OFF = "the light is off — switch it on first 🌑";
 
@@ -417,7 +417,7 @@
           var off = root.dataset.theme === "off";
           setActive(cardOn, off, NUDGE_ON);
           setActive(cardMenu, !off, NUDGE_OFF);
-          hint.textContent = off ? HINT_OFF : HINT_ON;
+          hintState.textContent = off ? HINT_OFF : HINT_ON;
           nudge.textContent = "";
           nudge.classList.remove("flash");
         }
