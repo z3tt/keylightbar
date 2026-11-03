@@ -34,7 +34,10 @@ import ServiceManagement
 
 let appVersion = "1.1"
 
-let pollInterval: TimeInterval = 30
+// Short on purpose: physical presses and Elgato's app change the light
+// without telling us, and a stale icon reads as a broken app. One tiny
+// GET every few seconds on the LAN is effectively free.
+let pollInterval: TimeInterval = 5
 // Fallback defaults; the live values are adjustable in the "Time Of Day"
 // menu (UserDefaults) and apply on wake *and* continuously while running.
 let daytimePreset    = "Work"    // default day preset
