@@ -87,6 +87,10 @@ If a configured preset no longer exists (renamed or removed in the manager), the
 - **Discovery doesn't find the light** → *Find Key Light* searches twice: via Bonjour and via a scan of your local network. If both fail, the light likely isn't reachable at all — use *Configure…* and enter `IP:9123` directly.
 - **Compile warnings about NetService deprecation** → expected and accepted; the API works fine and keeps the app single-file. Migrating to `NWBrowser` (Network.framework) is the modern alternative.
 
+## Trademark notice
+
+KeylightBar is a private, open-source hobby project. It is not affiliated with, endorsed by, or connected to Elgato or Corsair. *Elgato*, *Key Light*, and related names are trademarks of Corsair Memory, Inc., used here solely to state that KeylightBar works with their lights.
+
 ## License
 
 [MIT](LICENSE) — Cédric Scherer
