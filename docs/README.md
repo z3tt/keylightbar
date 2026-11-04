@@ -3,8 +3,8 @@
 One-page site served by GitHub Pages (deployed from this `docs/` folder on `main`), reachable at <https://keylightbar.cedricscherer.com>.
 
 - `index.html` — the page
-- `scss/main.scss` — styles; compile with `npx sass scss/main.scss css/main.css --style compressed --no-source-map`
-- `css/main.css` — compiled stylesheet (committed so Pages needs no build step)
+- `scss/main.scss` — styles; the **Site styles** workflow (`.github/workflows/site-styles.yml`) compiles them automatically on every push to `main` that touches `docs/scss/` and commits the output
+- `css/main.css` — compiled stylesheet (committed by CI so Pages needs no build step); for local iteration: `npx sass scss/main.scss css/main.css --style compressed --no-source-map`
 - `keylightbar.gif` — demo recording (also used by the main README)
 
 To publish changes: commit to `main` and push — Pages picks it up automatically.

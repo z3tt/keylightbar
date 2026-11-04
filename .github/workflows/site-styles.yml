@@ -1,0 +1,42 @@
+name: Site styles
+
+# Compiles docs/css/main.css from docs/scss/main.scss so contributors
+# never have to build locally: edit the SCSS, push, done. The committed
+# CSS keeps GitHub Pages deployable without a build step.
+
+on:
+  push:
+    branches: [main]
+    paths: ["docs/scss/**"]
+  pull_request:
+    paths: ["docs/scss/**"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: site-styles
+  cancel-in-progress: true
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Compile SCSS
+        # pinned to the version the stylesheet is developed with
+        run: npx -y sass@1.107.1 docs/scss/main.scss docs/css/main.css --style compressed --no-source-map
+
+      - name: Commit compiled CSS
+        if: github.event_name == 'push'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/css/main.css
+          if git diff --cached --quiet; then
+            echo "docs/css/main.css is up to date"
+          else
+            git commit -m "Compile the site stylesheet from SCSS"
+            git push
+          fi
