@@ -76,7 +76,7 @@ let defaultPresets: [Preset] = [
     Preset(name: "Meet",   brightness: 60,  temperature: 180),
     Preset(name: "Night",  brightness: 25,  temperature: 290),
     Preset(name: "Chill",  brightness: 8,   temperature: 344),
-    Preset(name: "Bright", brightness: 100, temperature: 220),
+    Preset(name: "Bright", brightness: 100, temperature: 243),
     Preset(name: "Cold",   brightness: 50,  temperature: 143),
     Preset(name: "Warm",   brightness: 50,  temperature: 344),
 ]
