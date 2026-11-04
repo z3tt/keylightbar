@@ -10,6 +10,9 @@
 - Working directly on `main` is fine for small fixes and docs tweaks —
   commit locally whenever a change compiles (`swiftc main.swift` → 0
   errors); small working steps are fine, one logical change per commit.
+- During interactive or drafting work (e.g. iterating on website copy),
+  commit each step locally but do NOT push every time — push only when
+  the owner asks or when the session's work is settled.
 - If it's unclear whether a change is small enough for `main`, ask the
   owner once before committing.
 - Still ask first: version tags, GitHub releases, and anything destructive
