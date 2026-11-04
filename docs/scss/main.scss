@@ -43,7 +43,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --preset-accent: #6b92c0;
 }
 
-// Bright (100/220) — maximum brightness
+// Bright (100/243) — maximum brightness, neutral white (~5000 K)
 :root[data-theme="bright"] {
   --bg: #fdfefe;
   --bg-soft: #f3f7fa;
@@ -51,7 +51,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted: #525a64;
   --muted-dim: #3f4650;
   --hero-glow: rgba(175, 198, 224, 0.25);
-  --preset-accent: #b9d0eb;
+  --preset-accent: #cdcece;
 }
 
 // Cold (50/143) — coldest temperature
@@ -529,7 +529,7 @@ strong {
       background: #8b754f;
     }
     &--bright {
-      background: #b9d0eb;
+      background: #cdcece;
     }
     &--cold {
       background: #5283bc;
