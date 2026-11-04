@@ -182,9 +182,10 @@
             <span aria-hidden="true">🕑</span>
             <h3>Day and night on schedule</h3>
             <p>
-              Bright light during the day, warm and dim at night. Or chill mode
-              after work? Define your own presets and schedules — they switch
-              by time of day, on their own.
+              Bright light by day, something softer after dark. Or do you prefer
+              chill mode after work?
+              <strong>Define your own presets and schedules</strong> — and
+              they'll switch on their own.
             </p>
           </article>
           <article class="feature">
@@ -192,7 +193,7 @@
             <h3>Set it and forget it</h3>
             <p>
               Flip <strong>Start At Login</strong> in the menu and the 💡 is in
-              your menu bar from the first boot. No Login Items fiddling in
+              your menu bar from the first boot. No Login Items fiddling in your
               System Settings.
             </p>
           </article>
@@ -357,7 +358,15 @@
       (function () {
         var root = document.documentElement;
         var meta = document.querySelector('meta[name="theme-color"]');
-        var LIGHT = ["work", "meet", "night", "chill", "bright", "cold", "warm"];
+        var LIGHT = [
+          "work",
+          "meet",
+          "night",
+          "chill",
+          "bright",
+          "cold",
+          "warm",
+        ];
 
         function setTheme(t) {
           root.dataset.theme = t;
