@@ -72,7 +72,7 @@ struct Preset: Codable {
 }
 
 let defaultPresets: [Preset] = [
-    Preset(name: "Work",   brightness: 45,  temperature: 220),
+    Preset(name: "Work",   brightness: 45,  temperature: 260),
     Preset(name: "Meet",   brightness: 60,  temperature: 180),
     Preset(name: "Night",  brightness: 25,  temperature: 290),
     Preset(name: "Chill",  brightness: 8,   temperature: 344),
@@ -149,7 +149,11 @@ func presetSwatchColor(preset: Preset) -> NSColor {
         hue *= 60
         if hue < 0 { hue += 360 }
     }
-    let saturation = maxC > 0 ? delta / maxC : 0
+    let sat = maxC > 0 ? delta / maxC : 0
+    // Steepened so neighboring presets read distinctly at dot size: the
+    // dot is a guide — hue directions stay true, the degree is exaggerated
+    // (the label right beside it does the exact identification).
+    let saturation = min(sat * 1.8, 1)
 
     let bright = Double(min(max(preset.brightness, 0), 100))
     let value = 0.40 + 0.48 * bright / 100
