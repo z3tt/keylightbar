@@ -15,17 +15,17 @@ $font-body: "Supreme", system-ui, sans-serif;
 // page, only Turn Off is dark. Shades stay light enough for the
 // dark ink family throughout.
 :root {
-  --bg: #faf8f3; // Work (45/260) — the default paper
-  --bg-soft: #f2eee4;
+  --bg: #faf6ec; // Work (45/260) — the default paper
+  --bg-soft: #f4eedd;
   --card: #ffffff;
-  --card-edge: #e7e2d4;
+  --card-edge: #e5dbc4;
   --text: #221f18;
   --muted: #5d584b;
   --muted-dim: #4a463b;
   --amber: #f0a92e;
   --amber-ink: #8a5f0b;
   --bulb-ink: #241a05;
-  --hero-glow: rgba(240, 169, 46, 0.14);
+  --hero-glow: rgba(203, 172, 105, 0.18);
   --bulb-glow: rgba(240, 169, 46, 0.45);
   --icon-glow: rgba(240, 169, 46, 0.7);
   --shadow-card: 0 2px 10px rgba(64, 52, 20, 0.06);
@@ -35,31 +35,34 @@ $font-body: "Supreme", system-ui, sans-serif;
 
 // Meet (60/180) — brighter and cooler than Work, for calls
 :root[data-theme="meet"] {
-  --bg: #fafaf6;
-  --bg-soft: #f0f2ec;
-  --card-edge: #e5e7dc;
-  --hero-glow: rgba(140, 170, 200, 0.12);
-  --icon-glow: rgba(120, 160, 195, 0.6);
+  --bg: #f6f9fc;
+  --bg-soft: #e9eff5;
+  --card-edge: #d6dfe9;
+  --hero-glow: rgba(92, 131, 175, 0.13);
+  --icon-glow: rgba(92, 131, 175, 0.55);
   --preset-accent: #5c83af;
 }
 
 // Bright (100/220) — maximum brightness
 :root[data-theme="bright"] {
-  --bg: #fffdf6;
-  --bg-soft: #f8f5ea;
-  --hero-glow: rgba(240, 169, 46, 0.18);
+  --bg: #fdfefe;
+  --bg-soft: #f3f7fa;
+  --card-edge: #dce6ee;
+  --muted: #525a64;
+  --muted-dim: #3f4650;
+  --hero-glow: rgba(175, 198, 224, 0.25);
   --preset-accent: #afc6e0;
 }
 
 // Cold (50/143) — coldest temperature
 :root[data-theme="cold"] {
-  --bg: #f3f5f4;
-  --bg-soft: #ebefee;
-  --card-edge: #dde3e0;
+  --bg: #eef3f8;
+  --bg-soft: #e6edf2;
+  --card-edge: #d5dfe8;
   --muted: #56606b;
   --muted-dim: #424b54;
-  --hero-glow: rgba(110, 150, 190, 0.14);
-  --icon-glow: rgba(110, 150, 190, 0.55);
+  --hero-glow: rgba(60, 107, 163, 0.14);
+  --icon-glow: rgba(60, 107, 163, 0.55);
   --preset-accent: #3c6ba3;
 }
 
@@ -83,19 +86,19 @@ $font-body: "Supreme", system-ui, sans-serif;
   --card-edge: #cfc3a5;
   --muted: #574c34;
   --muted-dim: #423a28;
-  --hero-glow: rgba(240, 169, 46, 0.09);
+  --hero-glow: rgba(133, 89, 13, 0.1);
   --preset-accent: #85590d;
 }
 
 // Chill (8/344) — the darkest, warmest background glow
 :root[data-theme="chill"] {
-  --bg: #e7d9bc;
-  --bg-soft: #d9c8a5;
-  --card: #eee0c4;
-  --card-edge: #c5b28b;
+  --bg: #e3d3ac;
+  --bg-soft: #d4c093;
+  --card: #ece0c0;
+  --card-edge: #b5a075;
   --muted: #5e5133;
   --muted-dim: #453c25;
-  --hero-glow: rgba(240, 169, 46, 0.05);
+  --hero-glow: rgba(112, 71, 0, 0.08);
   --preset-accent: #704700;
 }
 
