@@ -87,6 +87,18 @@ If a configured preset no longer exists (renamed or removed in the manager), the
 - **Discovery doesn't find the light** → *Find Key Light* searches twice: via Bonjour and via a scan of your local network. If both fail, the light likely isn't reachable at all — use *Configure…* and enter `IP:9123` directly.
 - **Compile warnings about NetService deprecation** → expected and accepted; the API works fine and keeps the app single-file. Migrating to `NWBrowser` (Network.framework) is the modern alternative.
 
+## Contributing
+
+Issues and pull requests are welcome — this is a hobby project, so kindness beats formality.
+
+- **Start small.** One logical change per PR. If you're unsure or it's more than that, open an issue first so we can talk it through.
+- **Build before you push.** `make bundle` must compile clean (`swiftc main.swift` → 0 errors). The `NetService` deprecation warning is expected and accepted.
+- **Respect the constraints.** KeylightBar is a single Swift file with zero dependencies by design — keep it that way. The emoji icons, title-cased preset names, and the absence of a Dock icon or companion windows are intentional.
+- **Test against a real light** if you can. Network behavior is hard to fake: a change that compiles is not a change that works.
+- **Website changes** live in `docs/`. Compile styles with `npx sass scss/main.scss css/main.css --style compressed --no-source-map` and commit the compiled CSS too — GitHub Pages has no build step. Feature-card headings are measured to fit one line, so mind a heading's width when you reword one.
+
+Version tags and releases stay with the maintainer.
+
 ## Trademark notice
 
 KeylightBar is an independent, open-source project. It is not affiliated with, endorsed by, or connected to Elgato or Corsair. *Elgato*, *Key Light*, and related names are trademarks of Corsair Memory, Inc., used here solely to state that KeylightBar works with their lights.
