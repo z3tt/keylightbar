@@ -89,7 +89,7 @@ If a configured preset no longer exists (renamed or removed in the manager), the
 
 ## Trademark notice
 
-KeylightBar is a private, open-source hobby project. It is not affiliated with, endorsed by, or connected to Elgato or Corsair. *Elgato*, *Key Light*, and related names are trademarks of Corsair Memory, Inc., used here solely to state that KeylightBar works with their lights.
+KeylightBar is an independent, open-source project. It is not affiliated with, endorsed by, or connected to Elgato or Corsair. *Elgato*, *Key Light*, and related names are trademarks of Corsair Memory, Inc., used here solely to state that KeylightBar works with their lights.
 
 ## License
 
