@@ -30,7 +30,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --icon-glow: rgba(240, 169, 46, 0.7);
   --shadow-card: 0 2px 10px rgba(64, 52, 20, 0.06);
   --shadow-deep: 0 16px 40px rgba(64, 52, 20, 0.14);
-  --preset-accent: #d9b469; // the work preset's own dot color
+  --preset-accent: #ccab68; // the work preset's own dot color
 }
 
 // Meet (60/180) — brighter and cooler than Work, for calls
@@ -48,7 +48,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --bg: #fffdf6;
   --bg-soft: #f8f5ea;
   --hero-glow: rgba(240, 169, 46, 0.18);
-  --preset-accent: #f7cf6b;
+  --preset-accent: #ffc245;
 }
 
 // Cold (50/143) — coldest temperature
@@ -523,10 +523,10 @@ strong {
       background: #cccdbb;
     }
     &--work {
-      background: #d9b469;
+      background: #ccab68;
     }
     &--bright {
-      background: #f7cf6b;
+      background: #ffc245;
     }
     &--cold {
       background: #8fb3dd;
