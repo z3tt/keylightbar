@@ -40,3 +40,11 @@
   simplicity; NWBrowser is the known modern alternative).
 - Every freshly compiled binary needs its own macOS "Local Network" permission
   grant — silent network failures are usually that, not a bug.
+
+## Session notes
+- Every session appends a dated entry to `docs/NOTES.md` when closing a
+  unit of work: what shipped, decisions and why, gotchas, next steps.
+  Substantial new work also starts with a brief (`docs/brief.md`) the
+  owner reviews before building, and keeps it current.
+- Discrete future work belongs in GitHub issues; long-running narrative
+  state lives in `docs/NOTES.md` — not in chat.
