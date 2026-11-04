@@ -32,7 +32,7 @@ import ServiceManagement
 
 // MARK: - Configuration
 
-let appVersion = "1.2.1"
+let appVersion = "1.2.2"
 
 // Short on purpose: physical presses and Elgato's app change the light
 // without telling us, and a stale icon reads as a broken app. One tiny
