@@ -1,6 +1,6 @@
 # KeylightBar 💡
 
-**[keylightbar site](https://z3tt.github.io/keylightbar/) · [Releases](https://github.com/z3tt/keylightbar/releases)**
+**[keylightbar site](https://keylightbar.cedricscherer.com/) · [Releases](https://github.com/z3tt/keylightbar/releases)**
 
 <p align="left">
   <a href="https://github.com/z3tt/keylightbar/actions/workflows/build.yml"><img src="https://github.com/z3tt/keylightbar/actions/workflows/build.yml/badge.svg" alt="Build status"></a>

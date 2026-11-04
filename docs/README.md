@@ -1,6 +1,6 @@
 # KeylightBar website
 
-One-page site served by GitHub Pages (deployed from this `docs/` folder on `main`).
+One-page site served by GitHub Pages (deployed from this `docs/` folder on `main`), reachable at <https://keylightbar.cedricscherer.com>.
 
 - `index.html` — the page
 - `scss/main.scss` — styles; compile with `npx sass scss/main.scss css/main.css --style compressed --no-source-map`
