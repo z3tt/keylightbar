@@ -30,7 +30,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --icon-glow: rgba(240, 169, 46, 0.7);
   --shadow-card: 0 2px 10px rgba(64, 52, 20, 0.06);
   --shadow-deep: 0 16px 40px rgba(64, 52, 20, 0.14);
-  --preset-accent: #717881; // the work preset's own dot color
+  --preset-accent: #676e76; // the work preset's own dot color
 }
 
 // Meet (60/180) — brighter and cooler than Work, for calls
@@ -40,7 +40,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --card-edge: #e5e7dc;
   --hero-glow: rgba(140, 170, 200, 0.12);
   --icon-glow: rgba(120, 160, 195, 0.6);
-  --preset-accent: #788ca3;
+  --preset-accent: #6c7e93;
 }
 
 // Bright (100/220) — maximum brightness
@@ -48,7 +48,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --bg: #fffdf6;
   --bg-soft: #f8f5ea;
   --hero-glow: rgba(240, 169, 46, 0.18);
-  --preset-accent: #e0eeff;
+  --preset-accent: #c5d2e0;
 }
 
 // Cold (50/143) — coldest temperature
@@ -60,7 +60,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted-dim: #424b54;
   --hero-glow: rgba(110, 150, 190, 0.14);
   --icon-glow: rgba(110, 150, 190, 0.55);
-  --preset-accent: #5b728c;
+  --preset-accent: #526780;
 }
 
 // Warm (50/344) — warmest temperature
@@ -72,7 +72,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted-dim: #51452f;
   --hero-glow: rgba(240, 169, 46, 0.24);
   --bulb-glow: rgba(240, 169, 46, 0.55);
-  --preset-accent: #8c631b;
+  --preset-accent: #805a18;
 }
 
 // Night (25/290) — dim, warm desk light for late sessions
@@ -84,7 +84,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted: #574c34;
   --muted-dim: #423a28;
   --hero-glow: rgba(240, 169, 46, 0.09);
-  --preset-accent: #53442a;
+  --preset-accent: #4f4128;
 }
 
 // Chill (8/344) — the darkest, warmest background glow
@@ -96,7 +96,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted: #5e5133;
   --muted-dim: #453c25;
   --hero-glow: rgba(240, 169, 46, 0.05);
-  --preset-accent: #2c1f08;
+  --preset-accent: #2e2009;
 }
 
 // Turn Off — the only dark state, like the light being out
@@ -517,30 +517,29 @@ strong {
   .dot {
     width: 0.6rem;
     height: 0.6rem;
-    box-shadow: inset 0 0 0 1px var(--card-edge); // hairline keeps near-white neutral dots visible
 
     border-radius: 50%;
 
     &--meet {
-      background: #788ca3;
+      background: #6c7e93;
     }
     &--work {
-      background: #717881;
+      background: #676e76;
     }
     &--bright {
-      background: #e0eeff;
+      background: #c5d2e0;
     }
     &--cold {
-      background: #5b728c;
+      background: #526780;
     }
     &--warm {
-      background: #8c631b;
+      background: #805a18;
     }
     &--night {
-      background: #53442a;
+      background: #4f4128;
     }
     &--chill {
-      background: #2c1f08;
+      background: #2e2009;
     }
   }
 

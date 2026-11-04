@@ -121,9 +121,10 @@ private let swatchTempAnchors: [(temp: Double, rgb: (Double, Double, Double))] =
 
 /// Swatch color for a preset — bivariate, mirroring the light's two
 /// controls: hue + saturation encode temperature (zero saturation at
-/// neutral), lightness encodes brightness alone (100 at neutral reads
-/// white, 50 mid gray, 0 near black), so the dot's lightness always
-/// matches the preset's brightness setting across every temperature.
+/// neutral), lightness encodes brightness alone, from near-black at 0
+/// over exact mid gray at 50 up to 0.88 at 100 — the ceiling keeps even
+/// the brightest neutral dot visible against a white menu, so no dot
+/// needs an outline.
 func presetSwatchColor(preset: Preset) -> NSColor {
     let t = Double(min(max(preset.temperature, 143), 344))
     var rgb = swatchTempAnchors[0].rgb
@@ -151,7 +152,7 @@ func presetSwatchColor(preset: Preset) -> NSColor {
     let saturation = maxC > 0 ? delta / maxC : 0
 
     let bright = Double(min(max(preset.brightness, 0), 100))
-    let value = 0.10 + 0.90 * bright / 100
+    let value = 0.12 + 0.76 * bright / 100
 
     return NSColor(hue: CGFloat(hue / 360), saturation: CGFloat(saturation),
                    brightness: CGFloat(value), alpha: 1)
@@ -160,14 +161,8 @@ func presetSwatchColor(preset: Preset) -> NSColor {
 func presetSwatchImage(preset: Preset) -> NSImage {
     let color = presetSwatchColor(preset: preset)
     return NSImage(size: NSSize(width: 16, height: 16), flipped: false) { rect in
-        let dot = NSBezierPath(ovalIn: rect.insetBy(dx: 2, dy: 2))
         color.setFill()
-        dot.fill()
-        // Neutral presets are near-white; a hairline keeps the dot visible
-        // on a light menu without tinting its color.
-        NSColor.separatorColor.withAlphaComponent(0.55).setStroke()
-        dot.lineWidth = 1
-        dot.stroke()
+        NSBezierPath(ovalIn: rect.insetBy(dx: 2, dy: 2)).fill()
         return true
     }
 }
