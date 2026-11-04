@@ -44,7 +44,14 @@
 ## Session notes
 - Every session appends a dated entry to `docs/NOTES.md` when closing a
   unit of work: what shipped, decisions and why, gotchas, next steps.
-  Substantial new work also starts with a brief (`docs/brief.md`) the
-  owner reviews before building, and keeps it current.
+- Substantial new work starts with a brief (`docs/brief.md`) the owner
+  reviews before building. Its step list is a living plan — keep it
+  current and let it grow into the to-do list. Exploratory design work
+  (like the dot arc) uses a goal statement + iteration loops instead of
+  a fixed definition of done.
+- Ambiguous or high-stakes requests: interview the owner first — a
+  batched set of 2–4 high-leverage questions — then draft the brief.
+  Clear requests: draft and mark assumptions. Never stall on
+  interchangeable details — pick and surface.
 - Discrete future work belongs in GitHub issues; long-running narrative
   state lives in `docs/NOTES.md` — not in chat.
