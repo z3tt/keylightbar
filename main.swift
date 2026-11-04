@@ -107,13 +107,14 @@ func savePresets(_ presets: [Preset]) {
 
 // MARK: - Preset swatch dots
 
-/// RGB anchors of the temperature scale (read at brightness 50), matching
-/// the colored preset dots on the website: cool blue → neutral tan → warm
-/// amber. Interpolated in RGB, so the cool-to-warm path never runs green.
+/// RGB anchors of the temperature scale (read at brightness 50): saturated
+/// cool blue and warm amber at the ends, neutral white at the scale's true
+/// midpoint (~243.5 ≈ 4950 K), so neutral presets read neutral. Interpolated
+/// in RGB, so the cool-to-warm path never runs green.
 private let swatchTempAnchors: [(temp: Double, rgb: (Double, Double, Double))] = [
-    (143, (143, 179, 221)),   // #8fb3dd — coldest
-    (220, (217, 180, 105)),   // #d9b469 — neutral
-    (344, (240, 169, 46)),    // #f0a92e — warmest
+    (143, (143, 179, 221)),     // #8fb3dd — coldest, saturated
+    (243.5, (244, 241, 233)),   // #f4f1e9 — neutral: the scale's midpoint ≈ 4950 K reads as neutral white
+    (344, (240, 169, 46)),      // #f0a92e — warmest, saturated
 ]
 
 /// Swatch color for a preset: the temperature interpolates the anchors'
@@ -163,8 +164,14 @@ func presetSwatchColor(preset: Preset) -> NSColor {
 func presetSwatchImage(preset: Preset) -> NSImage {
     let color = presetSwatchColor(preset: preset)
     return NSImage(size: NSSize(width: 16, height: 16), flipped: false) { rect in
+        let dot = NSBezierPath(ovalIn: rect.insetBy(dx: 2, dy: 2))
         color.setFill()
-        NSBezierPath(ovalIn: rect.insetBy(dx: 2, dy: 2)).fill()
+        dot.fill()
+        // Neutral presets are near-white; a hairline keeps the dot visible
+        // on a light menu without tinting its color.
+        NSColor.separatorColor.withAlphaComponent(0.55).setStroke()
+        dot.lineWidth = 1
+        dot.stroke()
         return true
     }
 }

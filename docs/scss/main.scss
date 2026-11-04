@@ -30,7 +30,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --icon-glow: rgba(240, 169, 46, 0.7);
   --shadow-card: 0 2px 10px rgba(64, 52, 20, 0.06);
   --shadow-deep: 0 16px 40px rgba(64, 52, 20, 0.14);
-  --preset-accent: #ccab68; // the work preset's own dot color
+  --preset-accent: #d1d6d9; // the work preset's own dot color
 }
 
 // Meet (60/180) — brighter and cooler than Work, for calls
@@ -40,7 +40,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --card-edge: #e5e7dc;
   --hero-glow: rgba(140, 170, 200, 0.12);
   --icon-glow: rgba(120, 160, 195, 0.6);
-  --preset-accent: #cccdbb;
+  --preset-accent: #c4defb;
 }
 
 // Bright (100/220) — maximum brightness
@@ -48,7 +48,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --bg: #fffdf6;
   --bg-soft: #f8f5ea;
   --hero-glow: rgba(240, 169, 46, 0.18);
-  --preset-accent: #ffc245;
+  --preset-accent: #f0f9ff;
 }
 
 // Cold (50/143) — coldest temperature
@@ -84,7 +84,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted: #574c34;
   --muted-dim: #423a28;
   --hero-glow: rgba(240, 169, 46, 0.09);
-  --preset-accent: #a68a55;
+  --preset-accent: #b2a081;
 }
 
 // Chill (8/344) — the darkest, warmest background glow
@@ -517,16 +517,18 @@ strong {
   .dot {
     width: 0.6rem;
     height: 0.6rem;
+    box-shadow: inset 0 0 0 1px var(--card-edge); // hairline keeps near-white neutral dots visible
+
     border-radius: 50%;
 
     &--meet {
-      background: #cccdbb;
+      background: #c4defb;
     }
     &--work {
-      background: #ccab68;
+      background: #d1d6d9;
     }
     &--bright {
-      background: #ffc245;
+      background: #f0f9ff;
     }
     &--cold {
       background: #8fb3dd;
@@ -535,7 +537,7 @@ strong {
       background: #f0a92e;
     }
     &--night {
-      background: #a68a55;
+      background: #b2a081;
     }
     &--chill {
       background: #85755a;
