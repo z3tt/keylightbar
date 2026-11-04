@@ -121,10 +121,10 @@ private let swatchTempAnchors: [(temp: Double, rgb: (Double, Double, Double))] =
 
 /// Swatch color for a preset — bivariate, mirroring the light's two
 /// controls: hue + saturation encode temperature (zero saturation at
-/// neutral), lightness encodes brightness alone, from near-black at 0
-/// over exact mid gray at 50 up to 0.88 at 100 — the ceiling keeps even
-/// the brightest neutral dot visible against a white menu, so no dot
-/// needs an outline.
+/// neutral), lightness encodes brightness alone, mapped into the band
+/// 0.40...0.88 — dim presets read deep-colored, never black (a dim light
+/// still glows, and black vanishes on dark menus), and the brightest
+/// stays below background white on light menus. No dot needs an outline.
 func presetSwatchColor(preset: Preset) -> NSColor {
     let t = Double(min(max(preset.temperature, 143), 344))
     var rgb = swatchTempAnchors[0].rgb
@@ -152,7 +152,7 @@ func presetSwatchColor(preset: Preset) -> NSColor {
     let saturation = maxC > 0 ? delta / maxC : 0
 
     let bright = Double(min(max(preset.brightness, 0), 100))
-    let value = 0.12 + 0.76 * bright / 100
+    let value = 0.40 + 0.48 * bright / 100
 
     return NSColor(hue: CGFloat(hue / 360), saturation: CGFloat(saturation),
                    brightness: CGFloat(value), alpha: 1)
