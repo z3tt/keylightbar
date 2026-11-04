@@ -16,8 +16,8 @@ Gotchas:
   check its width against the ~294px card box (longest heading should stay
   under ~200px to survive all layouts).
 - The preset menu dots and the `--preset-accent` card stripes are the app's
-  swatch-formula output (`presetSwatchColor` in `main.swift`: hue from the
-  temperature anchors, saturation x1.8, lightness 0.40 + 0.54·b/100).
+  swatch-formula output (`presetSwatchColor` in `main.swift`: hue + chroma from the
+  temperature anchors with saturation x1.8; brightness maps to perceptual OKLCH lightness L = 0.35 + 0.50·b/100).
   They are hardcoded hexes here — whenever the default presets change,
   recompute them, or the page drifts from the app. The per-theme backgrounds
   and glows are hand-picked (approach c) and only need re-tuning by eye.
