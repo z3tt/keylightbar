@@ -35,9 +35,9 @@ $font-body: "Supreme", system-ui, sans-serif;
 
 // Meet (60/180) — brighter and cooler than Work, for calls
 :root[data-theme="meet"] {
-  --bg: #f9fafb;
-  --bg-soft: #eef1f5;
-  --card-edge: #dee4ea;
+  --bg: #f6f9fc;
+  --bg-soft: #e9eff5;
+  --card-edge: #d6dfe9;
   --hero-glow: rgba(92, 131, 175, 0.13);
   --icon-glow: rgba(92, 131, 175, 0.55);
   --preset-accent: #5c83af;
@@ -45,20 +45,20 @@ $font-body: "Supreme", system-ui, sans-serif;
 
 // Bright (100/220) — maximum brightness
 :root[data-theme="bright"] {
-  --bg: #f8fafc;
-  --bg-soft: #eef3f7;
-  --card-edge: #dbe4ec;
+  --bg: #fdfefe;
+  --bg-soft: #f3f7fa;
+  --card-edge: #dce6ee;
   --muted: #525a64;
   --muted-dim: #3f4650;
-  --hero-glow: rgba(175, 198, 224, 0.2);
+  --hero-glow: rgba(175, 198, 224, 0.25);
   --preset-accent: #afc6e0;
 }
 
 // Cold (50/143) — coldest temperature
 :root[data-theme="cold"] {
-  --bg: #f3f5f4;
-  --bg-soft: #ebefee;
-  --card-edge: #dde3e0;
+  --bg: #eef3f8;
+  --bg-soft: #e6edf2;
+  --card-edge: #d5dfe8;
   --muted: #56606b;
   --muted-dim: #424b54;
   --hero-glow: rgba(60, 107, 163, 0.14);
@@ -92,10 +92,10 @@ $font-body: "Supreme", system-ui, sans-serif;
 
 // Chill (8/344) — the darkest, warmest background glow
 :root[data-theme="chill"] {
-  --bg: #eedfc0;
-  --bg-soft: #ddcaa6;
-  --card: #f3e6ca;
-  --card-edge: #bfa87e;
+  --bg: #e3d3ac;
+  --bg-soft: #d4c093;
+  --card: #ece0c0;
+  --card-edge: #b5a075;
   --muted: #5e5133;
   --muted-dim: #453c25;
   --hero-glow: rgba(112, 71, 0, 0.08);
