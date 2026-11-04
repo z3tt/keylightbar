@@ -77,8 +77,8 @@ let defaultPresets: [Preset] = [
     Preset(name: "Bright", brightness: 100, temperature: 220),
     Preset(name: "Cold",   brightness: 50,  temperature: 143),
     Preset(name: "Warm",   brightness: 50,  temperature: 344),
-    Preset(name: "Night",  brightness: 10,  temperature: 220),
-    Preset(name: "Chill",  brightness: 15,  temperature: 300),
+    Preset(name: "Night",  brightness: 25,  temperature: 290),
+    Preset(name: "Chill",  brightness: 8,   temperature: 344),
 ]
 
 func loadPresets() -> [Preset] {
