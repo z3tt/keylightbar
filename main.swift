@@ -107,19 +107,24 @@ func savePresets(_ presets: [Preset]) {
 
 // MARK: - Preset swatch dots
 
-/// RGB anchors of the temperature scale (read at brightness 50), matching
-/// the colored preset dots on the website: cool blue → neutral tan → warm
-/// amber. Interpolated in RGB, so the cool-to-warm path never runs green.
+/// RGB anchors of the temperature scale: saturated cool blue and warm
+/// amber at the ends, achromatic gray at the scale's true midpoint
+/// (~243.5 ≈ 4950 K), so neutral temperatures carry no hue. Interpolated
+/// in RGB, so the cool-to-warm path never runs green. The warm end is
+/// more vivid than the cool end — honest, since 2900 K tints stronger
+/// than 7000 K.
 private let swatchTempAnchors: [(temp: Double, rgb: (Double, Double, Double))] = [
-    (143, (143, 179, 221)),   // #8fb3dd — coldest
-    (220, (217, 180, 105)),   // #d9b469 — neutral
-    (344, (240, 169, 46)),    // #f0a92e — warmest
+    (143, (143, 179, 221)),    // #8fb3dd — coldest, saturated
+    (243.5, (128, 128, 128)),  // achromatic gray — neutral, the scale's midpoint ≈ 4950 K
+    (344, (240, 169, 46)),     // #f0a92e — warmest, saturated
 ]
 
-/// Swatch color for a preset: the temperature interpolates the anchors'
-/// hue, the brightness scales how light and saturated the dot reads —
-/// dim presets get a darker, grayer dot. Brightness 50 keeps the anchor
-/// colors, so the defaults land on the website's reference dots.
+/// Swatch color for a preset — bivariate, mirroring the light's two
+/// controls: hue + saturation encode temperature (zero saturation at
+/// neutral), lightness encodes brightness alone, mapped into the band
+/// 0.40...0.88 — dim presets read deep-colored, never black (a dim light
+/// still glows, and black vanishes on dark menus), and the brightest
+/// stays below background white on light menus. No dot needs an outline.
 func presetSwatchColor(preset: Preset) -> NSColor {
     let t = Double(min(max(preset.temperature, 143), 344))
     var rgb = swatchTempAnchors[0].rgb
@@ -144,22 +149,15 @@ func presetSwatchColor(preset: Preset) -> NSColor {
         hue *= 60
         if hue < 0 { hue += 360 }
     }
+    let saturation = maxC > 0 ? delta / maxC : 0
 
     let bright = Double(min(max(preset.brightness, 0), 100))
-    let value = min(max(maxC + (bright - 50) * 0.010, 0.15), 1)
-    let sat = maxC > 0 ? delta / maxC : 0
-    let saturation = min(sat * (bright / 50).squareRoot(), 1)
+    let value = 0.40 + 0.48 * bright / 100
 
     return NSColor(hue: CGFloat(hue / 360), saturation: CGFloat(saturation),
                    brightness: CGFloat(value), alpha: 1)
 }
 
-/// A small circular swatch dot for a preset menu item (16 pt). The image
-/// draws via a lazy handler at whatever scale the screen needs (retina
-/// included), and its point size is fixed — AppKit clips menu item images
-/// whose bitmap exceeds the 16 pt slot, which an explicit 2x bitmap rep
-/// triggers by losing its point-size metadata. Drawn fresh on every menu
-/// build, so added, renamed, and edited presets update their dot right away.
 func presetSwatchImage(preset: Preset) -> NSImage {
     let color = presetSwatchColor(preset: preset)
     return NSImage(size: NSSize(width: 16, height: 16), flipped: false) { rect in
