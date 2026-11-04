@@ -113,15 +113,27 @@
             >
               <li class="menu-title">Presets</li>
               <li>
+                <button type="button" data-theme="work">
+                  <span class="dot dot--work" aria-hidden="true"></span>
+                  <span class="name">Work</span>
+                </button>
+              </li>
+              <li>
                 <button type="button" data-theme="meet">
                   <span class="dot dot--meet" aria-hidden="true"></span>
                   <span class="name">Meet</span>
                 </button>
               </li>
               <li>
-                <button type="button" data-theme="work">
-                  <span class="dot dot--work" aria-hidden="true"></span>
-                  <span class="name">Work</span>
+                <button type="button" data-theme="night">
+                  <span class="dot dot--night" aria-hidden="true"></span>
+                  <span class="name">Night</span>
+                </button>
+              </li>
+              <li>
+                <button type="button" data-theme="chill">
+                  <span class="dot dot--chill" aria-hidden="true"></span>
+                  <span class="name">Chill</span>
                 </button>
               </li>
               <li>
@@ -140,18 +152,6 @@
                 <button type="button" data-theme="warm">
                   <span class="dot dot--warm" aria-hidden="true"></span>
                   <span class="name">Warm</span>
-                </button>
-              </li>
-              <li>
-                <button type="button" data-theme="night">
-                  <span class="dot dot--night" aria-hidden="true"></span>
-                  <span class="name">Night</span>
-                </button>
-              </li>
-              <li>
-                <button type="button" data-theme="chill">
-                  <span class="dot dot--chill" aria-hidden="true"></span>
-                  <span class="name">Chill</span>
                 </button>
               </li>
               <li class="menu-sep" role="separator"></li>
@@ -357,7 +357,7 @@
       (function () {
         var root = document.documentElement;
         var meta = document.querySelector('meta[name="theme-color"]');
-        var LIGHT = ["meet", "work", "bright", "cold", "warm", "night", "chill"];
+        var LIGHT = ["work", "meet", "night", "chill", "bright", "cold", "warm"];
 
         function setTheme(t) {
           root.dataset.theme = t;
