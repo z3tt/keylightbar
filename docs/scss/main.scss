@@ -1,7 +1,7 @@
 // KeylightBar one-pager — light-first, switchable dark mode
 // Theme metaphor: 💡 = lights on (light), 🌑 = lights off (dark)
 // Fonts: Tanker (display) + Supreme (body) via Fontshare
-// Compile: npx sass scss/main.scss css/main.css --style compressed
+// Compile: npx sass scss/main.scss css/main.css --style compressed --no-source-map
 
 $radius: 16px;
 $maxw: 1080px;
