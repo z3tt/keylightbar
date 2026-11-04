@@ -603,16 +603,15 @@ strong {
 
 // tap feedback, below the cards near the point of interaction
 .states-nudge {
+  // always hold one line so nudges appearing/disappearing don't jump the
+  // layout below; empty = an invisible reserved line
+  min-height: 1.4rem;
   max-width: 40rem;
   margin: 1.1rem auto 0;
   text-align: center;
   font-size: 0.85rem;
   color: var(--muted-dim);
   transition: color 0.35s ease;
-
-  &:empty {
-    display: none;
-  }
 
   // brief amber pulse when a nudge message appears
   &.flash {
