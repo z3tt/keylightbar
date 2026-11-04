@@ -513,11 +513,10 @@ strong {
     margin: 0.35rem 0.3rem;
   }
 
-  // temperature dots: cold = blue, warm = amber, dim = darker
+  // temperature dots: hue encodes temperature, lightness encodes brightness
   .dot {
     width: 0.6rem;
     height: 0.6rem;
-
     border-radius: 50%;
 
     &--meet {
