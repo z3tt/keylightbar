@@ -33,6 +33,16 @@ $font-body: "Supreme", system-ui, sans-serif;
   --preset-accent: #d9b469; // the work preset's own dot color
 }
 
+// Meet (60/180) — brighter and cooler than Work, for calls
+:root[data-theme="meet"] {
+  --bg: #fafaf6;
+  --bg-soft: #f0f2ec;
+  --card-edge: #e5e7dc;
+  --hero-glow: rgba(140, 170, 200, 0.12);
+  --icon-glow: rgba(120, 160, 195, 0.6);
+  --preset-accent: #cccdbb;
+}
+
 // Bright (100/220) — maximum brightness
 :root[data-theme="bright"] {
   --bg: #fffdf6;
@@ -65,16 +75,28 @@ $font-body: "Supreme", system-ui, sans-serif;
   --preset-accent: #f0a92e;
 }
 
-// Night (10/220) — dim, but still on
+// Night (25/290) — dim, warm desk light for late sessions
 :root[data-theme="night"] {
-  --bg: #e7e3d8;
-  --bg-soft: #ddd8cb;
-  --card: #f4f1e9;
-  --card-edge: #cfc9b9;
-  --muted: #4c473c;
-  --muted-dim: #3b372f;
-  --hero-glow: rgba(240, 169, 46, 0.08);
-  --preset-accent: #a89878;
+  --bg: #ece3ce;
+  --bg-soft: #e0d5ba;
+  --card: #f4eeda;
+  --card-edge: #cfc3a5;
+  --muted: #574c34;
+  --muted-dim: #423a28;
+  --hero-glow: rgba(240, 169, 46, 0.09);
+  --preset-accent: #a68a55;
+}
+
+// Chill (8/344) — the darkest, warmest background glow
+:root[data-theme="chill"] {
+  --bg: #e7d9bc;
+  --bg-soft: #d9c8a5;
+  --card: #eee0c4;
+  --card-edge: #c5b28b;
+  --muted: #5e5133;
+  --muted-dim: #453c25;
+  --hero-glow: rgba(240, 169, 46, 0.05);
+  --preset-accent: #85755a;
 }
 
 // Turn Off — the only dark state, like the light being out
@@ -497,6 +519,9 @@ strong {
     height: 0.6rem;
     border-radius: 50%;
 
+    &--meet {
+      background: #cccdbb;
+    }
     &--work {
       background: #d9b469;
     }
@@ -510,7 +535,10 @@ strong {
       background: #f0a92e;
     }
     &--night {
-      background: #a89878;
+      background: #a68a55;
+    }
+    &--chill {
+      background: #85755a;
     }
   }
 
