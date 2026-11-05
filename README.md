@@ -93,9 +93,9 @@ Issues and pull requests are welcome! This is a hobby project, so kindness beats
 
 - **Start small.** One logical change per PR. If you're unsure or it's more than that, open an issue first so we can talk it through.
 - **Build before you push.** `make bundle` must compile clean (`swiftc main.swift` → 0 errors). The `NetService` deprecation warning is expected and accepted.
-- **Respect the constraints.** KeylightBar is a single Swift file with zero dependencies by design; please adhere to this principle. The emoji icons, title-cased preset names, and the absence of a Dock icon or companion windows are intentional.
+- **Respect the constraints.** KeylightBar is a single Swift file with zero dependencies by design; please adhere to this principle. The absence of a Dock icon or companion windows is intentional.
 - **Test against a real light** if you can. Network behavior is hard to fake: a change that compiles is not necessarily a change that works.
-- **Website changes** live in `docs/`. Just edit `scss/main.scss` — GitHub Actions compiles and commits `css/main.css` for you on push (`.github/workflows/site-styles.yml`), so there's no local build step and nothing extra to commit. Feature-card headings are measured to fit one line, so mind a heading's width when you reword one.
+- **Website changes** live in `docs/`. Edit just `scss/main.scss`. Changes made to the `.css` file will be overwritten, as GitHub Actions compiles `css/main.css` from the `.scss` file and commits the file on push (`.github/workflows/site-styles.yml`), so there's no local build step and nothing extra to commit.
 
 Version tags and releases stay with the maintainer.
 
