@@ -105,4 +105,4 @@ KeylightBar is an independent, open-source project. It is not affiliated with, e
 
 ## License
 
-[MIT](LICENSE) — Cédric Scherer
+[MIT](LICENSE) — [Cédric Scherer](https://cedricscherer.com)
