@@ -70,6 +70,7 @@ $font-body: "Supreme", system-ui, sans-serif;
 :root[data-theme="warm"] {
   --bg: #fbf1dd;
   --bg-soft: #f3e7cd;
+  --card: #fffdf6;
   --card-edge: #e9dcbc;
   --muted: #6b5c3f;
   --muted-dim: #51452f;
@@ -80,7 +81,7 @@ $font-body: "Supreme", system-ui, sans-serif;
 
 // Night (25/290) — dim, warm desk light for late sessions
 :root[data-theme="night"] {
-  --bg: #ece3ce;
+  --bg: #ecdfc8;
   --bg-soft: #e0d5ba;
   --card: #f4eeda;
   --card-edge: #cfc3a5;
