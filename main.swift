@@ -171,6 +171,21 @@ func presetSwatchImage(preset: Preset) -> NSImage {
     }
 }
 
+/// Thin static gradient strip under a preset-manager slider, sampled from
+/// presetSwatchColor — the scale of the menu dots, laid out along the
+/// slider's track: the color under the knob is the color of the dot.
+final class PresetGradientStrip: NSView {
+    var colors: [NSColor] = [.systemGray] { didSet { needsDisplay = true } }
+
+    override func draw(_ dirtyRect: NSRect) {
+        guard let gradient = NSGradient(colors: colors) else { return }
+        let path = NSBezierPath(roundedRect: bounds.insetBy(dx: 1, dy: 1),
+                                xRadius: bounds.height / 3,
+                                yRadius: bounds.height / 3)
+        gradient.draw(in: path, angle: 0)
+    }
+}
+
 // MARK: - App
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -280,6 +295,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         watchSleepAndWake()
+
+        // Debug aid for screenshotting fresh builds (no effect on normal
+        // launches): run the binary directly with the env var set and the
+        // preset manager opens by itself.
+        //   KEYLIGHTBAR_DEBUG_UI=1 KeylightBar.app/Contents/MacOS/KeylightBar
+        if ProcessInfo.processInfo.environment["KEYLIGHTBAR_DEBUG_UI"] == "1" {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                guard let self = self else { return }
+                self.managePresetsViaMenu(nil)
+            }
+        }
     }
 
     // MARK: Click behavior (the hybrid)
@@ -425,7 +451,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         configure()
     }
 
-    @objc private func managePresetsViaMenu(_ sender: NSMenuItem) {
+    @objc private func managePresetsViaMenu(_ sender: Any?) {
         if presetManager == nil {
             presetManager = PresetManager(app: self)
         }
@@ -953,6 +979,8 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
     private var nameField: NSTextField!
     private var brightSlider: NSSlider!
     private var tempSlider: NSSlider!
+    private var brightStrip: PresetGradientStrip!
+    private var tempStrip: PresetGradientStrip!
     private var brightValue: NSTextField!
     private var tempValue: NSTextField!
 
@@ -1010,32 +1038,42 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
 
         content.addSubview(NSTextField(labelWithString: "Brightness:"))
         let brightLabel = content.subviews.last! as! NSTextField
-        brightLabel.frame = NSRect(x: 20, y: 102, width: 100, height: 18)
+        brightLabel.frame = NSRect(x: 20, y: 108, width: 100, height: 18)
 
         brightSlider = NSSlider(value: 50, minValue: 0, maxValue: 100,
                                 target: self, action: #selector(brightChanged(_:)))
-        brightSlider.frame = NSRect(x: 125, y: 100, width: 205, height: 22)
+        brightSlider.frame = NSRect(x: 125, y: 106, width: 205, height: 22)
         content.addSubview(brightSlider)
         brightValue = NSTextField(labelWithString: "50")
-        brightValue.frame = NSRect(x: 335, y: 102, width: 55, height: 18)
+        brightValue.frame = NSRect(x: 335, y: 108, width: 55, height: 18)
         content.addSubview(brightValue)
+
+        // Brightness axis of the dot color map: brightness swept 0...100 at
+        // the current temperature — the dot is the color under the knob.
+        brightStrip = PresetGradientStrip(frame: NSRect(x: 134, y: 97, width: 187, height: 7))
+        content.addSubview(brightStrip)
 
         content.addSubview(NSTextField(labelWithString: "Temperature:"))
         let tempLabel = content.subviews.last! as! NSTextField
-        tempLabel.frame = NSRect(x: 20, y: 68, width: 100, height: 18)
+        tempLabel.frame = NSRect(x: 20, y: 74, width: 100, height: 18)
 
         tempSlider = NSSlider(value: 220, minValue: 143, maxValue: 344,
                               target: self, action: #selector(tempChanged(_:)))
-        tempSlider.frame = NSRect(x: 125, y: 66, width: 205, height: 22)
+        tempSlider.frame = NSRect(x: 125, y: 72, width: 205, height: 22)
         content.addSubview(tempSlider)
         tempValue = NSTextField(labelWithString: "220")
-        tempValue.frame = NSRect(x: 335, y: 68, width: 55, height: 18)
+        tempValue.frame = NSRect(x: 335, y: 74, width: 55, height: 18)
         content.addSubview(tempValue)
+
+        // Temperature axis of the dot color map: temp swept 143...344 at the
+        // current brightness — cool left, warm right, neutral in the middle.
+        tempStrip = PresetGradientStrip(frame: NSRect(x: 134, y: 63, width: 187, height: 7))
+        content.addSubview(tempStrip)
 
         let hint = NSTextField(labelWithString: "143 = coldest \u{00B7} 344 = warmest")
         hint.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
         hint.textColor = .secondaryLabelColor
-        hint.frame = NSRect(x: 125, y: 51, width: 220, height: 14)
+        hint.frame = NSRect(x: 125, y: 45, width: 220, height: 14)
         content.addSubview(hint)
 
         let reset = NSButton(title: "Reset Defaults", target: self, action: #selector(resetDefaults(_:)))
@@ -1054,9 +1092,62 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
         if app.presets.count > 0 {
             table.selectRowIndexes(IndexSet(integer: 0), byExtendingSelection: false)
         }
+        // Debug aid alongside the snapshot hook: preselect a preset row for
+        // screenshot variants (e.g. a full-brightness preset's pale slices).
+        if let row = ProcessInfo.processInfo.environment["KEYLIGHTBAR_DEBUG_ROW"],
+           let r = Int(row), r >= 0, r < app.presets.count {
+            table.selectRowIndexes(IndexSet(integer: r), byExtendingSelection: false)
+        }
         refreshEditor()
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+        debugSnapshot()
+    }
+
+    /// Debug aid, env-gated like the auto-open in AppDelegate: render this
+    /// window's content to a PNG in-process — no screencapture, and so no
+    /// Screen Recording permission to fiddle with. Used to screenshot fresh
+    /// builds; does nothing on normal launches.
+    /// Debug aid, env-gated like the auto-open in AppDelegate: render this
+    /// window's content to a PNG in-process — no screencapture, and so no
+    /// Screen Recording permission to fiddle with. Used to screenshot fresh
+    /// builds; does nothing on normal launches.
+    private func debugSnapshot() {
+        guard ProcessInfo.processInfo.environment["KEYLIGHTBAR_DEBUG_UI"] == "1" else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self, let content = self.window.contentView else { return }
+            let bounds = content.bounds
+            let scale = max(self.window.backingScaleFactor, 2)   // crisp docs output
+            let pw = Int(bounds.width * scale), ph = Int(bounds.height * scale)
+            guard let inner = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: pw,
+                                               pixelsHigh: ph, bitsPerSample: 8,
+                                               samplesPerPixel: 4, hasAlpha: true,
+                                               isPlanar: false,
+                                               colorSpaceName: .calibratedRGB,
+                                               bytesPerRow: 0, bitsPerPixel: 0) else { return }
+            inner.size = bounds.size
+            content.cacheDisplay(in: bounds, to: inner)
+            // cacheDisplay skips the window's themed background (that's the
+            // window frame's job). Compose it back in with CoreGraphics, so
+            // the PNG reads like a real window screenshot.
+            guard let cginner = inner.cgImage else { return }
+            guard let space = CGColorSpace(name: CGColorSpace.sRGB),
+                  let ctx = CGContext(data: nil, width: pw, height: ph,
+                                     bitsPerComponent: 8, bytesPerRow: pw * 4,
+                                     space: space,
+                                     bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue),
+                  let bg = NSColor.windowBackgroundColor.usingColorSpace(.deviceRGB) else { return }
+            ctx.setFillColor(CGColor(red: bg.redComponent, green: bg.greenComponent,
+                                     blue: bg.blueComponent, alpha: 1))
+            ctx.fill(CGRect(x: 0, y: 0, width: pw, height: ph))
+            ctx.draw(cginner, in: CGRect(x: 0, y: 0, width: pw, height: ph))
+            guard let composedImage = ctx.makeImage(),
+                  let png = NSBitmapImageRep(cgImage: composedImage)
+                      .representation(using: .png, properties: [:]) else { return }
+            let path = ProcessInfo.processInfo.environment["KEYLIGHTBAR_SNAPSHOT"]
+                       ?? "/tmp/keylightbar-manager.png"
+            try? png.write(to: URL(fileURLWithPath: path))
+        }
     }
 
     // MARK: Table
@@ -1102,6 +1193,7 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
             nameField.stringValue = ""
             brightValue.stringValue = "-"
             tempValue.stringValue = "-"
+            refreshGradientStrips()
             return
         }
         let preset = app.presets[row]
@@ -1110,6 +1202,35 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
         tempSlider.intValue = Int32(preset.temperature)
         brightValue.stringValue = "\(preset.brightness)"
         tempValue.stringValue = "\(preset.temperature)"
+        refreshGradientStrips()
+    }
+
+    /// Crossing slices through the dot color map: the temperature strip is
+    /// temp swept at the current brightness, the brightness strip is
+    /// brightness swept at the current temperature — so the color under
+    /// each knob is the selected preset's dot. Null selection grays both.
+    private func refreshGradientStrips() {
+        guard table.selectedRow >= 0, table.selectedRow < app.presets.count else {
+            brightStrip.colors = [.systemGray]
+            tempStrip.colors = [.systemGray]
+            return
+        }
+        let bright = Int(brightSlider.intValue)
+        let temp = Int(tempSlider.intValue)
+        var temps: [NSColor] = []
+        for i in 0...24 {
+            let t = 143.0 + (344.0 - 143.0) * Double(i) / 24
+            temps.append(presetSwatchColor(preset: Preset(name: "", brightness: bright,
+                                                          temperature: Int(t))))
+        }
+        tempStrip.colors = temps
+        var brights: [NSColor] = []
+        for i in 0...24 {
+            let b = Int(100.0 * Double(i) / 24)
+            brights.append(presetSwatchColor(preset: Preset(name: "", brightness: b,
+                                                            temperature: temp)))
+        }
+        brightStrip.colors = brights
     }
 
     private func selectedRow() -> Preset? {
@@ -1154,6 +1275,7 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
                                                  brightness: Int(sender.intValue),
                                                  temperature: preset.temperature)
         brightValue.stringValue = "\(Int(sender.intValue))"
+        refreshGradientStrips()
         commit()
     }
 
@@ -1163,6 +1285,7 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
                                                 brightness: preset.brightness,
                                                 temperature: Int(sender.intValue))
         tempValue.stringValue = "\(Int(sender.intValue))"
+        refreshGradientStrips()
         commit()
     }
 
