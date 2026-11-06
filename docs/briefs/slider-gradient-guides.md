@@ -79,8 +79,9 @@ screenshots; fallback is a fixed mid-lightness temp strip.
        `~/gdrive/ai-artifacts/keylightbar/` (pixel-verified strip colors).
 6. [x] README updated (temp-before-brightness order, strip sentence in the
        Presets section; source header comment notes the strips).
-7. [ ] GIF refresh (editor segment shows moved sliders + strips) and
-       push/PR.
+7. [x] Push branch + PR. GIF refresh deliberately deferred — the strips
+       aren't advertised anywhere yet, so the existing GIF's editor segment
+       stays tolerable until the feature gets announced.
 
 ## Out of scope (this round)
 - README/site copy, GIF refresh — after the design settles.

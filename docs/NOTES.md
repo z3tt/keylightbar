@@ -69,9 +69,13 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
   the bright strip; themed bg light/dark correct). Interactions (slider
   drag, rename, add/remove) not yet hand-tested — that's for when the
   design is approved.
-- **Next**: review the three screenshots in `~/gdrive/ai-artifacts/keylightbar/`
-  (light, dark, light w/ Bright preset), iterate, then README + GIF refresh
-  + PR.
+- **Next**: PR from `feature/slider-gradient-guides` (three owner review
+  rounds: spacing/track alignment, band widening, slider reorder — all
+  approved). GIF refresh deliberately deferred: the strips aren't
+  advertised yet, so the old GIF's editor segment is tolerable until the
+  feature is announced. Open follow-up: the perceptual/OKLCH dot rework
+  on its own branch rewrites `presetSwatchColor` and will need a rebase
+  (+ a web hex recompute, docs gotcha).
 
 ## 2026-11-04 · v1.2.2 — perceptual swatch dots (full design arc)
 - **Dot formula (final)**: hue+chroma from temperature anchors (blue 143 /
