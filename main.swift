@@ -10,6 +10,8 @@
 //     (or set the address manually via "Configure…")
 //   * every preset menu item carries a small swatch dot visualizing its
 //     brightness × temperature, regenerated on each menu build
+//   * the preset editor's sliders carry gradient strips sampled from the
+//     same color model, so the color under each knob is the preset's dot
 //   * presets are managed in-app via "Manage Presets…" (no source editing,
 //     no command line); they persist in UserDefaults
 //   * preset picking is disabled until a Key Light is actually configured

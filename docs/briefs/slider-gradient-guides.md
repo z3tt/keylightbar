@@ -77,7 +77,10 @@ screenshots; fallback is a fixed mid-lightness temp strip.
 5. [x] Build clean (`make bundle`, 0 errors), screenshots light + dark +
        a Bright-preset variant, captured to
        `~/gdrive/ai-artifacts/keylightbar/` (pixel-verified strip colors).
-6. [ ] Iterate on feedback; update README + push/PR when settled.
+6. [x] README updated (temp-before-brightness order, strip sentence in the
+       Presets section; source header comment notes the strips).
+7. [ ] GIF refresh (editor segment shows moved sliders + strips) and
+       push/PR.
 
 ## Out of scope (this round)
 - README/site copy, GIF refresh — after the design settles.

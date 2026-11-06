@@ -51,7 +51,7 @@ Note that macOS grants **Local Network** access per binary: a freshly compiled K
 
 Everything is adjustable right from the 💡 menu — no source editing, no terminal.
 
-- **Presets** — _Manage Presets…_ opens a small editor: pick a preset in the table (or double-click its name to rename it), then set name, brightness (0–100), and temperature (143 = coldest, 344 = warmest) with the sliders. _+ Add_ asks for a name right away and starts from the selected preset's settings. Names are always title-cased (e.g. "Night Mode"). Changes apply immediately and survive restarts; _Reset Defaults_ restores the original seven.
+- **Presets** — _Manage Presets…_ opens a small editor: pick a preset in the table (or double-click its name to rename it), then set name, temperature (143 = coldest to 344 = warmest), and brightness (0–100) with the sliders. Each slider carries a gradient strip in the same color logic as the swatch dots in the 💡 menu — the color under a knob is exactly the dot the preset gets. _+ Add_ asks for a name right away and starts from the selected preset's settings. Names are always title-cased (e.g. "Night Mode"). Changes apply immediately and survive restarts; _Reset Defaults_ restores the original seven.
 - **Sleep & Wake** — the _Off When Mac Sleeps_ / _On When Mac Wakes_ checkboxes. On wake, KeylightBar applies the time-appropriate preset if _Time Of Day_ is on, otherwise your last-used one.
 - **Time Of Day** — the _Switch Presets By Time_ toggle plus day/evening presets and the hours they start (defaults: Work from 08:00, Chill from 19:00).
 - **Start At Login** — one checkbox in the 💡 menu; no fiddling in System Settings.
