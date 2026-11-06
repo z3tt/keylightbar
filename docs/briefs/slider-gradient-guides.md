@@ -37,6 +37,18 @@ screenshots; fallback is a fixed mid-lightness temp strip.
   knob-to-color alignment at the extremes. Strips now span x=125 w=205,
   flush with the track.
 
+## Iteration 2 (owner review)
+- "Bright doesn't look very bright" — owner's read was right, two stacked
+  causes: the 0.88 value cap (kept dots below background white on light
+  menus) and HSV value under-representing perceptual lightness. Easy
+  first step: value band widened 0.40–0.88 → 0.40–0.94 (floor unchanged,
+  so dim presets keep their deep color). Amends "no dot model change" —
+  this touches `presetSwatchColor`, so menu dots brighten too, and the
+  perceptual/OKLCH dot branch will need a rebase either way.
+- Screenshots regenerated; pixel check: brightness strip top end at
+  Bright's temperature went rgb(178,200,225) → (189,213,240), neutral
+  mid-temp slice at full brightness now ~(238,234,225).
+
 ## Constraints
 - Single file, zero dependencies (a tiny `NSView` subclass, ~30 lines).
 - Native slider look untouched (strips sit below the knobs).
