@@ -44,11 +44,15 @@
 ## Session notes
 - Every session appends a dated entry to `docs/NOTES.md` when closing a
   unit of work: what shipped, decisions and why, gotchas, next steps.
-- Substantial new work starts with a brief (`docs/brief.md`) the owner
-  reviews before building. Its step list is a living plan — keep it
-  current and let it grow into the to-do list. Exploratory design work
-  (like the dot arc) uses a goal statement + iteration loops instead of
-  a fixed definition of done.
+- Substantial new work starts with a brief the owner reviews before
+  building, stored at `docs/briefs/<feature>.md` (unique per feature —
+  one brief per branch, so parallel branches never collide; see the
+  slider-gradient-guides brief for the shape). Its step list is a
+  living plan — keep it current and let it grow into the to-do list.
+  Exploratory design work (like the dot arc) uses a goal statement +
+  iteration loops instead of a fixed definition of done. Briefs merge
+  with their feature and stay: NOTES.md carries the condensed dated
+  entry, the brief keeps the design rationale.
 - Ambiguous or high-stakes requests: interview the owner first — a
   batched set of 2–4 high-leverage questions — then draft the brief.
   Clear requests: draft and mark assumptions. Never stall on
