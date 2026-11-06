@@ -1036,40 +1036,42 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
         nameField.action = #selector(nameChanged(_:))
         content.addSubview(nameField)
 
-        content.addSubview(NSTextField(labelWithString: "Brightness:"))
-        let brightLabel = content.subviews.last! as! NSTextField
-        brightLabel.frame = NSRect(x: 20, y: 109, width: 100, height: 18)
-
-        brightSlider = NSSlider(value: 50, minValue: 0, maxValue: 100,
-                                target: self, action: #selector(brightChanged(_:)))
-        brightSlider.frame = NSRect(x: 125, y: 107, width: 205, height: 22)
-        content.addSubview(brightSlider)
-        brightValue = NSTextField(labelWithString: "50")
-        brightValue.frame = NSRect(x: 335, y: 109, width: 55, height: 18)
-        content.addSubview(brightValue)
-
-        // Brightness axis of the dot color map: brightness swept 0...100 at
-        // the current temperature — the dot is the color under the knob.
-        // Spans the slider's track exactly, so the knob never leaves it.
-        brightStrip = PresetGradientStrip(frame: NSRect(x: 125, y: 97, width: 205, height: 7))
-        content.addSubview(brightStrip)
-
+        // Temperature sets the character of the light, brightness its
+        // intensity — so temperature comes first.
         content.addSubview(NSTextField(labelWithString: "Temperature:"))
         let tempLabel = content.subviews.last! as! NSTextField
-        tempLabel.frame = NSRect(x: 20, y: 66, width: 100, height: 18)
+        tempLabel.frame = NSRect(x: 20, y: 109, width: 100, height: 18)
 
         tempSlider = NSSlider(value: 220, minValue: 143, maxValue: 344,
                               target: self, action: #selector(tempChanged(_:)))
-        tempSlider.frame = NSRect(x: 125, y: 64, width: 205, height: 22)
+        tempSlider.frame = NSRect(x: 125, y: 107, width: 205, height: 22)
         content.addSubview(tempSlider)
         tempValue = NSTextField(labelWithString: "220")
-        tempValue.frame = NSRect(x: 335, y: 66, width: 55, height: 18)
+        tempValue.frame = NSRect(x: 335, y: 109, width: 55, height: 18)
         content.addSubview(tempValue)
 
         // Temperature axis of the dot color map: temp swept 143...344 at the
         // current brightness — cool left, warm right, neutral in the middle.
-        tempStrip = PresetGradientStrip(frame: NSRect(x: 125, y: 54, width: 205, height: 7))
+        // Spans the slider's track exactly, so the knob never leaves it.
+        tempStrip = PresetGradientStrip(frame: NSRect(x: 125, y: 97, width: 205, height: 7))
         content.addSubview(tempStrip)
+
+        content.addSubview(NSTextField(labelWithString: "Brightness:"))
+        let brightLabel = content.subviews.last! as! NSTextField
+        brightLabel.frame = NSRect(x: 20, y: 66, width: 100, height: 18)
+
+        brightSlider = NSSlider(value: 50, minValue: 0, maxValue: 100,
+                                target: self, action: #selector(brightChanged(_:)))
+        brightSlider.frame = NSRect(x: 125, y: 64, width: 205, height: 22)
+        content.addSubview(brightSlider)
+        brightValue = NSTextField(labelWithString: "50")
+        brightValue.frame = NSRect(x: 335, y: 66, width: 55, height: 18)
+        content.addSubview(brightValue)
+
+        // Brightness axis of the dot color map: brightness swept 0...100 at
+        // the current temperature — the dot is the color under the knob.
+        brightStrip = PresetGradientStrip(frame: NSRect(x: 125, y: 54, width: 205, height: 7))
+        content.addSubview(brightStrip)
 
         let reset = NSButton(title: "Reset Defaults", target: self, action: #selector(resetDefaults(_:)))
         reset.frame = NSRect(x: 20, y: 10, width: 130, height: 28)

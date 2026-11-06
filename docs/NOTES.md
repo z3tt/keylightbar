@@ -22,6 +22,20 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
   the scale themselves; strip inset fixed to span the slider's full track
   (measured from screenshots: knob-center travel = frame 125–330, so the
   draft's 9pt pad broke knob-color alignment at the extremes).
+- **Iteration 2 (owner review)**: "Bright reads dim" — swatch value band
+  widened 0.40–0.88 → 0.40–0.94 (floor kept, dim presets stay deep;
+  dots and strips both derive from presetSwatchColor, so both moved).
+  Contrast analysis:
+  `~/gdrive/ai-artifacts/keylightbar/dots-contrast-preview.html` +
+  `generators/dot-contrast.py` (static HTML — Quick Look can't run JS,
+  see learnings). Verdict: every dot ≥ ~3:1 on light menus except Bright
+  (near-neutral temp 220 → pale in any band, 1.42:1) and Work at 2.99:1 —
+  owner judged clearly visible.
+- **Iteration 3 (owner review)**: sliders reordered — temperature first,
+  brightness second (temperature sets the character of the light,
+  brightness its intensity; owner spotted the brightness strip following
+  temperature and loved the crossing-slices behavior). Pixel-verified:
+  upper strip = temp axis, lower = brightness ramp.
 - **What**: each manager slider now carries a thin gradient strip sampled
   from `presetSwatchColor` — crossing slices through the dot color map:
   temp strip = temp swept 143–344 at the **current brightness**, bright

@@ -49,6 +49,14 @@ screenshots; fallback is a fixed mid-lightness temp strip.
   Bright's temperature went rgb(178,200,225) → (189,213,240), neutral
   mid-temp slice at full brightness now ~(238,234,225).
 
+## Iteration 3 (owner review)
+- Brightness strip adjusting with temperature confirmed as the delighter —
+  owner called the crossing slices "genius" (works both ways by design).
+- Sliders reordered: temperature first, brightness second — temperature
+  sets the character of the light, brightness its intensity. Screenshots
+  regenerated; pixel-verified the upper strip is the temp axis and the
+  lower one the brightness ramp.
+
 ## Constraints
 - Single file, zero dependencies (a tiny `NSView` subclass, ~30 lines).
 - Native slider look untouched (strips sit below the knobs).
