@@ -21,3 +21,6 @@ Gotchas:
   They are hardcoded hexes here — whenever the default presets change,
   recompute them, or the page drifts from the app. The per-theme backgrounds
   and glows are hand-picked (approach c) and only need re-tuning by eye.
+  Keep card-vs-page separation in the family band (OKLab ΔL ≈ +0.03–0.04):
+  night may stay the subtlest — it fits the vibe — but no theme should
+  read as sensing differently from the others.
