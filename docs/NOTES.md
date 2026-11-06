@@ -36,6 +36,12 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
   brightness its intensity; owner spotted the brightness strip following
   temperature and loved the crossing-slices behavior). Pixel-verified:
   upper strip = temp axis, lower = brightness ramp.
+- **Web coupling** (docs gotcha exercised): the site's menu dots and
+  `--preset-accent` stripes are hardcoded formula output — all fourteen
+  hexes were one step stale after the band widening and were recomputed
+  (docs/scss only, css is CI-compiled). Old -> new, e.g. Work
+  #9d8760 -> #a48c64, Bright #afc6e0 -> #bbd3f0; docs/README formula
+  constant updated to 0.54. Art-directed glows/backgrounds untouched.
 - **What**: each manager slider now carries a thin gradient strip sampled
   from `presetSwatchColor` — crossing slices through the dot color map:
   temp strip = temp swept 143–344 at the **current brightness**, bright

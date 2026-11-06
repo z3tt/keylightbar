@@ -56,6 +56,10 @@ screenshots; fallback is a fixed mid-lightness temp strip.
   sets the character of the light, brightness its intensity. Screenshots
   regenerated; pixel-verified the upper strip is the temp axis and the
   lower one the brightness ramp.
+- Web coupling honored (docs gotcha): the site's seven menu dots and the
+  seven `--preset-accent` stripes are hardcoded old-band hexes — recomputed
+  to the new band (scss only; CI compiles the css). Art-directed glows
+  and backgrounds left alone; docs/README's formula constant updated.
 
 ## Constraints
 - Single file, zero dependencies (a tiny `NSView` subclass, ~30 lines).
