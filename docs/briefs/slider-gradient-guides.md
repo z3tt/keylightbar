@@ -61,6 +61,11 @@ screenshots; fallback is a fixed mid-lightness temp strip.
   to the new band (scss only; CI compiles the css). Art-directed glows
   and backgrounds left alone; docs/README's formula constant updated.
 
+## Iteration 4 (owner review, live testing)
+- More space below the strips: gaps strip→buttons 16→24pt and
+  temp-strip→brightness-block 11→19pt; slider+strip blocks untouched.
+  Window 448→464; screenshots regenerated and pixel-verified.
+
 ## Constraints
 - Single file, zero dependencies (a tiny `NSView` subclass, ~30 lines).
 - Native slider look untouched (strips sit below the knobs).
