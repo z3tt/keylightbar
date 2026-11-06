@@ -14,6 +14,38 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
 - Every freshly compiled binary needs its own macOS Local Network grant —
   silent failures are that, not a bug. `defaults read com.cedricscherer.keylightbar keylight.host` prints the light's address.
 
+## 2026-11-06 · slider gradient guides, first draft (feature/slider-gradient-guides)
+- **What**: each manager slider now carries a thin gradient strip sampled
+  from `presetSwatchColor` — crossing slices through the dot color map:
+  temp strip = temp swept 143–344 at the **current brightness**, bright
+  strip = brightness swept 0–100 at the **current temperature**. The color
+  under each knob is the selected preset's dot, live. Editor layout
+  re-stacked (rows +6pt, strips at y=97 and y=63; window height stays 430).
+- **Decisions**: crossing slices over a fixed-lightness temp strip (the
+  stronger dot-link; pale-slice risk deferred to review — see the
+  Bright-preset screenshot); strips inset 9pt to align with the NSSlider
+  track, not the knob-caps; strips reuse the same function, so they can
+  never drift from the dots; gray on null selection (no slice defined).
+- **In-process screenshots** (new debug hooks, env-gated, default no-op):
+  `KEYLIGHTBAR_DEBUG_UI=1` auto-opens the manager;
+  `KEYLIGHTBAR_SNAPSHOT=path` + `KEYLIGHTBAR_DEBUG_ROW=n` render the window
+  content to a PNG via `cacheDisplay`. No `screencapture`, so no Screen
+  Recording permission needed (the agent host lacks it). Gotchas learned:
+  NSGraphicsContext(bitmapImageRep:) traps when the rep has no alpha →
+  samplesPerPixel 4 + hasAlpha true only; cacheDisplay skips the window's
+  themed background → compose `windowBackgroundColor` behind it (CoreGraphics
+  draw without flip; the AppKit NSImage composite path misplaces content at
+  2x); direct rep→PNG worked at 1x but the compose path needs the explicit
+  CGContext. Generator script: `~/gdrive/ai-artifacts/keylightbar/generators/`.
+- **Verification**: `make bundle` 0 errors; strip pixels sampled from the
+  PNGs (blue 143 → gray 243.5 → amber 344 on the temp strip; dark→light on
+  the bright strip; themed bg light/dark correct). Interactions (slider
+  drag, rename, add/remove) not yet hand-tested — that's for when the
+  design is approved.
+- **Next**: review the three screenshots in `~/gdrive/ai-artifacts/keylightbar/`
+  (light, dark, light w/ Bright preset), iterate, then README + GIF refresh
+  + PR.
+
 ## 2026-11-04 · v1.2.2 — perceptual swatch dots (full design arc)
 - **Dot formula (final)**: hue+chroma from temperature anchors (blue 143 /
   gray 243.5 ≈ 4950 K / amber 344, RGB-interpolated), saturation ×1.8,
