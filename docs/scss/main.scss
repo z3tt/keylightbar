@@ -30,7 +30,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --icon-glow: rgba(240, 169, 46, 0.7);
   --shadow-card: 0 2px 10px rgba(64, 52, 20, 0.06);
   --shadow-deep: 0 16px 40px rgba(64, 52, 20, 0.14);
-  --preset-accent: #a48c64; // the work preset's own dot color
+  --preset-accent: #8b754f; // the work preset's own dot color
 }
 
 // Meet (60/180) — brighter and cooler than Work, for calls
@@ -40,10 +40,10 @@ $font-body: "Supreme", system-ui, sans-serif;
   --card-edge: #d6dfe9;
   --hero-glow: rgba(92, 131, 175, 0.13);
   --icon-glow: rgba(92, 131, 175, 0.55);
-  --preset-accent: #6189b9;
+  --preset-accent: #6b92c0;
 }
 
-// Bright (100/220) — maximum brightness
+// Bright (100/243) — maximum brightness, neutral white (~5000 K)
 :root[data-theme="bright"] {
   --bg: #fdfefe;
   --bg-soft: #f3f7fa;
@@ -51,7 +51,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted: #525a64;
   --muted-dim: #3f4650;
   --hero-glow: rgba(175, 198, 224, 0.25);
-  --preset-accent: #bbd3f0;
+  --preset-accent: #cdcece;
 }
 
 // Cold (50/143) — coldest temperature
@@ -63,7 +63,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted-dim: #424b54;
   --hero-glow: rgba(60, 107, 163, 0.14);
   --icon-glow: rgba(60, 107, 163, 0.55);
-  --preset-accent: #3e70ab;
+  --preset-accent: #5283bc;
 }
 
 // Warm (50/344) — warmest temperature
@@ -75,7 +75,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted-dim: #51452f;
   --hero-glow: rgba(240, 169, 46, 0.24);
   --bulb-glow: rgba(240, 169, 46, 0.55);
-  --preset-accent: #ab6c00;
+  --preset-accent: #ae7117;
 }
 
 // Night (25/290) — dim, warm desk light for late sessions
@@ -87,7 +87,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted: #574c34;
   --muted-dim: #423a28;
   --hero-glow: rgba(133, 89, 13, 0.1);
-  --preset-accent: #885c0e;
+  --preset-accent: #7d5200;
 }
 
 // Chill (8/344) — the darkest, warmest background glow
@@ -99,7 +99,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted: #5e5133;
   --muted-dim: #453c25;
   --hero-glow: rgba(112, 71, 0, 0.08);
-  --preset-accent: #714800;
+  --preset-accent: #603c02;
 }
 
 // Turn Off — the only dark state, like the light being out
@@ -523,25 +523,25 @@ strong {
     border-radius: 50%;
 
     &--meet {
-      background: #6189b9;
+      background: #6b92c0;
     }
     &--work {
-      background: #a48c64;
+      background: #8b754f;
     }
     &--bright {
-      background: #bbd3f0;
+      background: #cdcece;
     }
     &--cold {
-      background: #3e70ab;
+      background: #5283bc;
     }
     &--warm {
-      background: #ab6c00;
+      background: #ae7117;
     }
     &--night {
-      background: #885c0e;
+      background: #7d5200;
     }
     &--chill {
-      background: #714800;
+      background: #603c02;
     }
   }
 
@@ -599,7 +599,7 @@ strong {
   max-width: 40rem;
   margin: 0 auto 1.1rem;
   text-align: center;
-  font-size: 1rem;
+  font-size: 0.85rem;
   color: var(--muted-dim);
   transition: color 0.35s ease;
 }

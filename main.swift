@@ -78,7 +78,7 @@ let defaultPresets: [Preset] = [
     Preset(name: "Meet",   brightness: 60,  temperature: 180),
     Preset(name: "Night",  brightness: 25,  temperature: 290),
     Preset(name: "Chill",  brightness: 8,   temperature: 344),
-    Preset(name: "Bright", brightness: 100, temperature: 220),
+    Preset(name: "Bright", brightness: 100, temperature: 243),
     Preset(name: "Cold",   brightness: 50,  temperature: 143),
     Preset(name: "Warm",   brightness: 50,  temperature: 344),
 ]
@@ -121,12 +121,16 @@ private let swatchTempAnchors: [(temp: Double, rgb: (Double, Double, Double))] =
     (344, (240, 169, 46)),     // #f0a92e — warmest, saturated
 ]
 
-/// Swatch color for a preset — bivariate, mirroring the light's two
-/// controls: hue + saturation encode temperature (zero saturation at
-/// neutral), lightness encodes brightness alone, mapped into the band
-/// 0.40...0.94 — dim presets read deep-colored, never black (a dim light
-/// still glows, and black vanishes on dark menus), and the brightest
-/// stays below background white on light menus. No dot needs an outline.
+/// Swatch color for a preset — bivariate, mirroring the light's two controls:
+/// hue + saturation encode temperature (zero saturation at neutral), and
+/// lightness encodes brightness on a *perceptual* scale. The temperature
+/// part is built in HSB as before (saturation steepened ×1.8 so neighboring
+/// presets read distinctly at dot size — the dot is a guide, the label does
+/// the exact identification), then the color is moved into OKLab and its
+/// lightness is set to L = 0.35...0.85 for brightness 0...100, keeping hue
+/// and chroma. Unlike HSB value (which renders saturated hues 5–10% dimmer
+/// than their setting), a 50% blue preset now reads exactly as light as a
+/// 50% gray one. Chroma is shrunk until the color fits sRGB.
 func presetSwatchColor(preset: Preset) -> NSColor {
     let t = Double(min(max(preset.temperature, 143), 344))
     var rgb = swatchTempAnchors[0].rgb
@@ -141,27 +145,79 @@ func presetSwatchColor(preset: Preset) -> NSColor {
         }
     }
 
-    let (r, g, b) = (rgb.0 / 255, rgb.1 / 255, rgb.2 / 255)
-    let maxC = max(r, g, b), minC = min(r, g, b), delta = maxC - minC
+    let (r0, g0, b0) = (rgb.0 / 255, rgb.1 / 255, rgb.2 / 255)
+    let maxC = max(r0, g0, b0), minC = min(r0, g0, b0), delta = maxC - minC
     var hue = 0.0
     if delta > 0 {
-        if maxC == r { hue = (g - b) / delta }
-        else if maxC == g { hue = (b - r) / delta + 2 }
-        else { hue = (r - g) / delta + 4 }
+        if maxC == r0 { hue = (g0 - b0) / delta }
+        else if maxC == g0 { hue = (b0 - r0) / delta + 2 }
+        else { hue = (r0 - g0) / delta + 4 }
         hue *= 60
         if hue < 0 { hue += 360 }
     }
     let sat = maxC > 0 ? delta / maxC : 0
-    // Steepened so neighboring presets read distinctly at dot size: the
-    // dot is a guide — hue directions stay true, the degree is exaggerated
-    // (the label right beside it does the exact identification).
     let saturation = min(sat * 1.8, 1)
 
     let bright = Double(min(max(preset.brightness, 0), 100))
-    let value = 0.40 + 0.54 * bright / 100
+    let value = 0.40 + 0.48 * bright / 100   // carrier lightness; replaced below
 
-    return NSColor(hue: CGFloat(hue / 360), saturation: CGFloat(saturation),
-                   brightness: CGFloat(value), alpha: 1)
+    // carrier color carrying hue + chroma into OKLab
+    let c = value * saturation
+    let x = c * (1 - abs((hue / 60).truncatingRemainder(dividingBy: 2) - 1))
+    let m = value - c
+    let seg = Int(hue / 60) % 6
+    let (r1, g1, b1): (Double, Double, Double)
+    switch seg {
+    case 0: (r1, g1, b1) = (c, x, 0)
+    case 1: (r1, g1, b1) = (x, c, 0)
+    case 2: (r1, g1, b1) = (0, c, x)
+    case 3: (r1, g1, b1) = (0, x, c)
+    case 4: (r1, g1, b1) = (x, 0, c)
+    default: (r1, g1, b1) = (c, 0, x)
+    }
+    let rl = linearize(r1 + m), gl = linearize(g1 + m), bl = linearize(b1 + m)
+
+    // linear sRGB -> OKLab
+    let l = 0.4122214708 * rl + 0.5363325363 * gl + 0.0514459929 * bl
+    let mm = 0.2119034982 * rl + 0.6806995451 * gl + 0.1073969566 * bl
+    let ss = 0.0883024619 * rl + 0.2817188376 * gl + 0.6299787005 * bl
+    let l_ = pow(l, 1.0 / 3), m_ = pow(mm, 1.0 / 3), s_ = pow(ss, 1.0 / 3)
+    let A = 1.9779984951 * l_ - 2.4285922050 * m_ + 0.4505937099 * s_
+    let B = 0.0259040371 * l_ + 0.7827717662 * m_ - 0.8086757660 * s_
+
+    // brightness -> perceptual lightness; hue + chroma kept
+    let L = 0.35 + 0.50 * bright / 100
+    var chroma = (A * A + B * B).squareRoot()
+    let h = atan2(B, A)
+
+    // OKLCH -> sRGB, shrinking chroma until the color fits the gamut
+    var lr = 0.0, lg = 0.0, lb = 0.0
+    while chroma > 0 {
+        let a2 = chroma * cos(h), b2 = chroma * sin(h)
+        let ll = L + 0.3963377774 * a2 + 0.2158037573 * b2
+        let m2 = L - 0.1055613458 * a2 - 0.0638541728 * b2
+        let s2 = L - 0.0894841775 * a2 - 1.2914855480 * b2
+        let l3 = ll * ll * ll, m3 = m2 * m2 * m2, s3 = s2 * s2 * s2
+        lr = 4.0767416621 * l3 - 3.3077115913 * m3 + 0.2309699292 * s3
+        lg = -1.2684380046 * l3 + 2.6097574011 * m3 - 0.3413193965 * s3
+        lb = -0.0041960863 * l3 - 0.7034186147 * m3 + 1.7076147010 * s3
+        if (lr >= -0.0005 && lr <= 1.0005) && (lg >= -0.0005 && lg <= 1.0005)
+            && (lb >= -0.0005 && lb <= 1.0005) { break }
+        chroma *= 0.97
+    }
+
+    return NSColor(red: CGFloat(delinearize(lr)), green: CGFloat(delinearize(lg)),
+                   blue: CGFloat(delinearize(lb)), alpha: 1)
+}
+
+/// Gamma-encoded sRGB component (0...1) to linear light.
+private func linearize(_ c: Double) -> Double {
+    c <= 0.04045 ? c / 12.92 : pow((c + 0.055) / 1.055, 2.4)
+}
+
+/// Linear light back to gamma-encoded sRGB (0...1).
+private func delinearize(_ c: Double) -> Double {
+    c <= 0.0031308 ? 12.92 * c : 1.055 * pow(c, 1 / 2.4) - 0.055
 }
 
 func presetSwatchImage(preset: Preset) -> NSImage {
