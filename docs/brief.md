@@ -24,6 +24,19 @@ Known trade-off accepted for the draft: at brightness 100, the temp strip
 runs at 0.88 lightness (pale, may wash out on light windows). Review in
 screenshots; fallback is a fixed mid-lightness temp strip.
 
+## Iteration 1 (owner review)
+- More breathing room between settings: window height 430 → 448, sections
+  re-spaced (table 181 / name 143 / bright slider 107 / bright strip 97 /
+  temp slider 64 / temp strip 54 / buttons 10).
+- "143 = coldest · 344 = warmest" hint removed — the strips carry the
+  scale now, and they are CVD-safe (blue→amber rides a strong lightness
+  contrast with an achromatic midpoint; the brightness ramp is pure
+  lightness).
+- Strip insets fixed: measured knob-center travel and track = the full
+  slider frame (125–330), confirming the draft's 9pt inset broke the
+  knob-to-color alignment at the extremes. Strips now span x=125 w=205,
+  flush with the track.
+
 ## Constraints
 - Single file, zero dependencies (a tiny `NSView` subclass, ~30 lines).
 - Native slider look untouched (strips sit below the knobs).

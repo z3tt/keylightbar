@@ -15,6 +15,13 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
   silent failures are that, not a bug. `defaults read com.cedricscherer.keylightbar keylight.host` prints the light's address.
 
 ## 2026-11-06 · slider gradient guides, first draft (feature/slider-gradient-guides)
+- **Iteration 1 (owner review)**: more spacing between settings (window
+  430→448, sections re-spaced); the "143 coldest · 344 warmest" hint
+  removed — the strips are CVD-safe (blue↔amber on a strong lightness
+  contrast, achromatic midpoint, brightness ramp pure lightness) and carry
+  the scale themselves; strip inset fixed to span the slider's full track
+  (measured from screenshots: knob-center travel = frame 125–330, so the
+  draft's 9pt pad broke knob-color alignment at the extremes).
 - **What**: each manager slider now carries a thin gradient strip sampled
   from `presetSwatchColor` — crossing slices through the dot color map:
   temp strip = temp swept 143–344 at the **current brightness**, bright

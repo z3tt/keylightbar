@@ -988,7 +988,7 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
         super.init()
         self.app = app
 
-        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 410, height: 430),
+        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 410, height: 448),
                           styleMask: [.titled, .closable],
                           backing: .buffered, defer: false)
         window.title = "KeylightBar Presets"
@@ -998,7 +998,7 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
 
         // Table needs 238pt of columns plus a scrollbar; 270pt keeps the
         // whole table visible without horizontal scrolling.
-        let scroll = NSScrollView(frame: NSRect(x: 20, y: 168, width: 270, height: 240))
+        let scroll = NSScrollView(frame: NSRect(x: 20, y: 181, width: 270, height: 240))
         table = NSTableView()
         let nameColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("name"))
         nameColumn.title = "Preset"
@@ -1019,18 +1019,18 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
         content.addSubview(scroll)
 
         let add = NSButton(title: "+ Add", target: self, action: #selector(addPreset(_:)))
-        add.frame = NSRect(x: 300, y: 378, width: 90, height: 30)
+        add.frame = NSRect(x: 300, y: 391, width: 90, height: 30)
         content.addSubview(add)
 
         let remove = NSButton(title: "− Remove", target: self, action: #selector(removePreset(_:)))
-        remove.frame = NSRect(x: 300, y: 343, width: 90, height: 30)
+        remove.frame = NSRect(x: 300, y: 356, width: 90, height: 30)
         content.addSubview(remove)
 
         content.addSubview(NSTextField(labelWithString: "Name:"))
         let nameLabel = content.subviews.last! as! NSTextField
-        nameLabel.frame = NSRect(x: 20, y: 136, width: 60, height: 18)
+        nameLabel.frame = NSRect(x: 20, y: 146, width: 60, height: 18)
 
-        nameField = NSTextField(frame: NSRect(x: 85, y: 133, width: 305, height: 24))
+        nameField = NSTextField(frame: NSRect(x: 85, y: 143, width: 305, height: 24))
         nameField.placeholderString = "preset name"
         nameField.target = self
         nameField.action = #selector(nameChanged(_:))
@@ -1038,43 +1038,38 @@ final class PresetManager: NSObject, NSTableViewDataSource, NSTableViewDelegate 
 
         content.addSubview(NSTextField(labelWithString: "Brightness:"))
         let brightLabel = content.subviews.last! as! NSTextField
-        brightLabel.frame = NSRect(x: 20, y: 108, width: 100, height: 18)
+        brightLabel.frame = NSRect(x: 20, y: 109, width: 100, height: 18)
 
         brightSlider = NSSlider(value: 50, minValue: 0, maxValue: 100,
                                 target: self, action: #selector(brightChanged(_:)))
-        brightSlider.frame = NSRect(x: 125, y: 106, width: 205, height: 22)
+        brightSlider.frame = NSRect(x: 125, y: 107, width: 205, height: 22)
         content.addSubview(brightSlider)
         brightValue = NSTextField(labelWithString: "50")
-        brightValue.frame = NSRect(x: 335, y: 108, width: 55, height: 18)
+        brightValue.frame = NSRect(x: 335, y: 109, width: 55, height: 18)
         content.addSubview(brightValue)
 
         // Brightness axis of the dot color map: brightness swept 0...100 at
         // the current temperature — the dot is the color under the knob.
-        brightStrip = PresetGradientStrip(frame: NSRect(x: 134, y: 97, width: 187, height: 7))
+        // Spans the slider's track exactly, so the knob never leaves it.
+        brightStrip = PresetGradientStrip(frame: NSRect(x: 125, y: 97, width: 205, height: 7))
         content.addSubview(brightStrip)
 
         content.addSubview(NSTextField(labelWithString: "Temperature:"))
         let tempLabel = content.subviews.last! as! NSTextField
-        tempLabel.frame = NSRect(x: 20, y: 74, width: 100, height: 18)
+        tempLabel.frame = NSRect(x: 20, y: 66, width: 100, height: 18)
 
         tempSlider = NSSlider(value: 220, minValue: 143, maxValue: 344,
                               target: self, action: #selector(tempChanged(_:)))
-        tempSlider.frame = NSRect(x: 125, y: 72, width: 205, height: 22)
+        tempSlider.frame = NSRect(x: 125, y: 64, width: 205, height: 22)
         content.addSubview(tempSlider)
         tempValue = NSTextField(labelWithString: "220")
-        tempValue.frame = NSRect(x: 335, y: 74, width: 55, height: 18)
+        tempValue.frame = NSRect(x: 335, y: 66, width: 55, height: 18)
         content.addSubview(tempValue)
 
         // Temperature axis of the dot color map: temp swept 143...344 at the
         // current brightness — cool left, warm right, neutral in the middle.
-        tempStrip = PresetGradientStrip(frame: NSRect(x: 134, y: 63, width: 187, height: 7))
+        tempStrip = PresetGradientStrip(frame: NSRect(x: 125, y: 54, width: 205, height: 7))
         content.addSubview(tempStrip)
-
-        let hint = NSTextField(labelWithString: "143 = coldest \u{00B7} 344 = warmest")
-        hint.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
-        hint.textColor = .secondaryLabelColor
-        hint.frame = NSRect(x: 125, y: 45, width: 220, height: 14)
-        content.addSubview(hint)
 
         let reset = NSButton(title: "Reset Defaults", target: self, action: #selector(resetDefaults(_:)))
         reset.frame = NSRect(x: 20, y: 10, width: 130, height: 28)
