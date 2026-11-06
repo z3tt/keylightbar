@@ -30,7 +30,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --icon-glow: rgba(240, 169, 46, 0.7);
   --shadow-card: 0 2px 10px rgba(64, 52, 20, 0.06);
   --shadow-deep: 0 16px 40px rgba(64, 52, 20, 0.14);
-  --preset-accent: #9d8760; // the work preset's own dot color
+  --preset-accent: #a48c64; // the work preset's own dot color
 }
 
 // Meet (60/180) — brighter and cooler than Work, for calls
@@ -40,7 +40,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --card-edge: #d6dfe9;
   --hero-glow: rgba(92, 131, 175, 0.13);
   --icon-glow: rgba(92, 131, 175, 0.55);
-  --preset-accent: #5c83af;
+  --preset-accent: #6189b9;
 }
 
 // Bright (100/220) — maximum brightness
@@ -51,7 +51,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted: #525a64;
   --muted-dim: #3f4650;
   --hero-glow: rgba(175, 198, 224, 0.25);
-  --preset-accent: #afc6e0;
+  --preset-accent: #bbd3f0;
 }
 
 // Cold (50/143) — coldest temperature
@@ -63,7 +63,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted-dim: #424b54;
   --hero-glow: rgba(60, 107, 163, 0.14);
   --icon-glow: rgba(60, 107, 163, 0.55);
-  --preset-accent: #3c6ba3;
+  --preset-accent: #3e70ab;
 }
 
 // Warm (50/344) — warmest temperature
@@ -75,7 +75,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted-dim: #51452f;
   --hero-glow: rgba(240, 169, 46, 0.24);
   --bulb-glow: rgba(240, 169, 46, 0.55);
-  --preset-accent: #a36700;
+  --preset-accent: #ab6c00;
 }
 
 // Night (25/290) — dim, warm desk light for late sessions
@@ -87,7 +87,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted: #574c34;
   --muted-dim: #423a28;
   --hero-glow: rgba(133, 89, 13, 0.1);
-  --preset-accent: #85590d;
+  --preset-accent: #885c0e;
 }
 
 // Chill (8/344) — the darkest, warmest background glow
@@ -99,7 +99,7 @@ $font-body: "Supreme", system-ui, sans-serif;
   --muted: #5e5133;
   --muted-dim: #453c25;
   --hero-glow: rgba(112, 71, 0, 0.08);
-  --preset-accent: #704700;
+  --preset-accent: #714800;
 }
 
 // Turn Off — the only dark state, like the light being out
@@ -523,25 +523,25 @@ strong {
     border-radius: 50%;
 
     &--meet {
-      background: #5c83af;
+      background: #6189b9;
     }
     &--work {
-      background: #9d8760;
+      background: #a48c64;
     }
     &--bright {
-      background: #afc6e0;
+      background: #bbd3f0;
     }
     &--cold {
-      background: #3c6ba3;
+      background: #3e70ab;
     }
     &--warm {
-      background: #a36700;
+      background: #ab6c00;
     }
     &--night {
-      background: #85590d;
+      background: #885c0e;
     }
     &--chill {
-      background: #704700;
+      background: #714800;
     }
   }
 
