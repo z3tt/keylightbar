@@ -14,6 +14,21 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
 - Every freshly compiled binary needs its own macOS Local Network grant —
   silent failures are that, not a bug. `defaults read com.cedricscherer.keylightbar keylight.host` prints the light's address.
 
+## 2026-11-06 · perceptual dots resurrected (feature/perceptual-dots)
+- The two orphan OKLCH commits from feature/perceptual-swatches
+  (3d00daf lightness rework, fe6e488 Bright → 100/243 neutral) cherry-
+  picked onto post-#13 main; conflicts resolved toward OKLCH — the 0.94
+  HSV band from PR #13 was the stopgap this replaces. Dots, strips, web
+  hexes all re-derive; the fourteen scss values match the formula output
+  compiled straight from main.swift (#8b754f … #cdcece family).
+- Gotcha for any future port of the formula: the HSB carrier lightness is
+  `0.40 + 0.48·b/100` (tops at 0.88) — misreading that as a band capped
+  at 0.48 halves the chroma (bit the Python generator first).
+- Contrast under OKLCH (light menus): Work 4.09:1, Meet 2.99, everything
+  colored ≥ ~3; Bright 1.46:1 by design (temp 243 = zero chroma → pure
+  gray-white #cdcece — semantically honest for a neutral preset).
+- Fresh Windows… still need Local Network grants per binary (standing).
+
 ## 2026-11-06 · slider gradient guides, first draft (feature/slider-gradient-guides)
 - **Iteration 1 (owner review)**: more spacing between settings (window
   430→448, sections re-spaced); the "143 coldest · 344 warmest" hint
