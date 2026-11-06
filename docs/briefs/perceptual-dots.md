@@ -37,7 +37,10 @@ light as a 50% gray one.
        from main.swift) vs Python port — 7/7 hexes match.
 4. [x] Contrast + screenshots regenerated (dots-contrast-preview.html,
        four preset-manager shots); strips verified at their rows.
-5. [ ] Owner live review (menubar runs this build), then merge.
+5. [x] Owner live review (menubar runs this build): better overall —
+       darker/more-present Bright, contrast much stronger ("barely
+       visible in merged on light"). Pure gray-white Bright accepted
+       as-is; no chroma nudge wanted. Ready to merge.
 
 ## Assumptions
 - The OKLCH band L = 0.35...0.85 stands as designed in the original arc

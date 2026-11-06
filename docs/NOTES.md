@@ -27,6 +27,9 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
 - Contrast under OKLCH (light menus): Work 4.09:1, Meet 2.99, everything
   colored ≥ ~3; Bright 1.46:1 by design (temp 243 = zero chroma → pure
   gray-white #cdcece — semantically honest for a neutral preset).
+- Owner live verdict (PR #14): better overall; Bright reads darker but
+  far more present — "barely visible in merged on light". Pure gray-white
+  Bright accepted, no chroma nudge needed.
 - Fresh Windows… still need Local Network grants per binary (standing).
 
 ## 2026-11-06 · slider gradient guides, first draft (feature/slider-gradient-guides)
