@@ -77,16 +77,26 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
   rounds: spacing/track alignment, band widening, slider reorder — all
   approved). GIF refresh deliberately deferred: the strips aren't
   advertised yet, so the old GIF's editor segment is tolerable until the
-  feature is announced. Open follow-up: the perceptual/OKLCH dot rework
-  on its own branch rewrites `presetSwatchColor` and will need a rebase
-  (+ a web hex recompute, docs gotcha).
+  feature is announced. OKLCH follow-up: no issue — the owner takes the
+  feature/perceptual-swatches commits up directly after this PR merges
+  (rebase over presetSwatchColor + web hex recompute apply again).
 
 ## 2026-11-04 · v1.2.2 — perceptual swatch dots (full design arc)
-- **Dot formula (final)**: hue+chroma from temperature anchors (blue 143 /
-  gray 243.5 ≈ 4950 K / amber 344, RGB-interpolated), saturation ×1.8,
-  brightness → OKLCH perceptual lightness L = 0.35 + 0.50·b/100,
-  chroma gamut-clamped. Hexes: Work #8b754f, Meet #6b92c0, Night #7d5200,
-  Chill #603c02, Bright #cdcece, Cold #5283bc, Warm #ae7117.
+- **Dot formula (actually shipped — corrected 2026-11-06)**: hue+sat from
+  temperature anchors (blue 143 / gray 243.5 ≈ 4950 K / amber 344,
+  RGB-interpolated), saturation ×1.8, brightness → HSV value
+  0.40 + 0.48·b/100 (0.40–0.88 band). Shipped hexes: Work #9d8760,
+  Meet #5c83af, Night #85590d, Chill #704700, Bright #afc6e0,
+  Cold #3c6ba3, Warm #a36700.
+- **Correction 2026-11-06**: this entry originally recorded the OKLCH
+  rewrite (L = 0.35 + 0.50·b/100, chroma-clamped, Bright → 100/243) as the
+  "final" formula — it never shipped. PR #11's base was
+  feature/theme-harmonize, not main, so its two commits
+  (Encode swatch brightness as perceptual OKLCH lightness; Make Bright the
+  neutral full-brightness preset) live only on feature/perceptual-swatches.
+  The v1.2.2 tag, main, and the web hexes are all the HSV formula above.
+  The owner picks the OKLCH thread up directly after the slider-gradient
+  work merges.
 - **Design decisions** (PRs #7–#11): dot = identifier/guide, not a legend
   (hue direction true, degree exaggerated; the label does exact ID);
   brightness must read perceptually (HSB value renders saturated hues
