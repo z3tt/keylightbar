@@ -14,6 +14,15 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
 - Every freshly compiled binary needs its own macOS Local Network grant —
   silent failures are that, not a bug. `defaults read com.cedricscherer.keylightbar keylight.host` prints the light's address.
 
+## 2026-11-06 · post-release fix: states-hint regression
+- The 1rem states-hint (landed Nov 5 as "0.85rem whispers" fix) was
+  silently reverted during the OKLCH cherry-pick: resolving conflicts with
+  whole-file `git checkout --theirs` takes the *entire* incoming Nov-4
+  file, not just the conflicted hunks — every main-side change made after
+  Nov 4 went with it. Full damage audit (diff vs. pre-pick main): the
+  hint font-size was the only casualty; restored to 1rem. Lesson logged
+  to the learnings inbox.
+
 ## 2026-11-06 · v1.3.0 SHIPPED (LIVE)
 - https://github.com/z3tt/keylightbar/releases/tag/v1.3.0 — Latest,
   KeylightBar.zip attached, notes from
