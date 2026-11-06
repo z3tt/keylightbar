@@ -14,7 +14,15 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
 - Every freshly compiled binary needs its own macOS Local Network grant —
   silent failures are that, not a bug. `defaults read com.cedricscherer.keylightbar keylight.host` prints the light's address.
 
-## 2026-11-06 · v1.3.0 release prep (feature/release-v1.3.0)
+## 2026-11-06 · v1.3.0 SHIPPED (LIVE)
+- https://github.com/z3tt/keylightbar/releases/tag/v1.3.0 — Latest,
+  KeylightBar.zip attached, notes from
+  `~/gdrive/ai-artifacts/keylightbar/release-notes-v1.3.0.md`. Tagged
+  on merged main; /Applications refreshed from the same build.
+  Bundles: gradient-strip editor (#13), perceptual OKLCH dots (#14),
+  neutral Bright default, web recompute. The v1.2.2 release page carries
+  the dated correction. GIF refresh still parked until the features are
+  advertised.
 - Feature release bundling the two merged arcs: the preset editor's
   gradient strips (#13) and the perceptual OKLCH dots (#14, including
   Bright's default → 100/243 neutral and the web hex recompute). Editor
