@@ -23,6 +23,10 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
   `gh release create v1.3.0 "KeylightBar.zip#KeylightBar.zip" --notes-file
   … --latest`. Zip = `zip -r KeylightBar.zip KeylightBar.app` from the
   post-merge build.
+- The published v1.2.2 release notes promised the OKLCH dots that the
+  v1.2.2 binary never contained (tag verified: HSV formula, Bright 220).
+  Prefaced its GitHub release body with a dated correction pointing to
+  v1.3.0; original text kept below the notice.
 
 ## 2026-11-06 · perceptual dots resurrected (feature/perceptual-dots)
 - The two orphan OKLCH commits from feature/perceptual-swatches
