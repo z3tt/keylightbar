@@ -36,6 +36,10 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
   brightness its intensity; owner spotted the brightness strip following
   temperature and loved the crossing-slices behavior). Pixel-verified:
   upper strip = temp axis, lower = brightness ramp.
+- **Iteration 4 (owner review, live)**: more space below the strips
+  (strip→buttons 16→24pt, temp-strip→brightness block 11→19pt, window
+  448→464) — owner tested the running PR build live and verified:
+  "love it". Editor layout is settled with this round.
 - **Web coupling** (docs gotcha exercised): the site's menu dots and
   `--preset-accent` stripes are hardcoded formula output — all fourteen
   hexes were one step stale after the band widening and were recomputed
