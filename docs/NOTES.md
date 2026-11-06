@@ -14,6 +14,16 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
 - Every freshly compiled binary needs its own macOS Local Network grant —
   silent failures are that, not a bug. `defaults read com.cedricscherer.keylightbar keylight.host` prints the light's address.
 
+## 2026-11-06 · v1.3.0 release prep (feature/release-v1.3.0)
+- Feature release bundling the two merged arcs: the preset editor's
+  gradient strips (#13) and the perceptual OKLCH dots (#14, including
+  Bright's default → 100/243 neutral and the web hex recompute). Editor
+  layout (temp-first sliders, strips, 464pt window) rides along.
+- Release path per repo convention: version bump branch → PR → merge →
+  `gh release create v1.3.0 "KeylightBar.zip#KeylightBar.zip" --notes-file
+  … --latest`. Zip = `zip -r KeylightBar.zip KeylightBar.app` from the
+  post-merge build.
+
 ## 2026-11-06 · perceptual dots resurrected (feature/perceptual-dots)
 - The two orphan OKLCH commits from feature/perceptual-swatches
   (3d00daf lightness rework, fe6e488 Bright → 100/243 neutral) cherry-
