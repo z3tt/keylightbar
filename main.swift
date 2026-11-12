@@ -1114,9 +1114,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func wakePresetName() -> String {
         // Time-appropriate preset when time-switching is on
         // ("Bright" at 22:00 yesterday shouldn't blind you this morning),
-        // otherwise the last-used preset.
+        // otherwise the last-used preset. Waking before the day starts
+        // still counts as that morning, not as a long night: an early
+        // wake gives the day preset.
         if timeSwitchEnabled {
-            return dayPartNow() == 1 ? dayPresetName : eveningPresetName
+            let hour = Calendar.current.component(.hour, from: Date())
+            return hour >= eveningStartHour ? eveningPresetName : dayPresetName
         }
         return lastPreset ?? presets.first?.name ?? ""
     }
