@@ -698,9 +698,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         // Timers fire the moment the Mac wakes — including unattended dark
         // wakes with the lid closed — so don't touch the light unless the
-        // user is around: lid open, or *confirmed* continued input in
-        // clamshell mode. (Just polling the idle clock is not enough: the
-        // HID packet that woke the Mac resets it too.)
+        // user is around: not a maintenance-classified wake, lid open, or
+        // *confirmed* continued input in clamshell mode. (Just polling the
+        // idle clock is not enough: the HID packet that woke the Mac
+        // resets it too.)
+        if unattendedWakeClassification() != nil { return }
         if clamshellClosed(), !presenceRecently() { return }
         let part = dayPartNow()
         defer { currentDayPart = part }
@@ -967,7 +969,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func wakeUp() {
         let lidClosed = clamshellClosed()
         let idle = idleSeconds()
-        powerLog.info("screens woke: lidClosed=\(lidClosed, privacy: .public), idle=\(Int(idle.rounded()), privacy: .public)s")
+        powerLog.info("screens woke: lidClosed=\(lidClosed, privacy: .public), idle=\(Int(idle.rounded()), privacy: .public)s, wakeType=\(self.lastWakeType() ?? "unreadable", privacy: .public)")
+        if let unattended = unattendedWakeClassification() {
+            // The OS itself classified this wake as maintenance — a dark
+            // wake (systems have been seen to fire the screens-wake event
+            // during those, e.g. overnight Power Nap rounds). Trust the
+            // classifier, not the idle clock: never touch the light here,
+            // but remember the wake so real input later still gets one.
+            pendingUnattendedWake = true
+            powerLog.info("wake classified '\(unattended, privacy: .public)' as unattended — ignored, watching for later input")
+            return
+        }
         if !lidClosed {
             // Open-lid (or desktop, where clamshellClosed() reads false)
             // wake — that's the user.
@@ -979,19 +991,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // clock, so "fresh input" at wake time is true *by definition* for
         // HID-caused wakes — one reading proves nothing. Continued input
         // over the next seconds does.
-        if idle > 60 {
-            // Not even input-caused (Power Nap dark wake, RTC maintenance,
-            // notification): definitely unattended — but remember it, so
-            // the user arriving later (no new screensDidWake will fire,
-            // the screens are already awake) still gets the light.
-            pendingUnattendedWake = true
-            powerLog.info("clamshell wake without fresh input — ignored, watching for later input")
-            return
-        }
         confirmPresence {
             self.powerLog.notice("presence confirmed after clamshell wake — turning light on")
             self.applyWakePresetIfNeeded(remaining: wakeRetryCount)
         }
+    }
+
+    /// The OS's classification of the most recent wake (what pmset prints
+    /// as the wake cause). Nil if unreadable.
+    private func lastWakeType() -> String? {
+        let service = IOServiceGetMatchingService(kIOMasterPortDefault,
+                                                  IOServiceMatching("IOPMrootDomain"))
+        guard service != IO_OBJECT_NULL else { return nil }
+        defer { IOObjectRelease(service) }
+        return IORegistryEntryCreateCFProperty(service, "Wake Type" as CFString,
+                                               kCFAllocatorDefault, 0)?
+            .takeUnretainedValue() as? String
+    }
+
+    /// Non-nil (the wake type) when the OS classifies the current wake as
+    /// maintenance/notification — a dark wake with nobody there. Nil when
+    /// it's user-ish or unreadable, so callers fall back to their own
+    /// judgment instead of blocking blindly.
+    private func unattendedWakeClassification() -> String? {
+        guard let type = lastWakeType() else { return nil }
+        let unattendedMarkers = ["Maintenance", "SleepService", "Sleep Service",
+                                 "Notification", "RTC", "Magic Packet", "Timer"]
+        return unattendedMarkers.contains(where: type.localizedCaseInsensitiveContains) ? type : nil
     }
 
     /// Waits `presenceWindow` for continued input after a clamshell wake.
@@ -1045,7 +1071,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             idleDrops = max(idleDrops - 1, 0)   // decay fades single packets
         }
         if idleDrops >= 2 { markPresence() }
-        if idleDrops >= 2, pendingUnattendedWake, wakeOnEnabled {
+        if idleDrops >= 2, pendingUnattendedWake, wakeOnEnabled,
+           unattendedWakeClassification() == nil {
             pendingUnattendedWake = false
             powerLog.notice("input after unattended wake — turning light on")
             applyWakePresetIfNeeded(remaining: wakeRetryCount)

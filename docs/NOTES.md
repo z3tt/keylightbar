@@ -52,6 +52,23 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
   display-driven. Knowingly affects lid-open laptops too: screen sleeps
   on idle → light off while sitting there reading; matches "mirrors the
   display", surfaced in the PR for review.
+- **Second-round hardening (same day)**: with "light was on before I
+  touched anything" verified and no full wakes overnight, only dark-wake
+  paths can have fired — and the pmset forensics show `sleep = 1 min`,
+  making the old 60 s presence window a coin flip vs. the first dark wake.
+  Neither the old gate nor pure input-confirmation is safe if
+  CGEventSource reads oddly during dark wakes, so the decisive gate became
+  the OS's own wake classification: IOPMrootDomain publishes
+  `"Wake Type"` (what pmset prints as the wake cause — live reading
+  "UserActivity Assertion"; maintenance dark wakes read
+  Maintenance/SleepService/Notification). Maintenance-classified events
+  now never touch the light (wakeUp, the time-switch tick, and the
+  pending-wake sampler all check it), and `wakeUp` logs wakeType at every
+  screens-wake for future diagnosis. Probing gotchas: on this machine
+  IODisplayWrangler carries no power state (Apple Silicon), CGDisplay
+  IsActive stays 1 through display sleep, and a display-forced sleep
+  (`pmset displaysleepnow`) is not observable from those — reason enough
+  to gate on IOPMrootDomain instead.
 - **Verification**: `make bundle` → 0 errors (expected NetService
   deprecations only). Behavior NOT hand-tested yet — needs a real
   overnight cycle; scenarios listed in PR #16. Two Nov 6 KeylightBar
