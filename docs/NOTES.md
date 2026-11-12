@@ -14,6 +14,42 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
 - Every freshly compiled binary needs its own macOS Local Network grant —
   silent failures are that, not a bug. `defaults read com.cedricscherer.keylightbar keylight.host` prints the light's address.
 
+## 2026-11-12 · stray-HID wake analysis → fix/stray-hid-wakes (PR #16)
+- **Symptoms**: light on when coming into the office (lid closed, screens
+  asleep, nobody touching anything, Nov 12 morning) + 2–3 days of "didn't
+  turn on after wake". **Diagnosis from pmset/log evidence**: the wake
+  gate was circular for HID-caused wakes — the Bluetooth/USB packet that
+  wakes the Mac also resets the CGEventSource idle clock, so it always
+  read as "fresh input" (light on with nobody there: only full wake was
+  08:43:06, cause `centauri-beta/HID Activity` via `wifibt`, minutes
+  before the owner walked in). Symmetrically, an unattended wake fired
+  screensDidWake *before* arrival, so the real keypress later fired no
+  event at all → "didn't wake up".
+- **Fix (PR #16)**: with the lid closed, presence = *continued* input
+  (idle-clock sampling; the clock gains exactly one sample interval
+  between readings when nobody types, so a short reading = an event).
+  Unconfirmed wakes are parked (`pendingUnattendedWake`) and the sampler
+  turns the light on when real input follows — no new screensDidWake
+  needed. Time-of-day switching requires the same confirmed presence.
+  Wake retries 5×3 s → 20×3 s (~60 s; Wi-Fi can re-associate slowly).
+  Gotcha from the archival dig: the retry window was ~20 s since fcb46fe
+  (Oct 28) — never longer; the longer-window memory was false.
+- **Diagnostics for next time** (the light's own state was never logged
+  anywhere — retroactive attribution impossible):
+  `log show --last 1h --predicate 'subsystem == "com.cedricscherer.keylightbar"'`
+  + the Nov 3 recipe: `pmset -g log | grep -E "Wake from|DarkWake"`.
+- **Not included, deferred (issue: Turn Off race)**: willSleep → `turnOff()`
+  is a single unverified PUT during sleep teardown — if it dies, the
+  light simply stays on overnight; alternative (unverifiable) explanation
+  for the Nov 12 morning. Needs owner decision: retry the off-PUT, and
+  whether an on-light during a confirmed-unattended wake may be turned
+  off (would also undo a manual flip).
+- **Verification**: `make bundle` → 0 errors (expected NetService
+  deprecations only). Behavior NOT hand-tested yet — needs a real
+  overnight cycle; scenarios listed in PR #16. Two Nov 6 KeylightBar
+  crash reports checked and ruled out: dev builds (parent zsh/VSCode
+  from the UI-session snapshot work), not the production app.
+
 ## 2026-11-06 · v1.3.0 SHIPPED (LIVE)
 - https://github.com/z3tt/keylightbar/releases/tag/v1.3.0 — Latest,
   KeylightBar.zip attached, notes from
