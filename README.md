@@ -6,7 +6,7 @@
   <a href="https://github.com/z3tt/keylightbar/actions/workflows/build.yml"><img src="https://github.com/z3tt/keylightbar/actions/workflows/build.yml/badge.svg" alt="Build status"></a>
 </p>
 
-Control any [Elgato Key Light](https://www.elgato.com/key-light) in your macOS menu bar — one click to switch it on, and from there it manages itself: it turns off when your Mac sleeps, comes back on when you wake it, and moves between your daytime and evening setups on schedule.
+Control any [Elgato Key Light](https://www.elgato.com/key-light) in your macOS menu bar — one click to switch it on, and from there it manages itself: it turns off when your Mac or your display goes to sleep, comes back on when you wake it, and moves between your daytime and evening setups on schedule.
 
 <p align="center">
   <img src="docs/keylightbar.gif" alt="KeylightBar in the menu bar: the icon switches between 🌑 and 💡, one click turns the light on, clicking while on opens the preset menu with the sleep/wake and time-of-day settings, and the Manage Presets editor" width="422">
@@ -35,7 +35,7 @@ A single icon to control your Key Light — simple, but versatile thanks to its 
 ### Additional features
 
 - **Your presets, built in-app.** Seven sensible presets ship with it — _Work, Meet, Night, Chill, Bright, Cold, Warm_ — and you can add, rename, and tune your own with sliders. No config files, no command line.
-- **A light that sleeps and wakes with your Mac.** Two independent rules you can toggle: _Off When Mac Sleeps_ and _On When Mac Wakes_. This is the gap KeylightBar was born to fill — Elgato's own Control Center can switch your light off automatically, but nothing switches it back on when you return to your desk.
+- **A light that sleeps and wakes with your Mac.** Two independent rules you can toggle: _Off When Mac Sleeps_ and _On When Mac Wakes_ — "sleep" includes your display going dark while the Mac keeps running (clamshell desk setups). This is the gap KeylightBar was born to fill — Elgato's own Control Center can switch your light off automatically, but nothing switches it back on when you return to your desk.
 - **A light that knows the time.** _Time Of Day_ switches between a day preset and an evening preset automatically — Work until 19:00, Chill after (presets and hours are yours to choose). It applies on its own while you work, and on wake.
 - **Always in sync.** The icon and menu reflect the light's _real_ state — even if you changed it from Elgato's app or the physical controls, KeylightBar keeps up.
 - **Zero setup on normal networks.** It finds your light by itself; on networks where auto-discovery fails, it scans the local network and finds it anyway. And it never pretends to control what it can't reach: preset picking stays disabled until your light is actually connected.
@@ -52,7 +52,7 @@ Note that macOS grants **Local Network** access per binary: a freshly compiled K
 Everything is adjustable right from the 💡 menu — no source editing, no terminal.
 
 - **Presets** — _Manage Presets…_ opens a small editor: pick a preset in the table (or double-click its name to rename it), then set name, temperature (143 = coldest to 344 = warmest), and brightness (0–100) with the sliders. Each slider carries a gradient strip in the same color logic as the swatch dots in the 💡 menu — the color under a knob is exactly the dot the preset gets. _+ Add_ asks for a name right away and starts from the selected preset's settings. Names are always title-cased (e.g. "Night Mode"). Changes apply immediately and survive restarts; _Reset Defaults_ restores the original seven.
-- **Sleep & Wake** — the _Off When Mac Sleeps_ / _On When Mac Wakes_ checkboxes. On wake, KeylightBar applies the time-appropriate preset if _Time Of Day_ is on, otherwise your last-used one.
+- **Sleep & Wake** — the _Off When Mac Sleeps_ / _On When Mac Wakes_ checkboxes. Displays sleeping with the Mac still running count as sleep. On wake, KeylightBar applies the time-appropriate preset if _Time Of Day_ is on, otherwise your last-used one.
 - **Time Of Day** — the _Switch Presets By Time_ toggle plus day/evening presets and the hours they start (defaults: Work from 08:00, Chill from 19:00).
 - **Start At Login** — one checkbox in the 💡 menu; no fiddling in System Settings.
 

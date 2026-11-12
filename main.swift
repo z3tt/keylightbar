@@ -948,6 +948,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self.powerLog.info("Mac going to sleep — turning light off")
             self.turnOff()
         }
+        center.addObserver(forName: NSWorkspace.screensDidSleepNotification,
+                           object: nil, queue: .main) { [weak self] _ in
+            // Mirror the display, not the system: with the lid closed on
+            // AC the Mac often stays awake after the monitor sleeps, but
+            // the user is just as gone — the light follows the screen.
+            guard let self = self, self.sleepOffEnabled else { return }
+            self.powerLog.info("screens slept — turning light off")
+            self.turnOff()
+        }
         center.addObserver(forName: NSWorkspace.screensDidWakeNotification,
                            object: nil, queue: .main) { [weak self] _ in
             guard let self = self, self.wakeOnEnabled else { return }

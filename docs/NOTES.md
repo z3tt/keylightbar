@@ -44,6 +44,14 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
   for the Nov 12 morning. Needs owner decision: retry the off-PUT, and
   whether an on-light during a confirmed-unattended wake may be turned
   off (would also undo a manual flip).
+- **Owner spec clarification (post-analysis, in chat)**: on the clamshell
+  widescreen desk, the intended rule is "light mirrors the display". The
+  app only keyed off *system* sleep — with the Mac awake after the Dell
+  sleeps, the light stayed on. Added `screensDidSleepNotification` →
+  turn off (same _Off When Mac Sleeps_ toggle); wake side was already
+  display-driven. Knowingly affects lid-open laptops too: screen sleeps
+  on idle → light off while sitting there reading; matches "mirrors the
+  display", surfaced in the PR for review.
 - **Verification**: `make bundle` → 0 errors (expected NetService
   deprecations only). Behavior NOT hand-tested yet — needs a real
   overnight cycle; scenarios listed in PR #16. Two Nov 6 KeylightBar
