@@ -56,11 +56,21 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
   speed — most probable root cause of ALL the intermittent morning lights,
   predating the wake-gate work. Flip-honoring now requires unlocked +
   non-maintenance wake (commit 6a55539) and logs when it fires.
-- **Live-verified so far**: screens-sleep → light off (10:32 test);
-  presence confirmation + apply on typing (10:31/10:32 lines); unlock
-  apply with pending wake (14:51:28 line); "started" persists via
-  /usr/bin/log. Overnight dark-wake behavior + phantom rejection +
-  flip-heuristic suppression: next-night observation pending.
+- **Live-verified so far**: screens-sleep → light off (10:32 test, verified
+  with a retry at 11:15); presence confirmation + apply on typing
+  (10:31/10:32 lines); unlock apply with pending wake (14:51:28 line);
+  flip-heuristic gated (12:08:36 incident); "started"/notices persist via
+  /usr/bin/log.
+- **Verification plan / handoff**: owner travels from 15 Nov; the office
+  Mac keeps the test build running (sleeps normally — only a reboot would
+  stop the app; relaunch /Applications/KeylightBar.app if that happens).
+  Check on return:
+  `/usr/bin/log show --last Ndays --predicate 'subsystem == "com.cedricscherer.keylightbar"'`
+  + `pmset -g log`. Expected: "light off confirmed" at each screens-sleep,
+  phantom/maintenance wakes parked pending, flip-heuristic silent, light
+  off every morning — multiple empty-office nights = the merge case for
+  PR #16. If anything turned on, the journal names the path and the gate
+  that let it through.
 
 ## 2026-11-12 · stray-HID wake analysis → fix/stray-hid-wakes (PR #16)
 - **Symptoms**: light on when coming into the office (lid closed, screens
