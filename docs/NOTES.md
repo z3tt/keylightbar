@@ -61,15 +61,19 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
   (10:31/10:32 lines); unlock apply with pending wake (14:51:28 line);
   flip-heuristic gated (12:08:36 incident); "started"/notices persist via
   /usr/bin/log.
-- **Verification plan / handoff**: owner travels from 15 Nov; the office
-  Mac keeps the test build running (sleeps normally — only a reboot would
-  stop the app; relaunch /Applications/KeylightBar.app if that happens).
-  Check on return:
+- **Verification plan / handoff (revised — the MacBook travels with the
+  owner, so the office Mac is GONE during travel, not sleeping)**: the one
+  pre-travel window is the night of Nov 14→15. During travel the app runs
+  against an unreachable light — expected: poll failures stay silent,
+  turnOff/sleep retried then logged, flip-heuristic MUST stay silent (any
+  reachable device at the light's IP on a travel network would be a great
+  accidental test of the unattended gates). Multi-night office
+  verification resumes when the MacBook is back at the Dell; until then
+  PR #16 waits:
   `/usr/bin/log show --last Ndays --predicate 'subsystem == "com.cedricscherer.keylightbar"'`
-  + `pmset -g log`. Expected: "light off confirmed" at each screens-sleep,
-  phantom/maintenance wakes parked pending, flip-heuristic silent, light
-  off every morning — multiple empty-office nights = the merge case for
-  PR #16. If anything turned on, the journal names the path and the gate
+  + `pmset -g log`. Expected when back: "light off confirmed" at each
+  screens-sleep, phantom/maintenance wakes parked pending, light off every
+  morning. If anything turned on, the journal names the path and the gate
   that let it through.
 
 ## 2026-11-12 · stray-HID wake analysis → fix/stray-hid-wakes (PR #16)
