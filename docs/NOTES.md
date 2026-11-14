@@ -14,6 +14,44 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
 - Every freshly compiled binary needs its own macOS Local Network grant —
   silent failures are that, not a bug. `defaults read com.cedricscherer.keylightbar keylight.host` prints the light's address.
 
+## 2026-11-14 · live test verdict: phantom wake + turn-off race (both caught in one night)
+- **The night of Nov 13→14 was the full repro, finally readable** (pmset +
+  `/usr/bin/log show`): owner left ~18:10, Mac display-slept 18:29, system-slept
+  18:30 — light correctly OFF. At **20:10:30** macOS promoted a dark wake to a
+  full wake on a **"UserActivity Assertion"** (lid closed, empty office;
+  same cause string as Nov 9 23:27 / Nov 10 09:26 before the test), display
+  on for ~80 min, and the app — following its classifier+presence gates
+  faithfully — turned the light on in Chill at 20:10:38. At **21:29:45**
+  the display slept again; the off-PUT fired and **died in the 5-second
+  window before system sleep** (21:29:50) — issue #17, live. Light stayed
+  on all night; found in Chill next morning.
+- **Fixes (PR #16, commit 78484d0)**: turnOff verifies the echoed state and
+  retries up to 3×; all journal logging moved .info → notice (info entries
+  are NOT persisted by unified logging — the first day of "no logs" was this
+  plus tooling, see below); launch proof-of-life line; and the decisive
+  phantom filter: **locked-session wake** (SCDynamicStore console user ==
+  "loginwindow") parks as pending and turns the light on **only at the
+  password unlock** (DistributedNotificationCenter screenIsUnlocked). A
+  phantom never unlocks. Unlocked/passwordless sessions keep input
+  confirmation. Owner's pre-9 a.m. → Chill convention kept (revert 82c7ff7).
+- **Debugging gotchas paid for on Nov 14**:
+  - The owner's zsh shadows `log` (login-watch) — every plain `log show`
+    silently failed and read as "no logs". Always `/usr/bin/log`.
+  - `cp -R` over an existing .app bundle NESTS — two "installs" that
+    morning never deployed; the running binary was still Nov 12's.
+    Quit + `rm -rf` bundle + copy, then verify via the new "started"
+    log line.
+  - IODisplayWrangler has no power state on this Apple Silicon machine and
+    `CGDisplayIsActive` stays 1 through display sleep — unusable as
+    dark-wake gates; "Wake Type" on IOPMrootDomain is the classification
+    that works (but a "UserActivity" phantom lies to it — hence the
+    unlock gate).
+- **Live-verified so far**: screens-sleep → light off (10:32 test);
+  presence confirmation + apply on typing (10:31/10:32 lines); unlock
+  apply with pending wake (14:51:28 line); "started" persists via
+  /usr/bin/log. Overnight dark-wake behavior + phantom rejection:
+  next-night observation pending.
+
 ## 2026-11-12 · stray-HID wake analysis → fix/stray-hid-wakes (PR #16)
 - **Symptoms**: light on when coming into the office (lid closed, screens
   asleep, nobody touching anything, Nov 12 morning) + 2–3 days of "didn't
