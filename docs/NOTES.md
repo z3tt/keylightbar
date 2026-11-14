@@ -14,6 +14,129 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
 - Every freshly compiled binary needs its own macOS Local Network grant —
   silent failures are that, not a bug. `defaults read com.cedricscherer.keylightbar keylight.host` prints the light's address.
 
+## 2026-11-14 · live test verdict: phantom wake + turn-off race (both caught in one night)
+- **The night of Nov 13→14 was the full repro, finally readable** (pmset +
+  `/usr/bin/log show`): owner left ~18:10, Mac display-slept 18:29, system-slept
+  18:30 — light correctly OFF. At **20:10:30** macOS promoted a dark wake to a
+  full wake on a **"UserActivity Assertion"** (lid closed, empty office;
+  same cause string as Nov 9 23:27 / Nov 10 09:26 before the test), display
+  on for ~80 min, and the app — following its classifier+presence gates
+  faithfully — turned the light on in Chill at 20:10:38. At **21:29:45**
+  the display slept again; the off-PUT fired and **died in the 5-second
+  window before system sleep** (21:29:50) — issue #17, live. Light stayed
+  on all night; found in Chill next morning.
+- **Fixes (PR #16, commit 78484d0)**: turnOff verifies the echoed state and
+  retries up to 3×; all journal logging moved .info → notice (info entries
+  are NOT persisted by unified logging — the first day of "no logs" was this
+  plus tooling, see below); launch proof-of-life line; and the decisive
+  phantom filter: **locked-session wake** (SCDynamicStore console user ==
+  "loginwindow") parks as pending and turns the light on **only at the
+  password unlock** (DistributedNotificationCenter screenIsUnlocked). A
+  phantom never unlocks. Unlocked/passwordless sessions keep input
+  confirmation. Owner's pre-9 a.m. → Chill convention kept (revert 82c7ff7).
+- **Debugging gotchas paid for on Nov 14**:
+  - The owner's zsh shadows `log` (login-watch) — every plain `log show`
+    silently failed and read as "no logs". Always `/usr/bin/log`.
+  - `cp -R` over an existing .app bundle NESTS — two "installs" that
+    morning never deployed; the running binary was still Nov 12's.
+    Quit + `rm -rf` bundle + copy, then verify via the new "started"
+    log line.
+  - IODisplayWrangler has no power state on this Apple Silicon machine and
+    `CGDisplayIsActive` stays 1 through display sleep — unusable as
+    dark-wake gates; "Wake Type" on IOPMrootDomain is the classification
+    that works (but a "UserActivity" phantom lies to it — hence the
+    unlock gate).
+- **The fifth — and likely original — bug (owner catch: "light was already
+  on before I logged in")**: at 12:08:36 the log showed`applying preset
+  Work` in a locked, empty office — the `syncFromLight` power-flip
+  heuristic ("silence ≥15 s ending in a reachable light = someone flipped
+  its power switch") misreading the Mac's own Wi-Fi re-association after a
+  12:07:07 maintenance dark wake. The light did not go silent; the network
+  did. With dark wakes every ~15 min this was a lottery on re-association
+  speed — most probable root cause of ALL the intermittent morning lights,
+  predating the wake-gate work. Flip-honoring now requires unlocked +
+  non-maintenance wake (commit 6a55539) and logs when it fires.
+- **Live-verified so far**: screens-sleep → light off (10:32 test, verified
+  with a retry at 11:15); presence confirmation + apply on typing
+  (10:31/10:32 lines); unlock apply with pending wake (14:51:28 line);
+  flip-heuristic gated (12:08:36 incident); "started"/notices persist via
+  /usr/bin/log.
+- **Verification plan / handoff (revised — the MacBook travels with the
+  owner, so the office Mac is GONE during travel, not sleeping)**: the one
+  pre-travel window is the night of Nov 14→15. During travel the app runs
+  against an unreachable light — expected: poll failures stay silent,
+  turnOff/sleep retried then logged, flip-heuristic MUST stay silent (any
+  reachable device at the light's IP on a travel network would be a great
+  accidental test of the unattended gates). Multi-night office
+  verification resumes when the MacBook is back at the Dell; until then
+  PR #16 waits:
+  `/usr/bin/log show --last Ndays --predicate 'subsystem == "com.cedricscherer.keylightbar"'`
+  + `pmset -g log`. Expected when back: "light off confirmed" at each
+  screens-sleep, phantom/maintenance wakes parked pending, light off every
+  morning. If anything turned on, the journal names the path and the gate
+  that let it through.
+
+## 2026-11-12 · stray-HID wake analysis → fix/stray-hid-wakes (PR #16)
+- **Symptoms**: light on when coming into the office (lid closed, screens
+  asleep, nobody touching anything, Nov 12 morning) + 2–3 days of "didn't
+  turn on after wake". **Diagnosis from pmset/log evidence**: the wake
+  gate was circular for HID-caused wakes — the Bluetooth/USB packet that
+  wakes the Mac also resets the CGEventSource idle clock, so it always
+  read as "fresh input" (light on with nobody there: only full wake was
+  08:43:06, cause `centauri-beta/HID Activity` via `wifibt`, minutes
+  before the owner walked in). Symmetrically, an unattended wake fired
+  screensDidWake *before* arrival, so the real keypress later fired no
+  event at all → "didn't wake up".
+- **Fix (PR #16)**: with the lid closed, presence = *continued* input
+  (idle-clock sampling; the clock gains exactly one sample interval
+  between readings when nobody types, so a short reading = an event).
+  Unconfirmed wakes are parked (`pendingUnattendedWake`) and the sampler
+  turns the light on when real input follows — no new screensDidWake
+  needed. Time-of-day switching requires the same confirmed presence.
+  Wake retries 5×3 s → 20×3 s (~60 s; Wi-Fi can re-associate slowly).
+  Gotcha from the archival dig: the retry window was ~20 s since fcb46fe
+  (Oct 28) — never longer; the longer-window memory was false.
+- **Diagnostics for next time** (the light's own state was never logged
+  anywhere — retroactive attribution impossible):
+  `log show --last 1h --predicate 'subsystem == "com.cedricscherer.keylightbar"'`
+  + the Nov 3 recipe: `pmset -g log | grep -E "Wake from|DarkWake"`.
+- **Not included, deferred (issue: Turn Off race)**: willSleep → `turnOff()`
+  is a single unverified PUT during sleep teardown — if it dies, the
+  light simply stays on overnight; alternative (unverifiable) explanation
+  for the Nov 12 morning. Needs owner decision: retry the off-PUT, and
+  whether an on-light during a confirmed-unattended wake may be turned
+  off (would also undo a manual flip).
+- **Owner spec clarification (post-analysis, in chat)**: on the clamshell
+  widescreen desk, the intended rule is "light mirrors the display". The
+  app only keyed off *system* sleep — with the Mac awake after the Dell
+  sleeps, the light stayed on. Added `screensDidSleepNotification` →
+  turn off (same _Off When Mac Sleeps_ toggle); wake side was already
+  display-driven. Knowingly affects lid-open laptops too: screen sleeps
+  on idle → light off while sitting there reading; matches "mirrors the
+  display", surfaced in the PR for review.
+- **Second-round hardening (same day)**: with "light was on before I
+  touched anything" verified and no full wakes overnight, only dark-wake
+  paths can have fired — and the pmset forensics show `sleep = 1 min`,
+  making the old 60 s presence window a coin flip vs. the first dark wake.
+  Neither the old gate nor pure input-confirmation is safe if
+  CGEventSource reads oddly during dark wakes, so the decisive gate became
+  the OS's own wake classification: IOPMrootDomain publishes
+  `"Wake Type"` (what pmset prints as the wake cause — live reading
+  "UserActivity Assertion"; maintenance dark wakes read
+  Maintenance/SleepService/Notification). Maintenance-classified events
+  now never touch the light (wakeUp, the time-switch tick, and the
+  pending-wake sampler all check it), and `wakeUp` logs wakeType at every
+  screens-wake for future diagnosis. Probing gotchas: on this machine
+  IODisplayWrangler carries no power state (Apple Silicon), CGDisplay
+  IsActive stays 1 through display sleep, and a display-forced sleep
+  (`pmset displaysleepnow`) is not observable from those — reason enough
+  to gate on IOPMrootDomain instead.
+- **Verification**: `make bundle` → 0 errors (expected NetService
+  deprecations only). Behavior NOT hand-tested yet — needs a real
+  overnight cycle; scenarios listed in PR #16. Two Nov 6 KeylightBar
+  crash reports checked and ruled out: dev builds (parent zsh/VSCode
+  from the UI-session snapshot work), not the production app.
+
 ## 2026-11-06 · v1.3.0 SHIPPED (LIVE)
 - https://github.com/z3tt/keylightbar/releases/tag/v1.3.0 — Latest,
   KeylightBar.zip attached, notes from
