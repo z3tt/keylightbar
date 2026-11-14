@@ -34,6 +34,7 @@
 import AppKit
 import IOKit
 import ServiceManagement
+import SystemConfiguration
 import os
 
 // MARK: - Configuration
@@ -284,7 +285,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var lastPresenceAt: Date?
     // A wake whose screens-event fired before the user arrived (dark wake,
     // notification wake, or a stray HID packet): no new screensDidWake will
-    // fire when they do arrive, so the sampler turns the light on instead.
+    // fire when they do arrive, so the sampler/unlock turns the light on
+    // instead.
     private var pendingUnattendedWake = false
 
     // when the light last stopped answering — a long enough silence that
@@ -388,6 +390,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         watchSleepAndWake()
+        watchSessionLocks()
+        powerLog.notice("KeylightBar \(appVersion, privacy: .public) started — logging at notice level so wake/sleep events persist in the unified log")
 
         // Debug aid for screenshotting fresh builds (no effect on normal
         // launches): run the binary directly with the env var set and the
@@ -702,6 +706,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // *confirmed* continued input in clamshell mode. (Just polling the
         // idle clock is not enough: the HID packet that woke the Mac
         // resets it too.)
+        // Nobody's home while the lock screen owns the console: no preset
+        // changes. (The unlock itself arms the light through the pending
+        // wake, which covers the boundary missed by a locked 09:00 tick.)
+        if sessionLockedNow() { return }
         if unattendedWakeClassification() != nil { return }
         if clamshellClosed(), !presenceRecently() { return }
         let part = dayPartNow()
@@ -863,6 +871,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         lastPreset = name
         UserDefaults.standard.set(name, forKey: lastPresetKey)
         updateIcon()
+        powerLog.notice("applying preset \(name, privacy: .public) — brightness \(preset.brightness, privacy: .public), temperature \(preset.temperature, privacy: .public)")
         api("PUT", ["numberOfLights": 1,
                     "lights": [["on": 1,
                                 "brightness": preset.brightness,
@@ -873,7 +882,40 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         currentOn = false
         currentPreset = nil
         updateIcon()
-        api("PUT", ["numberOfLights": 1, "lights": [["on": 0]]]) { _ in }
+        api("PUT", ["numberOfLights": 1, "lights": [["on": 0]]]) { [weak self] json in
+            guard let self = self else { return }
+            // The PUT echoes the new state; an off that failed here (the
+            // light unreachable mid sleep-teardown, say) silently leaves
+            // the light on all night — the one failure this must not hide.
+            let confirmed = (json?["lights"] as? [[String: Any]])?.first?["on"] as? Int == 0
+            if confirmed {
+                self.powerLog.notice("light off confirmed")
+            } else {
+                self.scheduleOffRetry(attempt: 1)
+            }
+        }
+    }
+
+    /// A turn-off whose confirmation didn't come back gets a few quick
+    /// retries — the Mac usually keeps the network a couple of seconds
+    /// past `willSleep`, and the request often just needs one more shot.
+    private func scheduleOffRetry(attempt: Int) {
+        guard attempt <= 3 else {
+            powerLog.error("light off failed after \(attempt, privacy: .public) attempts — last known state: on")
+            return
+        }
+        powerLog.notice("light off not confirmed — retry \(attempt, privacy: .public) of 3")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+            guard let self = self else { return }
+            self.api("PUT", ["numberOfLights": 1, "lights": [["on": 0]]]) { json in
+                let confirmed = (json?["lights"] as? [[String: Any]])?.first?["on"] as? Int == 0
+                if confirmed {
+                    self.powerLog.notice("light off confirmed (retry \(attempt, privacy: .public))")
+                } else {
+                    self.scheduleOffRetry(attempt: attempt + 1)
+                }
+            }
+        }
     }
 
     private func syncFromLight() {
@@ -947,7 +989,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self.idleDrops = 0
             self.presenceTimer?.invalidate()
             guard self.sleepOffEnabled else { return }
-            self.powerLog.info("Mac going to sleep — turning light off")
+            self.powerLog.notice("Mac going to sleep — turning light off")
             self.turnOff()
         }
         center.addObserver(forName: NSWorkspace.screensDidSleepNotification,
@@ -956,7 +998,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // AC the Mac often stays awake after the monitor sleeps, but
             // the user is just as gone — the light follows the screen.
             guard let self = self, self.sleepOffEnabled else { return }
-            self.powerLog.info("screens slept — turning light off")
+            self.powerLog.notice("screens slept — turning light off")
             self.turnOff()
         }
         center.addObserver(forName: NSWorkspace.screensDidWakeNotification,
@@ -966,10 +1008,45 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    // MARK: Session lock / unlock
+
+    /// True when the loginwindow (lock screen) owns the console — i.e.,
+    /// the session is locked *right now*. The password prompt is the one
+    /// proof of a human that a phantom wake cannot fake: the phantom that
+    /// woke this Mac on 2026-11-13 20:10 ("UserActivity Assertion", lid
+    /// closed, empty office) never came with an unlock.
+    private func sessionLockedNow() -> Bool {
+        var uid: uid_t = 0
+        var gid: gid_t = 0
+        let userName = SCDynamicStoreCopyConsoleUser(nil, &uid, &gid)
+        return userName == "loginwindow" as CFString?
+    }
+
+    /// Journal for lock/unlock; the unlock, after an unattended wake, is
+    /// the moment the light comes on for locking sessions.
+    private func watchSessionLocks() {
+        let center = DistributedNotificationCenter.default()
+        center.addObserver(forName: Notification.Name("com.apple.screenIsLocked"),
+                           object: nil, queue: .main) { [weak self] _ in
+            self?.powerLog.notice("session locked")
+        }
+        center.addObserver(forName: Notification.Name("com.apple.screenIsUnlocked"),
+                           object: nil, queue: .main) { [weak self] _ in
+            guard let self = self else { return }
+            let wasPending = self.pendingUnattendedWake
+            self.markPresence()
+            self.powerLog.notice("session unlocked (pending wake: \(wasPending, privacy: .public))")
+            if wasPending, self.wakeOnEnabled {
+                self.pendingUnattendedWake = false
+                self.applyWakePresetIfNeeded(remaining: wakeRetryCount)
+            }
+        }
+    }
+
     private func wakeUp() {
         let lidClosed = clamshellClosed()
         let idle = idleSeconds()
-        powerLog.info("screens woke: lidClosed=\(lidClosed, privacy: .public), idle=\(Int(idle.rounded()), privacy: .public)s, wakeType=\(self.lastWakeType() ?? "unreadable", privacy: .public)")
+        powerLog.notice("screens woke: lidClosed=\(lidClosed, privacy: .public), idle=\(Int(idle.rounded()), privacy: .public)s, wakeType=\(self.lastWakeType() ?? "unreadable", privacy: .public)")
         if let unattended = unattendedWakeClassification() {
             // The OS itself classified this wake as maintenance — a dark
             // wake (systems have been seen to fire the screens-wake event
@@ -977,7 +1054,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // classifier, not the idle clock: never touch the light here,
             // but remember the wake so real input later still gets one.
             pendingUnattendedWake = true
-            powerLog.info("wake classified '\(unattended, privacy: .public)' as unattended — ignored, watching for later input")
+            powerLog.notice("wake classified '\(unattended, privacy: .public)' as unattended — ignored, watching for later input")
             return
         }
         if !lidClosed {
@@ -989,8 +1066,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         // Lid closed: the HID packet that woke the Mac also resets the idle
         // clock, so "fresh input" at wake time is true *by definition* for
-        // HID-caused wakes — one reading proves nothing. Continued input
-        // over the next seconds does.
+        // HID-caused wakes — one reading proves nothing, and sampling was
+        // already fooled once by a phantom's synthetic activity
+        // (2026-11-13 20:10). A locked session gets the strongest proof
+        // instead: the wake stays dark until the password is typed — a
+        // phantom never unlocks, a real morning does, within seconds.
+        // An unlocked, present user keeps the fast sampling path.
+        if sessionLockedNow() {
+            pendingUnattendedWake = true
+            powerLog.notice("clamshell wake with the session locked — light stays off until the unlock")
+            return
+        }
         confirmPresence {
             self.powerLog.notice("presence confirmed after clamshell wake — turning light on")
             self.applyWakePresetIfNeeded(remaining: wakeRetryCount)
@@ -1071,7 +1157,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             idleDrops = max(idleDrops - 1, 0)   // decay fades single packets
         }
         if idleDrops >= 2 { markPresence() }
-        if idleDrops >= 2, pendingUnattendedWake, wakeOnEnabled,
+        // Locked sessions turn the light on at the unlock only — sampling
+        // was already fooled once by a phantom's synthetic activity.
+        if idleDrops >= 2, !sessionLockedNow(), pendingUnattendedWake, wakeOnEnabled,
            unattendedWakeClassification() == nil {
             pendingUnattendedWake = false
             powerLog.notice("input after unattended wake — turning light on")
@@ -1130,7 +1218,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             guard let lights = json?["lights"] as? [[String: Any]],
                   let light = lights.first else {
                 // Light unreachable — network probably still waking up.
-                self.powerLog.info("light unreachable after wake — \(remaining, privacy: .public) retries left")
+                self.powerLog.notice("light unreachable after wake — \(remaining, privacy: .public) retries left")
                 self.scheduleWakeRetry(remaining: remaining)
                 return
             }
