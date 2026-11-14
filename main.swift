@@ -936,10 +936,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // that was off before a power cut comes back dark. But a long
             // silence that ends in a reachable light is someone flipping
             // the switch back on: honor that like the switch promises.
-            // Short gaps stay ignored — those are network blips.
+            // Short gaps stay ignored — those are network blips. Silence
+            // right after a wake is a network blip too — the Mac's Wi-Fi
+            // re-associates in the middle of dark wakes (caught live
+            // 2026-11-14 12:08): the light did not go silent, the network
+            // did. Honor a flip only while awake, unlocked, and not on a
+            // maintenance-classified wake.
             if let since = silentSince,
                Date().timeIntervalSince(since) >= 15,
-               !self.currentOn {
+               !self.currentOn,
+               !self.sessionLockedNow(),
+               self.unattendedWakeClassification() == nil {
+                self.powerLog.notice("light back after \(Int(Date().timeIntervalSince(since)), privacy: .public)s of silence with someone present — honoring as a power flip")
                 self.applyPreset(self.lastPreset ?? self.presets.first?.name ?? "")
             }
         }
