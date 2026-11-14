@@ -46,11 +46,21 @@ entry (see AGENTS.md). Releases: https://github.com/z3tt/keylightbar/releases
     dark-wake gates; "Wake Type" on IOPMrootDomain is the classification
     that works (but a "UserActivity" phantom lies to it — hence the
     unlock gate).
+- **The fifth — and likely original — bug (owner catch: "light was already
+  on before I logged in")**: at 12:08:36 the log showed`applying preset
+  Work` in a locked, empty office — the `syncFromLight` power-flip
+  heuristic ("silence ≥15 s ending in a reachable light = someone flipped
+  its power switch") misreading the Mac's own Wi-Fi re-association after a
+  12:07:07 maintenance dark wake. The light did not go silent; the network
+  did. With dark wakes every ~15 min this was a lottery on re-association
+  speed — most probable root cause of ALL the intermittent morning lights,
+  predating the wake-gate work. Flip-honoring now requires unlocked +
+  non-maintenance wake (commit 6a55539) and logs when it fires.
 - **Live-verified so far**: screens-sleep → light off (10:32 test);
   presence confirmation + apply on typing (10:31/10:32 lines); unlock
   apply with pending wake (14:51:28 line); "started" persists via
-  /usr/bin/log. Overnight dark-wake behavior + phantom rejection:
-  next-night observation pending.
+  /usr/bin/log. Overnight dark-wake behavior + phantom rejection +
+  flip-heuristic suppression: next-night observation pending.
 
 ## 2026-11-12 · stray-HID wake analysis → fix/stray-hid-wakes (PR #16)
 - **Symptoms**: light on when coming into the office (lid closed, screens
